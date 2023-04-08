@@ -1,0 +1,23 @@
+# .editorconfig
+
+# Top-most EditorConfig file
+root = true
+
+# Apply these rules to all files
+[*]
+# Set default character set and line ending style
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Use 2-space indentation
+indent_style = space
+indent_size = 2
+
+# Apply these rules to specific file types
+[*.yml]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
