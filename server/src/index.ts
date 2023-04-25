@@ -2,7 +2,7 @@ import { Server, LobbyRoom } from "colyseus";
 import { monitor } from "@colyseus/monitor";
 import { createServer } from "http";
 import express from "express";
-import { RoomType } from "../../shared/types/test";
+import { RoomType } from "../../shared/types/roomType";
 
 import { OneairWorld } from "./rooms/OneairWorld";
 
