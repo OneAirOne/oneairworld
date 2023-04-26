@@ -2,9 +2,9 @@ import { Server, LobbyRoom } from "colyseus";
 import { monitor } from "@colyseus/monitor";
 import { createServer } from "http";
 import express from "express";
-import { RoomType } from "../../shared/types/roomType";
+import { RoomType } from "../../shared/types/room";
 
-import { OneairWorld } from "./rooms/OneairWorld";
+import { Game } from "./rooms/Game";
 
 const port = Number(process.env.port) || 2567;
 const app = express();
@@ -17,7 +17,7 @@ const gameServer = new Server({
 
 // registry room handlers
 gameServer.define(RoomType.LOBBY, LobbyRoom);
-gameServer.define(RoomType.PUBLIC, OneairWorld, {
+gameServer.define(RoomType.PUBLIC, Game, {
   name: "Public Lobby",
   description: " Welcome to the oneairworld",
   password: null,

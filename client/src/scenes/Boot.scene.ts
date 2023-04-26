@@ -57,4 +57,12 @@ export class BootScene extends Phaser.Scene {
   private launchBackground() {
     this.scene.launch(SCENES.BACKGROUND);
   }
+
+  launchGame() {
+    if (!this.preloadComplete) return;
+    this.scene.launch(SCENES.MAIN),
+      {
+        network: this.network,
+      };
+  }
 }

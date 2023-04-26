@@ -6,9 +6,12 @@ import { BootScene, SCENES } from "scenes";
 export default function StartGameDialog() {
   function startPublicGame() {
     const bootScene = phaserGame.scene.keys[SCENES.BOOT] as BootScene;
-    bootScene.network.joinOrCreatePublic().then(() => {
-      // TODO: dispatch in store
-    });
+    bootScene.network
+      .joinOrCreatePublic()
+      .then(() => {
+        bootScene.launchGame();
+      })
+      .catch((error) => console.error(error));
   }
   return (
     <Stack

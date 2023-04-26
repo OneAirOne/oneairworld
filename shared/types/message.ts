@@ -1,0 +1,5 @@
+export enum Message {
+  SEND_ROOM_DATA,
+  UPDATE_PLAYER,
+  UPDATE_PLAYER_NAME,
+}
