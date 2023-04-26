@@ -1,5 +1,4 @@
-import BootScene from "scenes/Boot.scene";
-import BackgroundScene from "scenes/Background.scene";
+import { BootScene, BackgroundScene } from "scenes";
 
 const gameConfig = {
   MAP: {

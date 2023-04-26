@@ -3,7 +3,7 @@ import { Client, Room } from "colyseus.js";
 import { OneairWorldState } from "../../../shared/types/oneairWorldState";
 import { RoomType } from "../../../shared/types/roomType";
 
-class Network {
+export class Network {
   private client: Client;
   private room?: Room<OneairWorldState>;
   private lobby!: Room;
@@ -16,6 +16,7 @@ class Network {
     this.client = new Client(endpoint);
     this.joinLobbyRoom().then(() => {
       // TODO : store in local store
+      console.log("joined the lobby room ... store in store");
     });
   }
 
@@ -24,8 +25,6 @@ class Network {
    * connected clients whenever rooms with "realtime listing" have updates
    */
   async joinLobbyRoom() {
-    console.log("JOIN LOBBY");
-
     this.lobby = await this.client.joinOrCreate(RoomType.LOBBY);
 
     this.lobby.onMessage("rooms", (rooms) => {
@@ -40,6 +39,23 @@ class Network {
     this.lobby.onMessage("-", (roomId) => {
       // TODO : store in local store
     });
+  }
+
+  /**
+   * Join ar create a room
+   */
+  async joinOrCreatePublic() {
+    this.room = await this.client.joinOrCreate(RoomType.PUBLIC);
+    this.initialize();
+  }
+
+  /**
+   * Set up all network listeners before the game starts
+   */
+  initialize() {
+    if (!this.room) return;
+
+    console.log("initialize ...");
   }
 }
 

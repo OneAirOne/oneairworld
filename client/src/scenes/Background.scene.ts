@@ -5,7 +5,7 @@ import { SCENES } from "./scene.config";
 
 const NB_CLOUDS = 20;
 
-export default class BackgroundScene extends Phaser.Scene {
+export class BackgroundScene extends Phaser.Scene {
   private clouds!: Phaser.Physics.Arcade.Group;
 
   constructor() {
