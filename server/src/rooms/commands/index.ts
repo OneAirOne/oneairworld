@@ -1,1 +1,1 @@
-export * from "./PlayerUpdateCommand";
+export * from "./PlayerUpdate.command";

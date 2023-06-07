@@ -1,6 +1,9 @@
 import Phaser from "phaser";
+
+// Network
 import Network, { Network as NetworkType } from "services/Network";
 
+// Others
 import gameConfig from "game.config";
 import { SCENES } from "./scene.config";
 
@@ -14,7 +17,7 @@ export class BootScene extends Phaser.Scene {
 
   preload() {
     this.loadAssets();
-    console.log("preload boot");
+    console.log("Preload boot scene ...");
   }
 
   loadAssets() {
@@ -46,7 +49,6 @@ export class BootScene extends Phaser.Scene {
     this.load.on("complete", () => {
       this.preloadComplete = true;
       this.launchBackground();
-      this.init();
     });
   }
 
@@ -55,14 +57,14 @@ export class BootScene extends Phaser.Scene {
   }
 
   private launchBackground() {
-    this.scene.launch(SCENES.BACKGROUND);
+    this.scene.start(SCENES.BACKGROUND);
   }
 
   launchGame() {
+    console.log("😀", this.network);
+
     if (!this.preloadComplete) return;
-    this.scene.launch(SCENES.MAIN),
-      {
-        network: this.network,
-      };
+
+    this.scene.start(SCENES.GAME, { network: this.network });
   }
 }

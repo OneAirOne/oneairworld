@@ -1,6 +1,33 @@
-import { BootScene, BackgroundScene } from "scenes";
+import { BootScene, BackgroundScene, SceneLevel1 } from "scenes";
+
+export const phaserConfig: Phaser.Types.Core.GameConfig = {
+  type: Phaser.AUTO,
+  parent: "game-container",
+  backgroundColor: "#93cbee",
+  pixelArt: true,
+  scale: {
+    mode: Phaser.Scale.ScaleModes.RESIZE,
+    width: window.innerWidth,
+    height: window.innerHeight,
+  },
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 0 },
+      debug: false,
+    },
+  },
+  scene: [BootScene, BackgroundScene, SceneLevel1],
+};
+
+export enum SpriteData {
+  SERVER_X = "serverX",
+  SERVER_Y = "serverY",
+  SERVER_ANIM = "serverAnim",
+}
 
 const gameConfig = {
+  INTERPOLATION_PERCENT: 0.2,
   MAP: {
     NAME: "tiles_dungeon",
     FILE: "tiles_dungeon",
@@ -23,26 +50,6 @@ const gameConfig = {
       SPRITE_SHEET_TEXTURE_PATH: `assets/background/cloud.png`,
     },
   },
-};
-
-export const phaserConfig: Phaser.Types.Core.GameConfig = {
-  type: Phaser.AUTO,
-  parent: "game-container",
-  backgroundColor: "#93cbee",
-  pixelArt: true,
-  scale: {
-    mode: Phaser.Scale.ScaleModes.RESIZE,
-    width: window.innerWidth,
-    height: window.innerHeight,
-  },
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 0 },
-      debug: false,
-    },
-  },
-  scene: [BootScene, BackgroundScene],
 };
 
 export default gameConfig;

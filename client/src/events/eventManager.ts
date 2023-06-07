@@ -2,7 +2,7 @@ import Phaser from "phaser";
 
 export const gameEvents = new Phaser.Events.EventEmitter();
 
-export enum Events {
+export enum Event {
   PLAYER_JOINED = "player-joined",
   PLAYER_UPDATED = "player-updated",
   PLAYER_LEFT = "player-left",

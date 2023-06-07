@@ -4,7 +4,7 @@ import { createServer } from "http";
 import express from "express";
 import { RoomType } from "../../shared/types/room";
 
-import { Game } from "./rooms/Game";
+import { Game } from "./rooms/Game.room";
 
 const port = Number(process.env.port) || 2567;
 const app = express();
@@ -19,7 +19,6 @@ const gameServer = new Server({
 gameServer.define(RoomType.LOBBY, LobbyRoom);
 gameServer.define(RoomType.PUBLIC, Game, {
   name: "Public Lobby",
-  description: " Welcome to the oneairworld",
   password: null,
   autoDispose: false,
 });

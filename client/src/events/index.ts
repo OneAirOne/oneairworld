@@ -1,1 +1,1 @@
-export { Events, gameEvents } from "./eventManager";
+export { Event, gameEvents } from "./eventManager";

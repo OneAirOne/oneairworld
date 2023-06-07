@@ -10,8 +10,14 @@ import { Player } from "./schema/Player";
 import { PlayerUpdateCommand } from "./commands";
 
 // Shared
-import { Message, IRoomData } from "../../../shared/types";
+import { Message, IRoomData, InputPayload } from "../../../shared/types";
 
+/**
+ * Game room
+ *
+ * Manage the game state
+ * Colyseus sends state updates to the client at every 50ms (20fps)
+ */
 export class Game extends Room<GameState> {
   private dispatcher = new Dispatcher(this);
   private name: string;
@@ -24,7 +30,6 @@ export class Game extends Room<GameState> {
    * Credit: https://0-13-x.docs.colyseus.io/best-practices/command-pattern/
    */
   async onCreate(options: IRoomData) {
-    console.log("[GAME] onCreate", options);
     const { name, password, autoDispose } = options;
     this.name = name;
     this.password = password;
@@ -33,29 +38,29 @@ export class Game extends Room<GameState> {
     let hasPassword = false;
     if (password) {
       const salt = await bcrypt.genSalt(10);
-      this.password = await bcrypt.hash(password, salt);
       hasPassword = true;
     }
     this.setMetadata({ name, hasPassword });
 
     this.setState(new GameState());
 
-    this.onMessage(
-      Message.UPDATE_PLAYER,
-      (client, message: { x: number; y: number; anim: string }) => {
-        this.dispatcher.dispatch(new PlayerUpdateCommand(), {
-          client,
-          x: message.x,
-          y: message.y,
-          anim: message.anim,
-        });
-      }
-    );
+    this.onMessage(Message.UPDATE_PLAYER, (client, data: InputPayload) => {
+      this.dispatcher.dispatch(new PlayerUpdateCommand(), {
+        client,
+        data,
+      });
+    });
   }
 
   onJoin(client: Client, options: any) {
-    console.log("[GAME] onJoin", options);
-    this.state.players.set(client.sessionId, new Player());
+    console.log(client.sessionId, "joined!");
+    const player = new Player();
+
+    player.x = 0;
+    player.y = 0;
+
+    this.state.players.set(client.sessionId, player);
+
     client.send(Message.SEND_ROOM_DATA, {
       id: this.roomId,
       name: this.name,
@@ -63,7 +68,6 @@ export class Game extends Room<GameState> {
   }
 
   onLeave(client: Client, consented: boolean) {
-    console.log("[GAME] onLeave", client);
     if (this.state.players.has(client.sessionId)) {
       this.state.players.delete(client.sessionId);
     }

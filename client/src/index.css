@@ -68,9 +68,8 @@ button:focus-visible {
   }
 }
 
-#game-container {
-  canvas {
-    display: 'block';
-  }
+#game-container canvas {
+  width: 100vw
 }
+
 
