@@ -30,7 +30,6 @@ export enum SpriteData {
 }
 
 const gameConfig = {
-  INTERPOLATION_PERCENT: 0.2,
   MAP: {
     NAME: "tiles_dungeon",
     FILE: "tiles_dungeon",

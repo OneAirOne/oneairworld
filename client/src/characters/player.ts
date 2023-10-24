@@ -1,9 +1,11 @@
 import Phaser from "phaser";
 import { Physics } from "phaser";
 
-import gameConfig, { SpriteData } from "game.config";
+import { SpriteData } from "game.config";
 
-const SIZE = 12;
+import { sharedConfig } from "../../../shared/config";
+
+const INTERPOLATION_PERCENT = 0.2;
 
 export class Player extends Phaser.Physics.Matter.Sprite {
   playerId: string;
@@ -21,10 +23,15 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     // Add sprite to the display list
     // Credits : https://github.com/photonstorm/phaser/issues/4255#issuecomment-586084493
     this.scene.add.existing(this);
-
     this.playerId = id;
     this.playerTexture = texture;
     this.anims.play(`${this.playerTexture}IdleDown`, true);
+    this.setBounce(1);
+    this.setBody({
+      type: "rectangle",
+      width: sharedConfig.SPRITE_SIZE,
+      height: sharedConfig.SPRITE_SIZE,
+    });
   }
 
   protected getBody(): MatterJS.BodyType {
@@ -36,11 +43,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
    * to update the position X
    */
   updatePositionX(x: number) {
-    // this.x = Phaser.Math.Linear(
-    //   this.x,
-    //   x,
-    //   gameConfig.INTERPOLATION_PERCENT
-    // );
+    this.x = Phaser.Math.Linear(this.x, x, INTERPOLATION_PERCENT);
     // this.setX(x);
   }
 
@@ -49,11 +52,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
    * to update the position Y
    */
   updatePositionY(y: number) {
-    // this.y = Phaser.Math.Linear(
-    //   this.y,
-    //   y,
-    //   gameConfig.INTERPOLATION_PERCENT
-    // );
+    this.y = Phaser.Math.Linear(this.y, y, INTERPOLATION_PERCENT);
     // this.setY(y);
   }
 

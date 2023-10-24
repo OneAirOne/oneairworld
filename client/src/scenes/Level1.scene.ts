@@ -9,7 +9,8 @@ import { createCharacterAnims, onairAnimsConfig, Player } from "characters";
 // Others
 import { SCENES } from "./scene.config";
 import type { InputPayload } from "../../../shared/types";
-import { SpriteData, WORLD_HEIGHT, WORLD_WIDTH } from "game.config";
+import gameConfig, { SpriteData, WORLD_HEIGHT, WORLD_WIDTH } from "game.config";
+import { sharedConfig } from "../../../shared/config";
 
 export class SceneLevel1 extends Phaser.Scene {
   network!: Network;
@@ -48,12 +49,18 @@ export class SceneLevel1 extends Phaser.Scene {
     // Create Oneair animation
     createCharacterAnims(onairAnimsConfig, 10, this.anims);
 
-    this.matter.world.setBounds(0, 0, 300, 200, 32);
+    this.matter.world.setBounds(
+      0,
+      0,
+      sharedConfig.WORLD_WIDTH,
+      sharedConfig.WORLD_HEIGHT,
+      20
+    );
 
     this.myPlayer = new Player(
       this,
-      150,
-      100,
+      sharedConfig.WORLD_WIDTH / 2,
+      sharedConfig.WORLD_HEIGHT / 2,
       "oneair",
       this.network.sessionId
     );
@@ -66,7 +73,12 @@ export class SceneLevel1 extends Phaser.Scene {
     this.network.onPlayerUpdated(this.handlePlayerUpdated, this);
 
     // Add remote ref to visualize server position
-    this.remoteRef = this.add.rectangle(150, 100, 12, 12);
+    this.remoteRef = this.add.rectangle(
+      150,
+      100,
+      sharedConfig.SPRITE_SIZE,
+      sharedConfig.SPRITE_SIZE
+    );
     this.remoteRef.setStrokeStyle(1, 0xff0000);
     this.remoteRef.setOrigin(0.5, 0.5);
   }
