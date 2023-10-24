@@ -6,8 +6,8 @@ export const WORLD_HEIGHT = window.innerHeight;
 export const phaserConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: "game-container",
-  // backgroundColor: "#93cbee",
-  // pixelArt: true,
+  backgroundColor: "012622",
+  pixelArt: true,
   scale: {
     mode: Phaser.Scale.ScaleModes.RESIZE,
     width: WORLD_WIDTH,
