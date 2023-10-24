@@ -111,7 +111,6 @@ export class Network {
      */
     this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
       console.log("[Network] onMessage ", Message.SEND_ROOM_DATA);
-      console.log({ content });
       // TODO : store room data in store
     });
   }

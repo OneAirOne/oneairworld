@@ -16,6 +16,7 @@ export class PlayerUpdateCommand extends Command<Game, Payload> {
 
     const player = this.state.players.get(client.sessionId);
     const velocity = 2;
+    console.log("position ", player.x, player.y);
 
     if (!player) return;
 

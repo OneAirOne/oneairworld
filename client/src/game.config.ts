@@ -1,20 +1,23 @@
 import { BootScene, BackgroundScene, SceneLevel1 } from "scenes";
 
+export const WORLD_WIDTH = window.innerWidth;
+export const WORLD_HEIGHT = window.innerHeight;
+
 export const phaserConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: "game-container",
-  backgroundColor: "#93cbee",
-  pixelArt: true,
+  // backgroundColor: "#93cbee",
+  // pixelArt: true,
   scale: {
     mode: Phaser.Scale.ScaleModes.RESIZE,
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: WORLD_WIDTH,
+    height: WORLD_HEIGHT,
   },
   physics: {
-    default: "arcade",
-    arcade: {
+    default: "matter",
+    matter: {
       gravity: { y: 0 },
-      debug: false,
+      debug: true,
     },
   },
   scene: [BootScene, BackgroundScene, SceneLevel1],

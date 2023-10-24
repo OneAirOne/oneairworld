@@ -1,11 +1,13 @@
 import Phaser from "phaser";
+import { Physics } from "phaser";
 
 import gameConfig, { SpriteData } from "game.config";
 
-export class Player extends Phaser.Physics.Arcade.Sprite {
+const SIZE = 12;
+
+export class Player extends Phaser.Physics.Matter.Sprite {
   playerId: string;
   playerTexture: string;
-  playerContainer: Phaser.GameObjects.Container;
 
   constructor(
     scene: Phaser.Scene,
@@ -15,37 +17,44 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     id: string,
     frame?: string | number
   ) {
-    super(scene, x, y, texture, frame);
+    super(scene.matter.world, x, y, texture, frame);
+    // Add sprite to the display list
+    // Credits : https://github.com/photonstorm/phaser/issues/4255#issuecomment-586084493
+    this.scene.add.existing(this);
 
     this.playerId = id;
     this.playerTexture = texture;
-    this.setDepth(this.y);
-    scene.add.existing(this);
-
-    this.playerContainer = this.scene.add
-      .container(this.x, this.y)
-      .setDepth(10000);
-
-    this.playerContainer.add(this);
-
     this.anims.play(`${this.playerTexture}IdleDown`, true);
   }
 
-  updatePositionX(x: number) {
-    console.log("x", x, this.x);
-    this.playerContainer.x = Phaser.Math.Linear(
-      this.playerContainer.x,
-      x,
-      gameConfig.INTERPOLATION_PERCENT
-    );
+  protected getBody(): MatterJS.BodyType {
+    return this.body as MatterJS.BodyType;
   }
+
+  /**
+   * Fonction called by the update loop of the scene
+   * to update the position X
+   */
+  updatePositionX(x: number) {
+    // this.x = Phaser.Math.Linear(
+    //   this.x,
+    //   x,
+    //   gameConfig.INTERPOLATION_PERCENT
+    // );
+    // this.setX(x);
+  }
+
+  /**
+   * Fonction called by the update loop of the scene
+   * to update the position Y
+   */
   updatePositionY(y: number) {
-    console.log("Y", y, this.y);
-    this.playerContainer.y = Phaser.Math.Linear(
-      this.playerContainer.y,
-      y,
-      gameConfig.INTERPOLATION_PERCENT
-    );
+    // this.y = Phaser.Math.Linear(
+    //   this.y,
+    //   y,
+    //   gameConfig.INTERPOLATION_PERCENT
+    // );
+    // this.setY(y);
   }
 
   /**
@@ -61,24 +70,27 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
    * Credits: https://learn.colyseus.io/phaser/2-linear-interpolation.html
    */
   update(field: string, value: number | string | boolean): void {
-    console.log({ field, value });
     switch (field) {
       case "x":
         if (typeof value === "number") {
           this.setData(SpriteData.SERVER_X, value);
+          // @ts-ignore
+          this.scene.remoteRef.x = value;
         }
         break;
 
       case "y":
         if (typeof value === "number") {
           this.setData(SpriteData.SERVER_Y, value);
+          // @ts-ignore
+          this.scene.remoteRef.y = value;
         }
         break;
       case "anim":
         if (typeof value === "string") {
           // TODO: setData
-          this.setData(SpriteData.SERVER_ANIM);
           this.anims.play(`${this.playerTexture}${value}`, true);
+          // this.setData(SpriteData.SERVER_ANIM);
         }
         break;
     }
