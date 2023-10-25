@@ -5,13 +5,15 @@ import { DataChange } from "@colyseus/schema";
 import { RoomType } from "../../../shared/types/room";
 
 // Events
-import { gameEvents, Event } from "events";
+import { phaserEvents, Event } from "events";
 
 import {
   IGameState,
   IPlayer,
   Message,
   InputPayload,
+  OptionsResponse,
+  Options,
 } from "../../../shared/types";
 
 export class Network {
@@ -42,7 +44,6 @@ export class Network {
 
     this.lobby.onMessage("rooms", (rooms) => {
       // TODO : store in local store
-      console.log({ rooms });
     });
 
     this.lobby.onMessage("+", ([roomId, room]) => {
@@ -57,8 +58,8 @@ export class Network {
   /**
    * Join ar create a room
    */
-  async joinOrCreatePublic() {
-    this.room = await this.client.joinOrCreate(RoomType.PUBLIC);
+  async joinOrCreatePublic(options?: Options) {
+    this.room = await this.client.joinOrCreate(RoomType.PUBLIC, options);
     this.initialize();
   }
 
@@ -76,22 +77,29 @@ export class Network {
 
     // Add a new instance to the player MapSchema
     this.room.state.players.onAdd = (player: IPlayer, sessionId: string) => {
-      // if (sessionId === this.sessionId) return;
       console.log("A player has joined! Their unique session id is", sessionId);
+
+      const optionsResponse: OptionsResponse = {
+        name: player.name,
+        texture: player.texture,
+        x: player.x,
+        y: player.y,
+      };
+
+      phaserEvents.emit(Event.MY_PLAYER_JOINED, optionsResponse);
 
       // Track changes on every child object inside the players MapSchema
       player.onChange = (changes: DataChange<any>[]) => {
         console.log("[Network] changes ", changes);
         changes.forEach((change) => {
           const { field, value } = change;
-          console.log("[Network] PLAYER_UPDATED", field);
 
-          gameEvents.emit(Event.PLAYER_UPDATED, field, value, sessionId);
+          console.log("[Network] PLAYER_UPDATED", field, value);
+          phaserEvents.emit(Event.PLAYER_UPDATED, field, value, sessionId);
 
           if (field === "name" && value !== "") {
-            console.log("[Network] PLAYER_JOINED", field);
-
-            gameEvents.emit(Event.PLAYER_JOINED, player, sessionId);
+            console.log("[Network] PLAYER_JOINED", field, value);
+            phaserEvents.emit(Event.PLAYER_JOINED, player, sessionId);
             // TODO : save new player in store + display message
           }
         });
@@ -102,7 +110,7 @@ export class Network {
      * Remove player from the playes MapSchema
      */
     this.room.state.players.onRemove = (player: IPlayer, key: string) => {
-      gameEvents.emit(Event.PLAYER_LEFT, key);
+      phaserEvents.emit(Event.PLAYER_LEFT, key);
       // TODO : remove player from the store + display message
     };
 
@@ -136,7 +144,11 @@ export class Network {
     callback: (field: string, value: number | string, key: string) => void,
     context?: any
   ) {
-    gameEvents.on(Event.PLAYER_UPDATED, callback, context);
+    phaserEvents.on(Event.PLAYER_UPDATED, callback, context);
+  }
+
+  onMyPlayerJoin(callback: (options: OptionsResponse) => void, context?: any) {
+    phaserEvents.on(Event.MY_PLAYER_JOINED, callback, context);
   }
 }
 

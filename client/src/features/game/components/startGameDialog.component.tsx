@@ -3,6 +3,7 @@ import { Button, Divider, Stack, Typography } from "@mui/material";
 
 import phaserGame from "Game";
 import { BootScene, SCENES } from "scenes";
+import { Characters } from "../../../../../shared/types";
 
 export default function StartGameDialog() {
   const [open, setOpen] = React.useState(true);
@@ -10,9 +11,13 @@ export default function StartGameDialog() {
   async function startPublicGame() {
     try {
       const bootScene = phaserGame.scene.keys[SCENES.BOOT] as BootScene;
-      await bootScene.network.joinOrCreatePublic();
+
+      await bootScene.network.joinOrCreatePublic({
+        name: "Erwan",
+        texture: Characters.ONEAIR,
+      });
+
       setOpen(false);
-      bootScene.launchGame();
     } catch (error) {
       console.error(error);
     }
@@ -30,7 +35,7 @@ export default function StartGameDialog() {
             justifyContent: "space-evenly",
             flexDirection: "column",
             alignItems: "center",
-            backgroundColor: "background.default",
+            backgroundColor: "#003b36",
             borderRadius: 8,
             paddingX: 4,
             paddingTop: 6,

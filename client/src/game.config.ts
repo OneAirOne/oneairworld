@@ -1,8 +1,5 @@
 import { BootScene, BackgroundScene, SceneLevel1 } from "scenes";
 
-export const WORLD_WIDTH = window.innerWidth;
-export const WORLD_HEIGHT = window.innerHeight;
-
 export const phaserConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: "game-container",
@@ -10,8 +7,8 @@ export const phaserConfig: Phaser.Types.Core.GameConfig = {
   pixelArt: true,
   scale: {
     mode: Phaser.Scale.ScaleModes.RESIZE,
-    width: WORLD_WIDTH,
-    height: WORLD_HEIGHT,
+    width: window.innerWidth,
+    height: window.innerHeight,
   },
   physics: {
     default: "matter",

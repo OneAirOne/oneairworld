@@ -10,7 +10,12 @@ import { Player } from "./schema/Player";
 import { PlayerUpdateCommand } from "./commands";
 
 // Shared
-import { Message, IRoomData, InputPayload } from "../../../shared/types";
+import {
+  Message,
+  IRoomData,
+  InputPayload,
+  Options,
+} from "../../../shared/types";
 
 /**
  * Game room
@@ -52,12 +57,14 @@ export class Game extends Room<GameState> {
     });
   }
 
-  onJoin(client: Client, options: any) {
-    console.log(client.sessionId, "joined!");
+  onJoin(client: Client, options: Options) {
+    console.log(client.sessionId, "joined!", options);
+
     const player = new Player();
 
-    // player.x = 0;
-    // player.y = 0;
+    // Set player with client options
+    player.name = options.name;
+    player.texture = options.texture;
 
     this.state.players.set(client.sessionId, player);
 

@@ -8,18 +8,19 @@ import { createCharacterAnims, onairAnimsConfig, Player } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
-import type { InputPayload } from "../../../shared/types";
 import gameConfig, { SpriteData, WORLD_HEIGHT, WORLD_WIDTH } from "game.config";
 import { sharedConfig } from "../../../shared/config";
+
+import type { InputPayload, OptionsResponse } from "../../../shared/types";
 
 export class SceneLevel1 extends Phaser.Scene {
   network!: Network;
   myPlayer!: Player;
   remoteRef: Phaser.GameObjects.Rectangle | null = null;
-  private otherPlayerMap = new Map<string, Player>();
+  private players = new Map<string, Player>();
   private cursorKeys!: Phaser.Types.Input.Keyboard.CursorKeys;
 
-  // local input  ache
+  // local input
   inputPayload: InputPayload = {
     left: false,
     right: false,
@@ -37,7 +38,8 @@ export class SceneLevel1 extends Phaser.Scene {
     this.cursorKeys = this.input.keyboard.createCursorKeys();
   }
 
-  create(data: { network: Network }) {
+  create(data: { network: Network; options: OptionsResponse }) {
+    const { options } = data;
     console.log("Create Game scene", data);
 
     if (!data.network) {
@@ -49,6 +51,7 @@ export class SceneLevel1 extends Phaser.Scene {
     // Create Oneair animation
     createCharacterAnims(onairAnimsConfig, 10, this.anims);
 
+    // Setup physics parameters
     this.matter.world.setBounds(
       0,
       0,
@@ -59,9 +62,9 @@ export class SceneLevel1 extends Phaser.Scene {
 
     this.myPlayer = new Player(
       this,
-      sharedConfig.WORLD_WIDTH / 2,
-      sharedConfig.WORLD_HEIGHT / 2,
-      "oneair",
+      options.x,
+      options.y,
+      options.texture,
       this.network.sessionId
     );
 
@@ -74,8 +77,8 @@ export class SceneLevel1 extends Phaser.Scene {
 
     // Add remote ref to visualize server position
     this.remoteRef = this.add.rectangle(
-      150,
-      100,
+      sharedConfig.WORLD_WIDTH / 2,
+      sharedConfig.WORLD_HEIGHT / 2,
       sharedConfig.SPRITE_SIZE,
       sharedConfig.SPRITE_SIZE
     );

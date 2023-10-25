@@ -3,3 +3,4 @@ export * from "./player";
 export * from "./room";
 export * from "./message";
 export * from "./inputPayload";
+export * from "./options";
