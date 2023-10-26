@@ -3,7 +3,7 @@ import { Client } from "colyseus";
 
 import { Game } from "../Game.room";
 
-import type { InputPayload } from "../../../../shared/types";
+import { PLAYER_VELOCITY, type InputPayload } from "../../../../shared/types";
 
 interface Payload {
   client: Client;
@@ -15,23 +15,22 @@ export class PlayerUpdateCommand extends Command<Game, Payload> {
     const { client, data } = payload;
 
     const player = this.state.players.get(client.sessionId);
-    const velocity = 2;
 
     if (!player) return;
 
     if (data.left) {
-      player.x -= velocity;
+      player.x -= PLAYER_VELOCITY;
       player.anim = "Left";
     } else if (data.right) {
-      player.x += velocity;
+      player.x += PLAYER_VELOCITY;
       player.anim = "Right";
     }
 
     if (data.up) {
-      player.y -= velocity;
+      player.y -= PLAYER_VELOCITY;
       player.anim = "Up";
     } else if (data.down) {
-      player.y += velocity;
+      player.y += PLAYER_VELOCITY;
       player.anim = "Down";
     }
   }

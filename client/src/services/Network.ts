@@ -12,8 +12,7 @@ import {
   IPlayer,
   Message,
   InputPayload,
-  OptionsResponse,
-  Options,
+  LauchOptions,
 } from "../../../shared/types";
 
 export class Network {
@@ -56,10 +55,10 @@ export class Network {
   }
 
   /**
-   * Join ar create a room
+   * Join or create a room
    */
-  async joinOrCreatePublic(options?: Options) {
-    this.room = await this.client.joinOrCreate(RoomType.PUBLIC, options);
+  async joinOrCreatePublic(lauchOptions?: LauchOptions) {
+    this.room = await this.client.joinOrCreate(RoomType.PUBLIC, lauchOptions);
     this.initialize();
   }
 
@@ -79,29 +78,21 @@ export class Network {
     this.room.state.players.onAdd = (player: IPlayer, sessionId: string) => {
       console.log("A player has joined! Their unique session id is", sessionId);
 
-      const optionsResponse: OptionsResponse = {
-        name: player.name,
-        texture: player.texture,
-        x: player.x,
-        y: player.y,
-      };
-
-      phaserEvents.emit(Event.MY_PLAYER_JOINED, optionsResponse);
+      phaserEvents.emit(Event.PLAYER_JOINED, player, sessionId);
 
       // Track changes on every child object inside the players MapSchema
       player.onChange = (changes: DataChange<any>[]) => {
-        console.log("[Network] changes ", changes);
         changes.forEach((change) => {
           const { field, value } = change;
 
           console.log("[Network] PLAYER_UPDATED", field, value);
           phaserEvents.emit(Event.PLAYER_UPDATED, field, value, sessionId);
 
-          if (field === "name" && value !== "") {
-            console.log("[Network] PLAYER_JOINED", field, value);
-            phaserEvents.emit(Event.PLAYER_JOINED, player, sessionId);
-            // TODO : save new player in store + display message
-          }
+          // if (field === "name" && value !== "") {
+          //   console.log("[Network] PLAYER_JOINED", field, value);
+          //   phaserEvents.emit(Event.PLAYER_JOINED, player, sessionId);
+          //   // TODO : save new player in store + display message
+          // }
         });
       };
     };
@@ -110,6 +101,8 @@ export class Network {
      * Remove player from the playes MapSchema
      */
     this.room.state.players.onRemove = (player: IPlayer, key: string) => {
+      console.log("player left the rooom ", player, key);
+
       phaserEvents.emit(Event.PLAYER_LEFT, key);
       // TODO : remove player from the store + display message
     };
@@ -118,7 +111,7 @@ export class Network {
      * When the server sends room data
      */
     this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
-      console.log("[Network] onMessage ", Message.SEND_ROOM_DATA);
+      console.log("[Network] onMessage ", Message.SEND_ROOM_DATA, content);
       // TODO : store room data in store
     });
   }
@@ -147,8 +140,15 @@ export class Network {
     phaserEvents.on(Event.PLAYER_UPDATED, callback, context);
   }
 
-  onMyPlayerJoin(callback: (options: OptionsResponse) => void, context?: any) {
-    phaserEvents.on(Event.MY_PLAYER_JOINED, callback, context);
+  onPlayerJoin(
+    callback: (player: IPlayer, sessionId: string) => void,
+    context?: any
+  ) {
+    phaserEvents.on(Event.PLAYER_JOINED, callback, context);
+  }
+
+  onPlayerLeft(callback: (sessionId: string) => void, context?: any) {
+    phaserEvents.on(Event.PLAYER_LEFT, callback, context);
   }
 }
 

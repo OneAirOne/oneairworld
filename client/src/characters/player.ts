@@ -10,6 +10,7 @@ const INTERPOLATION_PERCENT = 0.2;
 export class Player extends Phaser.Physics.Matter.Sprite {
   playerId: string;
   playerTexture: string;
+  velocity: number;
 
   constructor(
     scene: Phaser.Scene,
@@ -32,6 +33,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       width: sharedConfig.SPRITE_SIZE,
       height: sharedConfig.SPRITE_SIZE,
     });
+    this.velocity = 2;
   }
 
   protected getBody(): MatterJS.BodyType {
@@ -44,7 +46,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
    */
   updatePositionX(x: number) {
     this.x = Phaser.Math.Linear(this.x, x, INTERPOLATION_PERCENT);
-    // this.setX(x);
   }
 
   /**
@@ -53,7 +54,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
    */
   updatePositionY(y: number) {
     this.y = Phaser.Math.Linear(this.y, y, INTERPOLATION_PERCENT);
-    // this.setY(y);
   }
 
   /**
@@ -70,6 +70,21 @@ export class Player extends Phaser.Physics.Matter.Sprite {
    */
   update(field: string, value: number | string | boolean): void {
     switch (field) {
+      // Used form my player
+      case "left":
+        this.x -= Number(value);
+        break;
+      case "right":
+        this.x += Number(value);
+        break;
+      case "up":
+        this.y -= Number(value);
+        break;
+      case "down":
+        this.y += Number(value);
+        break;
+
+      // Used for other players
       case "x":
         if (typeof value === "number") {
           this.setData(SpriteData.SERVER_X, value);
@@ -77,7 +92,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
           this.scene.remoteRef.x = value;
         }
         break;
-
       case "y":
         if (typeof value === "number") {
           this.setData(SpriteData.SERVER_Y, value);

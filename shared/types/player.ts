@@ -11,3 +11,5 @@ export interface IPlayer extends Schema {
   anim: string;
   texture: Characters;
 }
+
+export const PLAYER_VELOCITY = 2;

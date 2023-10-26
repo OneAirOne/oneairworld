@@ -14,7 +14,7 @@ import {
   Message,
   IRoomData,
   InputPayload,
-  Options,
+  LauchOptions,
 } from "../../../shared/types";
 
 /**
@@ -57,14 +57,17 @@ export class Game extends Room<GameState> {
     });
   }
 
-  onJoin(client: Client, options: Options) {
-    console.log(client.sessionId, "joined!", options);
+  /**
+   * Call when a new player join a room
+   */
+  onJoin(client: Client, lauchOptions: LauchOptions) {
+    console.log(client.sessionId, "joined!", lauchOptions);
 
     const player = new Player();
 
     // Set player with client options
-    player.name = options.name;
-    player.texture = options.texture;
+    player.name = lauchOptions.name;
+    player.texture = lauchOptions.texture;
 
     this.state.players.set(client.sessionId, player);
 
@@ -74,12 +77,18 @@ export class Game extends Room<GameState> {
     });
   }
 
+  /**
+   * Call when a player leave the room
+   */
   onLeave(client: Client, consented: boolean) {
     if (this.state.players.has(client.sessionId)) {
       this.state.players.delete(client.sessionId);
     }
   }
 
+  /**
+   * Call when a player dispose
+   */
   onDispose() {
     console.log("[GAME] onDispose");
   }

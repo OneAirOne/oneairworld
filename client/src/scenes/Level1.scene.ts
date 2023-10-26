@@ -8,16 +8,21 @@ import { createCharacterAnims, onairAnimsConfig, Player } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
-import gameConfig, { SpriteData, WORLD_HEIGHT, WORLD_WIDTH } from "game.config";
+import gameConfig, { SpriteData } from "game.config";
 import { sharedConfig } from "../../../shared/config";
 
-import type { InputPayload, OptionsResponse } from "../../../shared/types";
+// Shared
+import {
+  PLAYER_VELOCITY,
+  type InputPayload,
+  type IPlayer,
+} from "../../../shared/types";
 
 export class SceneLevel1 extends Phaser.Scene {
   network!: Network;
-  myPlayer!: Player;
   remoteRef: Phaser.GameObjects.Rectangle | null = null;
   private players = new Map<string, Player>();
+  myPlayer!: Player;
   private cursorKeys!: Phaser.Types.Input.Keyboard.CursorKeys;
 
   // local input
@@ -33,24 +38,81 @@ export class SceneLevel1 extends Phaser.Scene {
     super(SCENES.GAME);
   }
 
+  /**
+   * Call before scene creation
+   */
   preload() {
     // Set up keyboard
     this.cursorKeys = this.input.keyboard.createCursorKeys();
   }
 
-  create(data: { network: Network; options: OptionsResponse }) {
-    const { options } = data;
-    console.log("Create Game scene", data);
+  /**
+   * Create and initialize the scene
+   */
+  create(data: { network: Network }) {
+    const { network } = data;
 
-    if (!data.network) {
+    console.log("Create Game scene", network.sessionId);
+
+    if (!network) {
       throw new Error("Network instance is missing");
     } else {
-      this.network = data.network;
+      this.network = network;
     }
 
     // Create Oneair animation
     createCharacterAnims(onairAnimsConfig, 10, this.anims);
 
+    // Register network event listener
+    this.registerNetworkListeners();
+  }
+
+  /**
+   * Initialize scene network listeners
+   */
+  registerNetworkListeners() {
+    this.network.onPlayerJoin(this.handleJoinPLayer, this);
+    this.network.onPlayerUpdated(this.handlePlayerUpdated, this);
+    this.network.onPlayerLeft(this.handleLeftPlayer, this);
+  }
+
+  /**
+   * Call when networks left events are triggered
+   */
+  handleLeftPlayer(sessionId: string) {
+    console.log("player left room 1", sessionId);
+
+    const player = this.players.get(sessionId);
+    if (!player) return;
+    // TODO: check why the ref is not destroy
+    player.destroy();
+  }
+
+  /**
+   * Call when networks join events are triggered
+   */
+  handleJoinPLayer(player: IPlayer, sessionId: string) {
+    const newPlayer = new Player(
+      this,
+      player.x,
+      player.y,
+      player.texture,
+      sessionId
+    );
+    console.log("[scene] join ", this.network.sessionId, sessionId);
+
+    if (sessionId === this.network.sessionId) {
+      this.createWorld(newPlayer);
+    } else {
+      console.log("[scene] NEW PLAYER");
+      this.players.set(sessionId, newPlayer);
+    }
+  }
+
+  /**
+   * Create physic world and add my player
+   */
+  createWorld(myPlayer: Player) {
     // Setup physics parameters
     this.matter.world.setBounds(
       0,
@@ -60,20 +122,12 @@ export class SceneLevel1 extends Phaser.Scene {
       20
     );
 
-    this.myPlayer = new Player(
-      this,
-      options.x,
-      options.y,
-      options.texture,
-      this.network.sessionId
-    );
+    // Register player
+    this.myPlayer = myPlayer;
 
     // Setup camera
     this.cameras.main.setZoom(2);
     this.cameras.main.startFollow(this.myPlayer, true);
-
-    // Register network event listener
-    this.network.onPlayerUpdated(this.handlePlayerUpdated, this);
 
     // Add remote ref to visualize server position
     this.remoteRef = this.add.rectangle(
@@ -87,14 +141,21 @@ export class SceneLevel1 extends Phaser.Scene {
   }
 
   /**
-   * Call when networks events are triggered
+   * Call when networks update events are triggered
    */
   handlePlayerUpdated(field: string, value: number | string, id: string) {
-    if (id === this.myPlayer.playerId) {
+    console.log("[scene] update", id);
+
+    if (id === this.network.sessionId && !!this.myPlayer) {
+      console.log(field);
+
       this.myPlayer.update(field, value);
-      // console.log("handlePlayerUpdated", field, value);
     } else {
-      // TODO : update other player (call internal setData)
+      const player = this.players.get(id);
+      console.log("Update other player ", field, value);
+
+      if (!player) return;
+      player.update(field, value);
     }
   }
 
@@ -111,33 +172,30 @@ export class SceneLevel1 extends Phaser.Scene {
     // Send input to the server at every tick
     this.network.updatePlayer(this.inputPayload);
 
-    const serverX = this.myPlayer.getData(SpriteData.SERVER_X);
-    const serverY = this.myPlayer.getData(SpriteData.SERVER_Y);
-    // console.log("[scene update] server", serverX, serverY);
-
-    // Update client objects à every tick
-    // Interpolate all players entities (except the current player)
-    const velocity = 2;
-
+    // Predict my player
     if (this.inputPayload.left) {
-      this.myPlayer.x -= velocity;
-    } else if (this.inputPayload.right) {
-      this.myPlayer.x += velocity;
+      this.myPlayer?.update("left", PLAYER_VELOCITY);
     }
-
+    if (this.inputPayload.right) {
+      this.myPlayer?.update("right", PLAYER_VELOCITY);
+    }
     if (this.inputPayload.up) {
-      this.myPlayer.y -= velocity;
-    } else if (this.inputPayload.down) {
-      this.myPlayer.y += velocity;
+      this.myPlayer?.update("up", PLAYER_VELOCITY);
+    }
+    if (this.inputPayload.down) {
+      this.myPlayer?.update("down", PLAYER_VELOCITY);
     }
 
-    // if (serverX) {
-    //   this.myPlayer.updatePositionX(serverX);
-    // }
-    // if (serverY) {
-    //   this.myPlayer.updatePositionY(serverY);
-    // }
-
-    // console.log("[SCENE GAME] update", time);
+    // LERP other players
+    this.players.forEach((player) => {
+      const serverX = player?.getData(SpriteData.SERVER_X);
+      const serverY = player?.getData(SpriteData.SERVER_Y);
+      if (serverX) {
+        player.updatePositionX(serverX);
+      }
+      if (serverY) {
+        player.updatePositionY(serverY);
+      }
+    });
   }
 }

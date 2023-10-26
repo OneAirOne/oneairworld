@@ -1,16 +1,7 @@
-import { Characters, IPlayer } from "./player";
+import { Characters } from "./player";
 
-export interface Options {
-  name: IPlayer["name"];
-  texture: Characters;
-  x?: number;
-  y?: number;
-  color?: string;
-}
-
-export interface OptionsResponse {
+export interface LauchOptions {
   name: string;
-  texture: string;
-  x: number;
-  y: number;
+  texture: Characters;
+  color?: string;
 }

@@ -7,7 +7,7 @@ import Network, { Network as NetworkType } from "services/Network";
 import gameConfig from "game.config";
 import { SCENES } from "./scene.config";
 
-import type { OptionsResponse } from "../../../shared/types/options";
+import { Characters, IPlayer, LauchOptions } from "../../../shared/types";
 
 export class BootScene extends Phaser.Scene {
   private preloadComplete = false;
@@ -23,12 +23,7 @@ export class BootScene extends Phaser.Scene {
     console.log("Preload boot scene ...");
   }
 
-  create() {
-    this.network.onMyPlayerJoin(
-      (optionsReponse: OptionsResponse) => this.launchGame(optionsReponse),
-      this
-    );
-  }
+  create() {}
 
   private init() {
     this.network = Network;
@@ -70,9 +65,11 @@ export class BootScene extends Phaser.Scene {
     this.scene.start(SCENES.BACKGROUND);
   }
 
-  launchGame(options: Options) {
+  launchGame() {
     if (!this.preloadComplete) return;
 
-    this.scene.start(SCENES.GAME, { network: this.network, options });
+    this.scene.start(SCENES.GAME, {
+      network: this.network,
+    });
   }
 }

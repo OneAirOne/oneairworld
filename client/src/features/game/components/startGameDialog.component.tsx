@@ -12,6 +12,8 @@ export default function StartGameDialog() {
     try {
       const bootScene = phaserGame.scene.keys[SCENES.BOOT] as BootScene;
 
+      bootScene.launchGame();
+
       await bootScene.network.joinOrCreatePublic({
         name: "Erwan",
         texture: Characters.ONEAIR,
