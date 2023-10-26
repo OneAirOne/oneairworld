@@ -1,1 +1,1 @@
-export { Event, gameEvents } from "./eventManager";
+export { PhaserEvent as Event, phaserEvents } from "./eventManager";

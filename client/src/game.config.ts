@@ -3,7 +3,7 @@ import { BootScene, BackgroundScene, SceneLevel1 } from "scenes";
 export const phaserConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: "game-container",
-  backgroundColor: "#93cbee",
+  backgroundColor: "012622",
   pixelArt: true,
   scale: {
     mode: Phaser.Scale.ScaleModes.RESIZE,
@@ -11,10 +11,10 @@ export const phaserConfig: Phaser.Types.Core.GameConfig = {
     height: window.innerHeight,
   },
   physics: {
-    default: "arcade",
-    arcade: {
+    default: "matter",
+    matter: {
       gravity: { y: 0 },
-      debug: false,
+      debug: true,
     },
   },
   scene: [BootScene, BackgroundScene, SceneLevel1],
@@ -27,7 +27,6 @@ export enum SpriteData {
 }
 
 const gameConfig = {
-  INTERPOLATION_PERCENT: 0.2,
   MAP: {
     NAME: "tiles_dungeon",
     FILE: "tiles_dungeon",

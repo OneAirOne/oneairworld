@@ -7,17 +7,26 @@ import Network, { Network as NetworkType } from "services/Network";
 import gameConfig from "game.config";
 import { SCENES } from "./scene.config";
 
+import { Characters, IPlayer, LauchOptions } from "../../../shared/types";
+
 export class BootScene extends Phaser.Scene {
   private preloadComplete = false;
   network!: NetworkType;
 
   constructor() {
     super(SCENES.BOOT);
+    this.init();
   }
 
   preload() {
     this.loadAssets();
     console.log("Preload boot scene ...");
+  }
+
+  create() {}
+
+  private init() {
+    this.network = Network;
   }
 
   loadAssets() {
@@ -52,19 +61,15 @@ export class BootScene extends Phaser.Scene {
     });
   }
 
-  private init() {
-    this.network = Network;
-  }
-
   private launchBackground() {
     this.scene.start(SCENES.BACKGROUND);
   }
 
   launchGame() {
-    console.log("😀", this.network);
-
     if (!this.preloadComplete) return;
 
-    this.scene.start(SCENES.GAME, { network: this.network });
+    this.scene.start(SCENES.GAME, {
+      network: this.network,
+    });
   }
 }

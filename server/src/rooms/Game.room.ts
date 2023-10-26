@@ -10,7 +10,12 @@ import { Player } from "./schema/Player";
 import { PlayerUpdateCommand } from "./commands";
 
 // Shared
-import { Message, IRoomData, InputPayload } from "../../../shared/types";
+import {
+  Message,
+  IRoomData,
+  InputPayload,
+  LauchOptions,
+} from "../../../shared/types";
 
 /**
  * Game room
@@ -52,12 +57,17 @@ export class Game extends Room<GameState> {
     });
   }
 
-  onJoin(client: Client, options: any) {
-    console.log(client.sessionId, "joined!");
+  /**
+   * Call when a new player join a room
+   */
+  onJoin(client: Client, lauchOptions: LauchOptions) {
+    console.log(client.sessionId, "joined!", lauchOptions);
+
     const player = new Player();
 
-    player.x = 0;
-    player.y = 0;
+    // Set player with client options
+    player.name = lauchOptions.name;
+    player.texture = lauchOptions.texture;
 
     this.state.players.set(client.sessionId, player);
 
@@ -67,12 +77,18 @@ export class Game extends Room<GameState> {
     });
   }
 
+  /**
+   * Call when a player leave the room
+   */
   onLeave(client: Client, consented: boolean) {
     if (this.state.players.has(client.sessionId)) {
       this.state.players.delete(client.sessionId);
     }
   }
 
+  /**
+   * Call when a player dispose
+   */
   onDispose() {
     console.log("[GAME] onDispose");
   }
