@@ -18,6 +18,9 @@ export class PlayerUpdateCommand extends Command<Game, Payload> {
 
     if (!player) return;
 
+    // Enqueue input to user input buffer
+    player.inputQueue.push(data);
+
     if (data.left) {
       player.x -= PLAYER_VELOCITY;
       player.anim = "Left";

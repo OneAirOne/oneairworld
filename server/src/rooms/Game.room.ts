@@ -15,6 +15,7 @@ import {
   IRoomData,
   InputPayload,
   LauchOptions,
+  PLAYER_VELOCITY,
 } from "../../../shared/types";
 
 /**
@@ -27,6 +28,8 @@ export class Game extends Room<GameState> {
   private dispatcher = new Dispatcher(this);
   private name: string;
   private password: string | null = null;
+
+  fixedTimeStep = 1000 / 60;
 
   /**
    * Create the room and all messages dispatcher
@@ -54,6 +57,42 @@ export class Game extends Room<GameState> {
         client,
         data,
       });
+    });
+
+    let elapsedTime = 0;
+
+    this.setSimulationInterval((deltaTime) => {
+      elapsedTime += deltaTime;
+
+      while (elapsedTime >= this.fixedTimeStep) {
+        elapsedTime -= this.fixedTimeStep;
+        this.fixedTick(this.fixedTimeStep);
+      }
+    });
+  }
+
+  fixedTick(deltaTime: number) {
+    this.state.players.forEach((player) => {
+      let input: InputPayload;
+
+      // Dequeue player inputs
+      while ((input = player.inputQueue.shift())) {
+        if (input.left) {
+          player.x -= PLAYER_VELOCITY;
+          player.anim = "Left";
+        } else if (input.right) {
+          player.x += PLAYER_VELOCITY;
+          player.anim = "Right";
+        }
+
+        if (input.up) {
+          player.y -= PLAYER_VELOCITY;
+          player.anim = "Up";
+        } else if (input.down) {
+          player.y += PLAYER_VELOCITY;
+          player.anim = "Down";
+        }
+      }
     });
   }
 

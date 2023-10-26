@@ -21,9 +21,11 @@ import {
 export class SceneLevel1 extends Phaser.Scene {
   network!: Network;
   remoteRef: Phaser.GameObjects.Rectangle | null = null;
+  localRef: Phaser.GameObjects.Rectangle | null = null;
   private players = new Map<string, Player>();
   myPlayer!: Player;
   private cursorKeys!: Phaser.Types.Input.Keyboard.CursorKeys;
+  debugFPS: Phaser.GameObjects.Text | null = null;
 
   // local input
   inputPayload: InputPayload = {
@@ -50,6 +52,8 @@ export class SceneLevel1 extends Phaser.Scene {
    * Create and initialize the scene
    */
   create(data: { network: Network }) {
+    this.debugFPS = this.add.text(4, 4, "", { color: "#ff0000" });
+
     const { network } = data;
 
     console.log("Create Game scene", network.sessionId);
@@ -138,6 +142,14 @@ export class SceneLevel1 extends Phaser.Scene {
     );
     this.remoteRef.setStrokeStyle(1, 0xff0000);
     this.remoteRef.setOrigin(0.5, 0.5);
+
+    this.localRef = this.add.rectangle(
+      sharedConfig.WORLD_WIDTH / 2,
+      sharedConfig.WORLD_HEIGHT / 2,
+      sharedConfig.SPRITE_SIZE,
+      sharedConfig.SPRITE_SIZE
+    );
+    this.localRef.setStrokeStyle(1, 0x00ff00);
   }
 
   /**
@@ -147,8 +159,6 @@ export class SceneLevel1 extends Phaser.Scene {
     console.log("[scene] update", id);
 
     if (id === this.network.sessionId && !!this.myPlayer) {
-      console.log(field);
-
       this.myPlayer.update(field, value);
     } else {
       const player = this.players.get(id);
@@ -162,8 +172,26 @@ export class SceneLevel1 extends Phaser.Scene {
   /**
    * Update the scene, call at every tick
    * Client-side re-renders at every 16.6ms (60fps).
+   * Credits: https://learn.colyseus.io/phaser/2-linear-interpolation
    */
+
+  elapsedTime = 0;
+  fixedTimeStep = 1000 / 60;
   update(time: number, delta: number): void {
+    if (!this.myPlayer) return;
+
+    this.elapsedTime += delta;
+    while (this.elapsedTime >= this.fixedTimeStep) {
+      this.elapsedTime -= this.fixedTimeStep;
+      this.fixedTick(time, this.fixedTimeStep);
+    }
+
+    if (this.debugFPS) {
+      this.debugFPS.text = `Frame rate: ${this.game.loop.actualFps}`;
+    }
+  }
+
+  fixedTick(time: number, delta: number) {
     this.inputPayload.left = this.cursorKeys.left.isDown;
     this.inputPayload.right = this.cursorKeys.right.isDown;
     this.inputPayload.up = this.cursorKeys.up.isDown;
@@ -184,6 +212,11 @@ export class SceneLevel1 extends Phaser.Scene {
     }
     if (this.inputPayload.down) {
       this.myPlayer?.update("down", PLAYER_VELOCITY);
+    }
+
+    if (this.localRef) {
+      this.localRef.x = this.myPlayer.x;
+      this.localRef.y = this.myPlayer.y;
     }
 
     // LERP other players

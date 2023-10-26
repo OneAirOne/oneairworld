@@ -17,6 +17,9 @@ export const phaserConfig: Phaser.Types.Core.GameConfig = {
       debug: true,
     },
   },
+  // fps: {
+  //   target: 60,
+  // },
   scene: [BootScene, BackgroundScene, SceneLevel1],
 };
 
