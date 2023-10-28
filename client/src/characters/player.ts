@@ -12,6 +12,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   playerId: string;
   playerTexture: string;
   velocity: number;
+  lastAnim: Anim = Anim.IDDLE_DOWN;
 
   constructor(
     scene: Phaser.Scene,
@@ -60,8 +61,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   /**
    * Update sprite animation according to the direction
    */
-  updateAnim(value: string) {
+  updateAnim(value: Anim) {
     this.anims.play(`${this.playerTexture}${value}`, true);
+    this.lastAnim = value;
   }
 
   /**

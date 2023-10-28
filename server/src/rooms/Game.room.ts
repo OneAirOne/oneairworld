@@ -98,19 +98,6 @@ export class Game extends Room<GameState> {
         }
 
         // Check for the iddle anim
-        const movePayload = {
-          up: input.up,
-          down: input.down,
-          left: input.left,
-          right: input.right,
-        };
-
-        for (const [key, value] of Object.entries(movePayload)) {
-          if (value) {
-            player.anim = (key.charAt(0).toUpperCase() + key.slice(1)) as Anim;
-          }
-        }
-
         const iddleAnim = getIddleAnim(input, player.anim as Anim);
 
         if (iddleAnim) {

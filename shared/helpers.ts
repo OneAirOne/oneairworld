@@ -4,7 +4,7 @@ import { Anim, InputPayload } from "./types";
  * Get the iddle anim name given an input paload
  */
 export function getIddleAnim(inputPayload: InputPayload, lastAnim: Anim) {
-  let iddleAnim: string | null = null;
+  let iddleAnim: Anim | null = null;
 
   const noPressKeys =
     !inputPayload.left &&

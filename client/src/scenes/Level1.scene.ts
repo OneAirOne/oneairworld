@@ -216,20 +216,7 @@ export class SceneLevel1 extends Phaser.Scene {
     }
 
     // Check for the iddle anim
-    const movePayload = {
-      up: this.inputPayload.up,
-      down: this.inputPayload.down,
-      left: this.inputPayload.left,
-      right: this.inputPayload.right,
-    };
-
-    for (const [key, value] of Object.entries(movePayload)) {
-      if (value) {
-        this.lastAnim = (key.charAt(0).toUpperCase() + key.slice(1)) as Anim;
-      }
-    }
-
-    const iddleAnim = getIddleAnim(this.inputPayload, this.lastAnim);
+    const iddleAnim = getIddleAnim(this.inputPayload, this.myPlayer.lastAnim);
 
     if (iddleAnim) {
       this?.myPlayer.updateAnim(iddleAnim);
