@@ -13,8 +13,6 @@ export function getIddleAnim(inputPayload: InputPayload, lastAnim: Anim) {
     !inputPayload.down;
 
   if (noPressKeys) {
-    iddleAnim = Anim.IDDLE_DOWN;
-
     if (lastAnim === Anim.UP) {
       iddleAnim = Anim.IDDLE_UP;
     }

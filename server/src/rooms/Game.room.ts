@@ -107,12 +107,11 @@ export class Game extends Room<GameState> {
 
         for (const [key, value] of Object.entries(movePayload)) {
           if (value) {
-            this.lastAnim = (key.charAt(0).toUpperCase() +
-              key.slice(1)) as Anim;
+            player.anim = (key.charAt(0).toUpperCase() + key.slice(1)) as Anim;
           }
         }
 
-        const iddleAnim = getIddleAnim(input, this.lastAnim);
+        const iddleAnim = getIddleAnim(input, player.anim as Anim);
 
         if (iddleAnim) {
           player.anim = iddleAnim;
