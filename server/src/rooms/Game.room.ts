@@ -16,7 +16,9 @@ import {
   InputPayload,
   LauchOptions,
   PLAYER_VELOCITY,
+  Anim,
 } from "../../../shared/types";
+import { getIddleAnim } from "../../../shared/helpers";
 
 /**
  * Game room
@@ -28,6 +30,7 @@ export class Game extends Room<GameState> {
   private dispatcher = new Dispatcher(this);
   private name: string;
   private password: string | null = null;
+  private lastAnim: Anim = Anim.IDDLE_DOWN;
 
   fixedTimeStep = 1000 / 60;
 
@@ -59,6 +62,7 @@ export class Game extends Room<GameState> {
       });
     });
 
+    // Fix the tick rate with the client
     let elapsedTime = 0;
 
     this.setSimulationInterval((deltaTime) => {
@@ -79,19 +83,42 @@ export class Game extends Room<GameState> {
       while ((input = player.inputQueue.shift())) {
         if (input.left) {
           player.x -= PLAYER_VELOCITY;
-          player.anim = "Left";
+          player.anim = Anim.LEFT;
         } else if (input.right) {
           player.x += PLAYER_VELOCITY;
-          player.anim = "Right";
+          player.anim = Anim.RIGHT;
         }
 
         if (input.up) {
           player.y -= PLAYER_VELOCITY;
-          player.anim = "Up";
+          player.anim = Anim.UP;
         } else if (input.down) {
           player.y += PLAYER_VELOCITY;
-          player.anim = "Down";
+          player.anim = Anim.DOWN;
         }
+
+        // Check for the iddle anim
+        const movePayload = {
+          up: input.up,
+          down: input.down,
+          left: input.left,
+          right: input.right,
+        };
+
+        for (const [key, value] of Object.entries(movePayload)) {
+          if (value) {
+            this.lastAnim = (key.charAt(0).toUpperCase() +
+              key.slice(1)) as Anim;
+          }
+        }
+
+        const iddleAnim = getIddleAnim(input, this.lastAnim);
+
+        if (iddleAnim) {
+          player.anim = iddleAnim;
+        }
+
+        player.tick = input.tick;
       }
     });
   }

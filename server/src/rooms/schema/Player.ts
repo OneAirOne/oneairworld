@@ -10,5 +10,7 @@ export class Player extends Schema implements IPlayer {
   @type("number") y = sharedConfig.WORLD_HEIGHT / 2;
   @type("string") anim = "IdleDown";
   @type("string") texture = Characters.ONEAIR;
+  @type("number") tick: number;
+
   inputQueue: any[] = [];
 }

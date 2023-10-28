@@ -16,15 +16,19 @@ import {
   PLAYER_VELOCITY,
   type InputPayload,
   type IPlayer,
+  Anim,
 } from "../../../shared/types";
+import { getIddleAnim } from "../../../shared/helpers";
 
 export class SceneLevel1 extends Phaser.Scene {
-  network!: Network;
-  remoteRef: Phaser.GameObjects.Rectangle | null = null;
-  localRef: Phaser.GameObjects.Rectangle | null = null;
+  private network!: Network;
   private players = new Map<string, Player>();
-  myPlayer!: Player;
+  private myPlayer!: Player;
   private cursorKeys!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private lastAnim: Anim = Anim.IDDLE_DOWN;
+
+  remoteRef: Phaser.GameObjects.Rectangle | null = null;
+
   debugFPS: Phaser.GameObjects.Text | null = null;
 
   // local input
@@ -33,8 +37,10 @@ export class SceneLevel1 extends Phaser.Scene {
     right: false,
     up: false,
     down: false,
-    anim: "Down",
+    tick: undefined,
   };
+
+  currentTick: number = 0;
 
   constructor() {
     super(SCENES.GAME);
@@ -117,6 +123,8 @@ export class SceneLevel1 extends Phaser.Scene {
    * Create physic world and add my player
    */
   createWorld(myPlayer: Player) {
+    console.log("Create world ", myPlayer);
+
     // Setup physics parameters
     this.matter.world.setBounds(
       0,
@@ -140,29 +148,18 @@ export class SceneLevel1 extends Phaser.Scene {
       sharedConfig.SPRITE_SIZE,
       sharedConfig.SPRITE_SIZE
     );
-    this.remoteRef.setStrokeStyle(1, 0xff0000);
+    // this.remoteRef.setStrokeStyle(1, 0xff0000);
     this.remoteRef.setOrigin(0.5, 0.5);
-
-    this.localRef = this.add.rectangle(
-      sharedConfig.WORLD_WIDTH / 2,
-      sharedConfig.WORLD_HEIGHT / 2,
-      sharedConfig.SPRITE_SIZE,
-      sharedConfig.SPRITE_SIZE
-    );
-    this.localRef.setStrokeStyle(1, 0x00ff00);
   }
 
   /**
    * Call when networks update events are triggered
    */
   handlePlayerUpdated(field: string, value: number | string, id: string) {
-    console.log("[scene] update", id);
-
     if (id === this.network.sessionId && !!this.myPlayer) {
       this.myPlayer.update(field, value);
     } else {
       const player = this.players.get(id);
-      console.log("Update other player ", field, value);
 
       if (!player) return;
       player.update(field, value);
@@ -192,42 +189,66 @@ export class SceneLevel1 extends Phaser.Scene {
   }
 
   fixedTick(time: number, delta: number) {
+    this.currentTick++;
+
     this.inputPayload.left = this.cursorKeys.left.isDown;
     this.inputPayload.right = this.cursorKeys.right.isDown;
     this.inputPayload.up = this.cursorKeys.up.isDown;
     this.inputPayload.down = this.cursorKeys.down.isDown;
+    this.inputPayload.tick = this.currentTick;
 
     // Send input to the server at every tick
     this.network.updatePlayer(this.inputPayload);
 
+    // TODO : share with server
     // Predict my player
     if (this.inputPayload.left) {
-      this.myPlayer?.update("left", PLAYER_VELOCITY);
+      this.myPlayer?.update(Anim.LEFT, PLAYER_VELOCITY);
     }
     if (this.inputPayload.right) {
-      this.myPlayer?.update("right", PLAYER_VELOCITY);
+      this.myPlayer?.update(Anim.RIGHT, PLAYER_VELOCITY);
     }
     if (this.inputPayload.up) {
-      this.myPlayer?.update("up", PLAYER_VELOCITY);
+      this.myPlayer?.update(Anim.UP, PLAYER_VELOCITY);
     }
     if (this.inputPayload.down) {
-      this.myPlayer?.update("down", PLAYER_VELOCITY);
+      this.myPlayer?.update(Anim.DOWN, PLAYER_VELOCITY);
     }
 
-    if (this.localRef) {
-      this.localRef.x = this.myPlayer.x;
-      this.localRef.y = this.myPlayer.y;
+    // Check for the iddle anim
+    const movePayload = {
+      up: this.inputPayload.up,
+      down: this.inputPayload.down,
+      left: this.inputPayload.left,
+      right: this.inputPayload.right,
+    };
+
+    for (const [key, value] of Object.entries(movePayload)) {
+      if (value) {
+        this.lastAnim = (key.charAt(0).toUpperCase() + key.slice(1)) as Anim;
+      }
+    }
+
+    const iddleAnim = getIddleAnim(this.inputPayload, this.lastAnim);
+
+    if (iddleAnim) {
+      this?.myPlayer.updateAnim(iddleAnim);
     }
 
     // LERP other players
     this.players.forEach((player) => {
       const serverX = player?.getData(SpriteData.SERVER_X);
       const serverY = player?.getData(SpriteData.SERVER_Y);
+      const serverAnim = player?.getData(SpriteData.SERVER_ANIM);
+
       if (serverX) {
         player.updatePositionX(serverX);
       }
       if (serverY) {
         player.updatePositionY(serverY);
+      }
+      if (serverAnim) {
+        player.updateAnim(serverAnim);
       }
     });
   }

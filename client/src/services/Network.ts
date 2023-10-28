@@ -85,14 +85,7 @@ export class Network {
         changes.forEach((change) => {
           const { field, value } = change;
 
-          console.log("[Network] PLAYER_UPDATED", field, value);
           phaserEvents.emit(Event.PLAYER_UPDATED, field, value, sessionId);
-
-          // if (field === "name" && value !== "") {
-          //   console.log("[Network] PLAYER_JOINED", field, value);
-          //   phaserEvents.emit(Event.PLAYER_JOINED, player, sessionId);
-          //   // TODO : save new player in store + display message
-          // }
         });
       };
     };
