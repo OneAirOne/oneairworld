@@ -84,15 +84,11 @@ export class Network {
       player.onChange = (changes: DataChange<any>[]) => {
         changes.forEach((change) => {
           const { field, value } = change;
+          if (field !== "tick") {
+            console.log("[Network] update ", field, value);
+          }
 
-          console.log("[Network] PLAYER_UPDATED", field, value);
           phaserEvents.emit(Event.PLAYER_UPDATED, field, value, sessionId);
-
-          // if (field === "name" && value !== "") {
-          //   console.log("[Network] PLAYER_JOINED", field, value);
-          //   phaserEvents.emit(Event.PLAYER_JOINED, player, sessionId);
-          //   // TODO : save new player in store + display message
-          // }
         });
       };
     };

@@ -4,6 +4,7 @@ import { Physics } from "phaser";
 import { SpriteData } from "game.config";
 
 import { sharedConfig } from "../../../shared/config";
+import { Anim, InputPayload } from "../../../shared/types";
 
 const INTERPOLATION_PERCENT = 0.2;
 
@@ -11,6 +12,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   playerId: string;
   playerTexture: string;
   velocity: number;
+  lastAnim: Anim = Anim.IDDLE_DOWN;
 
   constructor(
     scene: Phaser.Scene,
@@ -26,7 +28,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.scene.add.existing(this);
     this.playerId = id;
     this.playerTexture = texture;
-    this.anims.play(`${this.playerTexture}IdleDown`, true);
+    this.anims.play(`${this.playerTexture}${Anim.IDDLE_DOWN}`, true);
     this.setBounce(1);
     this.setBody({
       type: "rectangle",
@@ -57,6 +59,14 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   }
 
   /**
+   * Update sprite animation according to the direction
+   */
+  updateAnim(value: Anim) {
+    this.anims.play(`${this.playerTexture}${value}`, true);
+    this.lastAnim = value;
+  }
+
+  /**
    * Update player
    *
    * Interpolation method is applied :
@@ -71,17 +81,24 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   update(field: string, value: number | string | boolean): void {
     switch (field) {
       // Used form my player
-      case "left":
+      case Anim.LEFT:
         this.x -= Number(value);
+        this.updateAnim(Anim.LEFT);
         break;
-      case "right":
+      case Anim.RIGHT:
         this.x += Number(value);
+        this.updateAnim(Anim.RIGHT);
+
         break;
-      case "up":
+      case Anim.UP:
         this.y -= Number(value);
+        this.updateAnim(Anim.UP);
+
         break;
-      case "down":
+      case Anim.DOWN:
         this.y += Number(value);
+        this.updateAnim(Anim.DOWN);
+
         break;
 
       // Used for other players
@@ -101,9 +118,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         break;
       case "anim":
         if (typeof value === "string") {
-          // TODO: setData
-          this.anims.play(`${this.playerTexture}${value}`, true);
-          // this.setData(SpriteData.SERVER_ANIM);
+          this.setData(SpriteData.SERVER_ANIM, value);
         }
         break;
     }

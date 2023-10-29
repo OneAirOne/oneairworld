@@ -18,20 +18,24 @@ export class PlayerUpdateCommand extends Command<Game, Payload> {
 
     if (!player) return;
 
-    if (data.left) {
-      player.x -= PLAYER_VELOCITY;
-      player.anim = "Left";
-    } else if (data.right) {
-      player.x += PLAYER_VELOCITY;
-      player.anim = "Right";
-    }
+    // Enqueue input to user input buffer
+    player.inputQueue.push(data);
+    // console.log(player.inputQueue);
 
-    if (data.up) {
-      player.y -= PLAYER_VELOCITY;
-      player.anim = "Up";
-    } else if (data.down) {
-      player.y += PLAYER_VELOCITY;
-      player.anim = "Down";
-    }
+    // if (data.left) {
+    //   player.x -= PLAYER_VELOCITY;
+    //   player.anim = "Left";
+    // } else if (data.right) {
+    //   player.x += PLAYER_VELOCITY;
+    //   player.anim = "Right";
+    // }
+
+    // if (data.up) {
+    //   player.y -= PLAYER_VELOCITY;
+    //   player.anim = "Up";
+    // } else if (data.down) {
+    //   player.y += PLAYER_VELOCITY;
+    //   player.anim = "Down";
+    // }
   }
 }

@@ -16,14 +16,20 @@ import {
   PLAYER_VELOCITY,
   type InputPayload,
   type IPlayer,
+  Anim,
 } from "../../../shared/types";
+import { getIddleAnim } from "../../../shared/helpers";
 
 export class SceneLevel1 extends Phaser.Scene {
-  network!: Network;
-  remoteRef: Phaser.GameObjects.Rectangle | null = null;
+  private network!: Network;
   private players = new Map<string, Player>();
-  myPlayer!: Player;
+  private myPlayer!: Player;
   private cursorKeys!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private lastAnim: Anim = Anim.IDDLE_DOWN;
+
+  remoteRef: Phaser.GameObjects.Rectangle | null = null;
+
+  debugFPS: Phaser.GameObjects.Text | null = null;
 
   // local input
   inputPayload: InputPayload = {
@@ -31,8 +37,10 @@ export class SceneLevel1 extends Phaser.Scene {
     right: false,
     up: false,
     down: false,
-    anim: "Down",
+    tick: undefined,
   };
+
+  currentTick: number = 0;
 
   constructor() {
     super(SCENES.GAME);
@@ -50,6 +58,8 @@ export class SceneLevel1 extends Phaser.Scene {
    * Create and initialize the scene
    */
   create(data: { network: Network }) {
+    this.debugFPS = this.add.text(4, 4, "", { color: "#ff0000" });
+
     const { network } = data;
 
     console.log("Create Game scene", network.sessionId);
@@ -92,6 +102,8 @@ export class SceneLevel1 extends Phaser.Scene {
    * Call when networks join events are triggered
    */
   handleJoinPLayer(player: IPlayer, sessionId: string) {
+    console.log("[scene] join ", this.network.sessionId, sessionId);
+
     const newPlayer = new Player(
       this,
       player.x,
@@ -99,7 +111,6 @@ export class SceneLevel1 extends Phaser.Scene {
       player.texture,
       sessionId
     );
-    console.log("[scene] join ", this.network.sessionId, sessionId);
 
     if (sessionId === this.network.sessionId) {
       this.createWorld(newPlayer);
@@ -113,6 +124,8 @@ export class SceneLevel1 extends Phaser.Scene {
    * Create physic world and add my player
    */
   createWorld(myPlayer: Player) {
+    console.log("Create world ", myPlayer);
+
     // Setup physics parameters
     this.matter.world.setBounds(
       0,
@@ -136,7 +149,7 @@ export class SceneLevel1 extends Phaser.Scene {
       sharedConfig.SPRITE_SIZE,
       sharedConfig.SPRITE_SIZE
     );
-    this.remoteRef.setStrokeStyle(1, 0xff0000);
+    // this.remoteRef.setStrokeStyle(1, 0xff0000);
     this.remoteRef.setOrigin(0.5, 0.5);
   }
 
@@ -144,17 +157,13 @@ export class SceneLevel1 extends Phaser.Scene {
    * Call when networks update events are triggered
    */
   handlePlayerUpdated(field: string, value: number | string, id: string) {
-    console.log("[scene] update", id);
-
     if (id === this.network.sessionId && !!this.myPlayer) {
-      console.log(field);
-
       this.myPlayer.update(field, value);
     } else {
       const player = this.players.get(id);
-      console.log("Update other player ", field, value);
 
       if (!player) return;
+
       player.update(field, value);
     }
   }
@@ -162,39 +171,74 @@ export class SceneLevel1 extends Phaser.Scene {
   /**
    * Update the scene, call at every tick
    * Client-side re-renders at every 16.6ms (60fps).
+   * Credits: https://learn.colyseus.io/phaser/2-linear-interpolation
    */
+
+  elapsedTime = 0;
+  fixedTimeStep = 1000 / 60;
   update(time: number, delta: number): void {
+    if (!this.myPlayer) return;
+
+    this.elapsedTime += delta;
+
+    while (this.elapsedTime >= this.fixedTimeStep) {
+      this.elapsedTime -= this.fixedTimeStep;
+      this.fixedTick(time, this.fixedTimeStep);
+    }
+
+    if (this.debugFPS) {
+      this.debugFPS.text = `Frame rate: ${this.game.loop.actualFps}`;
+    }
+  }
+
+  fixedTick(_time: number, _delta: number) {
+    this.currentTick++;
+
     this.inputPayload.left = this.cursorKeys.left.isDown;
     this.inputPayload.right = this.cursorKeys.right.isDown;
     this.inputPayload.up = this.cursorKeys.up.isDown;
     this.inputPayload.down = this.cursorKeys.down.isDown;
+    this.inputPayload.tick = this.currentTick;
 
     // Send input to the server at every tick
     this.network.updatePlayer(this.inputPayload);
 
+    // TODO : share with server
     // Predict my player
     if (this.inputPayload.left) {
-      this.myPlayer?.update("left", PLAYER_VELOCITY);
+      this.myPlayer?.update(Anim.LEFT, PLAYER_VELOCITY);
     }
     if (this.inputPayload.right) {
-      this.myPlayer?.update("right", PLAYER_VELOCITY);
+      this.myPlayer?.update(Anim.RIGHT, PLAYER_VELOCITY);
     }
     if (this.inputPayload.up) {
-      this.myPlayer?.update("up", PLAYER_VELOCITY);
+      this.myPlayer?.update(Anim.UP, PLAYER_VELOCITY);
     }
     if (this.inputPayload.down) {
-      this.myPlayer?.update("down", PLAYER_VELOCITY);
+      this.myPlayer?.update(Anim.DOWN, PLAYER_VELOCITY);
+    }
+
+    // Check for the iddle anim
+    const iddleAnim = getIddleAnim(this.inputPayload, this.myPlayer.lastAnim);
+
+    if (iddleAnim) {
+      this?.myPlayer.updateAnim(iddleAnim);
     }
 
     // LERP other players
     this.players.forEach((player) => {
       const serverX = player?.getData(SpriteData.SERVER_X);
       const serverY = player?.getData(SpriteData.SERVER_Y);
+      const serverAnim = player?.getData(SpriteData.SERVER_ANIM);
+
       if (serverX) {
         player.updatePositionX(serverX);
       }
       if (serverY) {
         player.updatePositionY(serverY);
+      }
+      if (serverAnim) {
+        player.updateAnim(serverAnim);
       }
     });
   }
