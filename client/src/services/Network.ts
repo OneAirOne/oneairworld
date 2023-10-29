@@ -84,6 +84,9 @@ export class Network {
       player.onChange = (changes: DataChange<any>[]) => {
         changes.forEach((change) => {
           const { field, value } = change;
+          if (field !== "tick") {
+            console.log("[Network] update ", field, value);
+          }
 
           phaserEvents.emit(Event.PLAYER_UPDATED, field, value, sessionId);
         });

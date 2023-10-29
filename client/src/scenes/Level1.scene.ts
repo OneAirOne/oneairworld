@@ -102,6 +102,8 @@ export class SceneLevel1 extends Phaser.Scene {
    * Call when networks join events are triggered
    */
   handleJoinPLayer(player: IPlayer, sessionId: string) {
+    console.log("[scene] join ", this.network.sessionId, sessionId);
+
     const newPlayer = new Player(
       this,
       player.x,
@@ -109,7 +111,6 @@ export class SceneLevel1 extends Phaser.Scene {
       player.texture,
       sessionId
     );
-    console.log("[scene] join ", this.network.sessionId, sessionId);
 
     if (sessionId === this.network.sessionId) {
       this.createWorld(newPlayer);
@@ -162,6 +163,7 @@ export class SceneLevel1 extends Phaser.Scene {
       const player = this.players.get(id);
 
       if (!player) return;
+
       player.update(field, value);
     }
   }
@@ -178,6 +180,7 @@ export class SceneLevel1 extends Phaser.Scene {
     if (!this.myPlayer) return;
 
     this.elapsedTime += delta;
+
     while (this.elapsedTime >= this.fixedTimeStep) {
       this.elapsedTime -= this.fixedTimeStep;
       this.fixedTick(time, this.fixedTimeStep);
@@ -188,7 +191,7 @@ export class SceneLevel1 extends Phaser.Scene {
     }
   }
 
-  fixedTick(time: number, delta: number) {
+  fixedTick(_time: number, _delta: number) {
     this.currentTick++;
 
     this.inputPayload.left = this.cursorKeys.left.isDown;
