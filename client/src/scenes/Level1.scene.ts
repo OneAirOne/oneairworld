@@ -132,7 +132,7 @@ export class SceneLevel1 extends Phaser.Scene {
       0,
       sharedConfig.WORLD_WIDTH,
       sharedConfig.WORLD_HEIGHT,
-      20
+      sharedConfig.WORLD_WALL_SIZE
     );
 
     // Register player

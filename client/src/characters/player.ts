@@ -4,14 +4,13 @@ import { Physics } from "phaser";
 import { SpriteData } from "game.config";
 
 import { sharedConfig } from "../../../shared/config";
-import { Anim, InputPayload } from "../../../shared/types";
+import { Anim, InputPayload, PLAYER_VELOCITY } from "../../../shared/types";
 
 const INTERPOLATION_PERCENT = 0.2;
 
 export class Player extends Phaser.Physics.Matter.Sprite {
   playerId: string;
   playerTexture: string;
-  velocity: number;
   lastAnim: Anim = Anim.IDDLE_DOWN;
 
   constructor(
@@ -29,13 +28,12 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.playerId = id;
     this.playerTexture = texture;
     this.anims.play(`${this.playerTexture}${Anim.IDDLE_DOWN}`, true);
-    this.setBounce(1);
+    // this.setBounce(1);
     this.setBody({
       type: "rectangle",
       width: sharedConfig.SPRITE_SIZE,
       height: sharedConfig.SPRITE_SIZE,
     });
-    this.velocity = 2;
   }
 
   protected getBody(): MatterJS.BodyType {
@@ -79,24 +77,35 @@ export class Player extends Phaser.Physics.Matter.Sprite {
    * Credits: https://learn.colyseus.io/phaser/2-linear-interpolation.html
    */
   update(field: string, value: number | string | boolean): void {
+    let vx = 0;
+    let vy = 0;
+
     switch (field) {
       // Used form my player
       case Anim.LEFT:
-        this.x -= Number(value);
+        // this.x -= Number(value);
+        vx = -PLAYER_VELOCITY;
+        vy = 0;
         this.updateAnim(Anim.LEFT);
         break;
       case Anim.RIGHT:
-        this.x += Number(value);
+        // this.x += Number(value);
+        vx = PLAYER_VELOCITY;
+        vy = 0;
         this.updateAnim(Anim.RIGHT);
 
         break;
       case Anim.UP:
-        this.y -= Number(value);
+        // this.y -= Number(value);
+        vy = -PLAYER_VELOCITY;
+        vx = 0;
         this.updateAnim(Anim.UP);
 
         break;
       case Anim.DOWN:
-        this.y += Number(value);
+        // this.y += Number(value);
+        vy = PLAYER_VELOCITY;
+        vx = 0;
         this.updateAnim(Anim.DOWN);
 
         break;
@@ -122,5 +131,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         }
         break;
     }
+
+    this.setVelocity(vx, vy);
   }
 }

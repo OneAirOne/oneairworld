@@ -2,7 +2,12 @@ import { Schema, MapSchema, type } from "@colyseus/schema";
 
 import { sharedConfig } from "../../../../shared/config";
 
-import type { IGameState, IPlayer } from "../../../../shared/types";
+import type {
+  IGameState,
+  IPlayer,
+  InputPayload,
+  LauchOptions,
+} from "../../../../shared/types";
 
 import { Player } from "./Player";
 
@@ -11,4 +16,11 @@ export class GameState extends Schema implements IGameState {
   @type("number") worldHeight = sharedConfig.WORLD_HEIGHT;
 
   @type({ map: Player }) players = new MapSchema<Player>();
+
+  createPlayer(sessionId: string, lauchOptions: LauchOptions) {
+    const newPlayer = new Player();
+    newPlayer.name = lauchOptions.name;
+    newPlayer.texture = lauchOptions.texture = lauchOptions.texture;
+    this.players.set(sessionId, newPlayer);
+  }
 }

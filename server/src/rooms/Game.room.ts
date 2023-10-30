@@ -1,6 +1,7 @@
 import { Room, Client } from "colyseus";
 import { Dispatcher } from "@colyseus/command";
 import bcrypt from "bcrypt";
+import Matter from "matter-js";
 
 // Schemas
 import { GameState } from "./schema/GameState";
@@ -8,6 +9,8 @@ import { Player } from "./schema/Player";
 
 // Commands
 import { PlayerUpdateCommand } from "./commands";
+
+import { GameEngine } from "../GameEngine";
 
 // Shared
 import {
@@ -32,6 +35,8 @@ export class Game extends Room<GameState> {
   private password: string | null = null;
   private lastAnim: Anim = Anim.IDDLE_DOWN;
 
+  private engine: GameEngine = null;
+
   fixedTimeStep = 1000 / 60;
 
   /**
@@ -47,6 +52,7 @@ export class Game extends Room<GameState> {
     this.autoDispose = autoDispose;
 
     let hasPassword = false;
+
     if (password) {
       const salt = await bcrypt.genSalt(10);
       hasPassword = true;
@@ -54,6 +60,8 @@ export class Game extends Room<GameState> {
     this.setMetadata({ name, hasPassword });
 
     this.setState(new GameState());
+
+    this.engine = new GameEngine(this.state);
 
     this.onMessage(Message.UPDATE_PLAYER, (client, data: InputPayload) => {
       this.dispatcher.dispatch(new PlayerUpdateCommand(), {
@@ -76,26 +84,30 @@ export class Game extends Room<GameState> {
   }
 
   fixedTick(deltaTime: number) {
-    this.state.players.forEach((player) => {
+    Matter.Engine.update(this.engine.getEngine(), deltaTime);
+
+    this.state.players.forEach((player, sessionId) => {
       let input: InputPayload;
 
       // Dequeue player inputs
       while ((input = player.inputQueue.shift())) {
-        if (input.left) {
-          player.x -= PLAYER_VELOCITY;
-          player.anim = Anim.LEFT;
-        } else if (input.right) {
-          player.x += PLAYER_VELOCITY;
-          player.anim = Anim.RIGHT;
-        }
+        this.engine.processPlayerAction(sessionId, input);
 
-        if (input.up) {
-          player.y -= PLAYER_VELOCITY;
-          player.anim = Anim.UP;
-        } else if (input.down) {
-          player.y += PLAYER_VELOCITY;
-          player.anim = Anim.DOWN;
-        }
+        // if (input.left) {
+        //   player.x -= PLAYER_VELOCITY;
+        //   player.anim = Anim.LEFT;
+        // } else if (input.right) {
+        //   player.x += PLAYER_VELOCITY;
+        //   player.anim = Anim.RIGHT;
+        // }
+
+        // if (input.up) {
+        //   player.y -= PLAYER_VELOCITY;
+        //   player.anim = Anim.UP;
+        // } else if (input.down) {
+        //   player.y += PLAYER_VELOCITY;
+        //   player.anim = Anim.DOWN;
+        // }
 
         // Check for the iddle anim
         const iddleAnim = getIddleAnim(input, player.anim as Anim);
@@ -115,13 +127,15 @@ export class Game extends Room<GameState> {
   onJoin(client: Client, lauchOptions: LauchOptions) {
     console.log(client.sessionId, "joined!", lauchOptions);
 
-    const player = new Player();
+    // const player = new Player();
 
-    // Set player with client options
-    player.name = lauchOptions.name;
-    player.texture = lauchOptions.texture;
+    // // Set player with client options
+    // player.name = lauchOptions.name;
+    // player.texture = lauchOptions.texture;
 
-    this.state.players.set(client.sessionId, player);
+    // this.state.players.set(client.sessionId, player);
+
+    this.engine.addPlayer(client.sessionId, lauchOptions);
 
     client.send(Message.SEND_ROOM_DATA, {
       id: this.roomId,
