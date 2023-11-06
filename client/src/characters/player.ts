@@ -28,12 +28,20 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.playerId = id;
     this.playerTexture = texture;
     this.anims.play(`${this.playerTexture}${Anim.IDDLE_DOWN}`, true);
-    // this.setBounce(1);
-    this.setBody({
-      type: "rectangle",
-      width: sharedConfig.SPRITE_SIZE,
-      height: sharedConfig.SPRITE_SIZE,
-    });
+    this.setBounce(0);
+    this.setBody(
+      {
+        type: "rectangle",
+        width: sharedConfig.SPRITE_SIZE,
+        height: sharedConfig.SPRITE_SIZE,
+      },
+      {
+        restitution: 0,
+        friction: 0,
+        frictionAir: 0,
+        frictionStatic: 0,
+      }
+    );
   }
 
   protected getBody(): MatterJS.BodyType {
@@ -93,21 +101,18 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         vx = PLAYER_VELOCITY;
         vy = 0;
         this.updateAnim(Anim.RIGHT);
-
         break;
       case Anim.UP:
         // this.y -= Number(value);
-        vy = -PLAYER_VELOCITY;
         vx = 0;
+        vy = -PLAYER_VELOCITY;
         this.updateAnim(Anim.UP);
-
         break;
       case Anim.DOWN:
         // this.y += Number(value);
-        vy = PLAYER_VELOCITY;
         vx = 0;
+        vy = PLAYER_VELOCITY;
         this.updateAnim(Anim.DOWN);
-
         break;
 
       // Used for other players

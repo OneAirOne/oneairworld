@@ -35,6 +35,20 @@ export class GameEngine {
     return this.engine;
   }
 
+  debug() {
+    for (const key in this.players) {
+      if (!this.state.players.get(key) || !this.players[key]) {
+        continue;
+      }
+      console.log("---------------------");
+      console.log(
+        `[${key}] x:${this.state.players.get(key).x} y:${
+          this.state.players.get(key).y
+        }`
+      );
+    }
+  }
+
   /**
    * Sync physics game engine with colyseus state
    * at every update event
@@ -53,6 +67,7 @@ export class GameEngine {
   }
 
   processPlayerAction(sessionId: string, input: InputPayload) {
+    this.debug();
     const player = this.players[sessionId];
     const playerState = this.state.players.get(sessionId);
 

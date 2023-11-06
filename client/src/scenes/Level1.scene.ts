@@ -132,7 +132,7 @@ export class SceneLevel1 extends Phaser.Scene {
       0,
       sharedConfig.WORLD_WIDTH,
       sharedConfig.WORLD_HEIGHT,
-      sharedConfig.WORLD_WALL_SIZE
+      1
     );
 
     // Register player
@@ -168,6 +168,17 @@ export class SceneLevel1 extends Phaser.Scene {
     }
   }
 
+  debug() {
+    this.players.forEach((player) => {
+      console.log("---------------------");
+      console.log(`[${player.playerId}] x:${player.x} y:${player.y}`);
+    });
+    console.log("---------------------");
+    console.log(
+      `[my player ${this.myPlayer.playerId}] x:${this.myPlayer.x} y:${this.myPlayer.y}`
+    );
+  }
+
   /**
    * Update the scene, call at every tick
    * Client-side re-renders at every 16.6ms (60fps).
@@ -193,6 +204,7 @@ export class SceneLevel1 extends Phaser.Scene {
 
   fixedTick(_time: number, _delta: number) {
     this.currentTick++;
+    this.debug();
 
     this.inputPayload.left = this.cursorKeys.left.isDown;
     this.inputPayload.right = this.cursorKeys.right.isDown;
