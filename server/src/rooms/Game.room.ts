@@ -78,36 +78,40 @@ export class Game extends Room<GameState> {
 
       while (elapsedTime >= this.fixedTimeStep) {
         elapsedTime -= this.fixedTimeStep;
-        this.fixedTick(this.fixedTimeStep);
+        this.update(this.fixedTimeStep);
       }
     });
   }
 
-  fixedTick(deltaTime: number) {
-    Matter.Engine.update(this.engine.getEngine(), deltaTime);
+  update(deltaTime: number) {
+    // Matter.Engine.update(this.engine.getEngine(), deltaTime);
 
     this.state.players.forEach((player, sessionId) => {
       let input: InputPayload;
 
+      console.log("---------------------");
+      console.log(`[${sessionId}] x:${player.x} y:${player.y}`);
+
       // Dequeue player inputs
       while ((input = player.inputQueue.shift())) {
-        this.engine.processPlayerAction(sessionId, input);
+        // this.engine.processPlayerAction(sessionId, input);
 
-        // if (input.left) {
-        //   player.x -= PLAYER_VELOCITY;
-        //   player.anim = Anim.LEFT;
-        // } else if (input.right) {
-        //   player.x += PLAYER_VELOCITY;
-        //   player.anim = Anim.RIGHT;
-        // }
+        // this.engine.processAction(sessionId, input, deltaTime);
+        if (input.left) {
+          player.x -= PLAYER_VELOCITY * deltaTime;
+          player.anim = Anim.LEFT;
+        } else if (input.right) {
+          player.x += PLAYER_VELOCITY * deltaTime;
+          player.anim = Anim.RIGHT;
+        }
 
-        // if (input.up) {
-        //   player.y -= PLAYER_VELOCITY;
-        //   player.anim = Anim.UP;
-        // } else if (input.down) {
-        //   player.y += PLAYER_VELOCITY;
-        //   player.anim = Anim.DOWN;
-        // }
+        if (input.up) {
+          player.y -= PLAYER_VELOCITY * deltaTime;
+          player.anim = Anim.UP;
+        } else if (input.down) {
+          player.y += PLAYER_VELOCITY * deltaTime;
+          player.anim = Anim.DOWN;
+        }
 
         // Check for the iddle anim
         const iddleAnim = getIddleAnim(input, player.anim as Anim);

@@ -149,7 +149,7 @@ export class SceneLevel1 extends Phaser.Scene {
       sharedConfig.SPRITE_SIZE,
       sharedConfig.SPRITE_SIZE
     );
-    // this.remoteRef.setStrokeStyle(1, 0xff0000);
+    this.remoteRef.setStrokeStyle(1, 0xff0000);
     this.remoteRef.setOrigin(0.5, 0.5);
   }
 
@@ -168,6 +168,9 @@ export class SceneLevel1 extends Phaser.Scene {
     }
   }
 
+  /**
+   * Log debug stuffs
+   */
   debug() {
     this.players.forEach((player) => {
       console.log("---------------------");
@@ -177,6 +180,27 @@ export class SceneLevel1 extends Phaser.Scene {
     console.log(
       `[my player ${this.myPlayer.playerId}] x:${this.myPlayer.x} y:${this.myPlayer.y}`
     );
+  }
+
+  /**
+   * Update other players using LERP
+   */
+  updateOtherPlayers() {
+    this.players.forEach((player) => {
+      const serverX = player?.getData(SpriteData.SERVER_X);
+      const serverY = player?.getData(SpriteData.SERVER_Y);
+      const serverAnim = player?.getData(SpriteData.SERVER_ANIM);
+
+      if (serverX) {
+        player.lerpPositionX(serverX);
+      }
+      if (serverY) {
+        player.lerpPositionY(serverY);
+      }
+      if (serverAnim) {
+        player.updateAnim(serverAnim);
+      }
+    });
   }
 
   /**
@@ -202,7 +226,7 @@ export class SceneLevel1 extends Phaser.Scene {
     }
   }
 
-  fixedTick(_time: number, _delta: number) {
+  fixedTick(_time: number, delta: number) {
     this.currentTick++;
     this.debug();
 
@@ -215,19 +239,22 @@ export class SceneLevel1 extends Phaser.Scene {
     // Send input to the server at every tick
     this.network.updatePlayer(this.inputPayload);
 
-    // TODO : share with server
-    // Predict my player
+    // this.myPlayer.processAction(this.inputPayload, delta);
+
     if (this.inputPayload.left) {
-      this.myPlayer?.update(Anim.LEFT, PLAYER_VELOCITY);
+      this.myPlayer.x -= PLAYER_VELOCITY * delta;
+      this.myPlayer.updateAnim(Anim.LEFT);
+    } else if (this.inputPayload.right) {
+      this.myPlayer.x += PLAYER_VELOCITY * delta;
+      this.myPlayer.updateAnim(Anim.RIGHT);
     }
-    if (this.inputPayload.right) {
-      this.myPlayer?.update(Anim.RIGHT, PLAYER_VELOCITY);
-    }
+
     if (this.inputPayload.up) {
-      this.myPlayer?.update(Anim.UP, PLAYER_VELOCITY);
-    }
-    if (this.inputPayload.down) {
-      this.myPlayer?.update(Anim.DOWN, PLAYER_VELOCITY);
+      this.myPlayer.y -= PLAYER_VELOCITY * delta;
+      this.myPlayer.updateAnim(Anim.UP);
+    } else if (this.inputPayload.down) {
+      this.myPlayer.y += PLAYER_VELOCITY * delta;
+      this.myPlayer.updateAnim(Anim.DOWN);
     }
 
     // Check for the iddle anim
@@ -238,20 +265,6 @@ export class SceneLevel1 extends Phaser.Scene {
     }
 
     // LERP other players
-    this.players.forEach((player) => {
-      const serverX = player?.getData(SpriteData.SERVER_X);
-      const serverY = player?.getData(SpriteData.SERVER_Y);
-      const serverAnim = player?.getData(SpriteData.SERVER_ANIM);
-
-      if (serverX) {
-        player.updatePositionX(serverX);
-      }
-      if (serverY) {
-        player.updatePositionY(serverY);
-      }
-      if (serverAnim) {
-        player.updateAnim(serverAnim);
-      }
-    });
+    this.updateOtherPlayers();
   }
 }

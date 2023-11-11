@@ -8,6 +8,7 @@ import {
   LauchOptions,
   PLAYER_VELOCITY,
 } from "../../shared/types";
+import { processPlayerAction } from "../../shared/characters";
 
 export class GameEngine {
   private world: Matter.World = null;
@@ -66,38 +67,52 @@ export class GameEngine {
     });
   }
 
-  processPlayerAction(sessionId: string, input: InputPayload) {
-    this.debug();
+  processAction(sessionId: string, input: InputPayload, delta: number) {
     const player = this.players[sessionId];
     const playerState = this.state.players.get(sessionId);
 
-    let vx = 0;
-    let vy = 0;
-
     if (!player || !playerState) return;
 
-    if (input.left) {
-      vx = -PLAYER_VELOCITY;
-      vy = 0;
-      playerState.anim = Anim.LEFT;
-    } else if (input.right) {
-      vx = PLAYER_VELOCITY;
-      vy = 0;
-      playerState.anim = Anim.RIGHT;
-    }
-
-    if (input.up) {
-      vy = -PLAYER_VELOCITY;
-      vx = 0;
-      playerState.anim = Anim.UP;
-    } else if (input.down) {
-      vy = PLAYER_VELOCITY;
-      vx = 0;
-      playerState.anim = Anim.DOWN;
-    }
-
-    Matter.Body.setVelocity(player, { x: vx, y: vy });
+    processPlayerAction(
+      player,
+      input,
+      delta,
+      (anim) => (playerState.anim = anim)
+    );
   }
+
+  // processPlayerAction(sessionId: string, input: InputPayload) {
+  //   this.debug();
+  //   const player = this.players[sessionId];
+  //   const playerState = this.state.players.get(sessionId);
+
+  //   let vx = 0;
+  //   let vy = 0;
+
+  //   if (!player || !playerState) return;
+
+  //   if (input.left) {
+  //     vx = -PLAYER_VELOCITY;
+  //     vy = 0;
+  //     playerState.anim = Anim.LEFT;
+  //   } else if (input.right) {
+  //     vx = PLAYER_VELOCITY;
+  //     vy = 0;
+  //     playerState.anim = Anim.RIGHT;
+  //   }
+
+  //   if (input.up) {
+  //     vx = 0;
+  //     vy = -PLAYER_VELOCITY;
+  //     playerState.anim = Anim.UP;
+  //   } else if (input.down) {
+  //     vx = 0;
+  //     vy = PLAYER_VELOCITY;
+  //     playerState.anim = Anim.DOWN;
+  //   }
+
+  //   Matter.Body.setVelocity(player, { x: vx, y: vy });
+  // }
 
   addPlayer(sessionId: string, lauchOptions: LauchOptions) {
     const player = Matter.Bodies.rectangle(
