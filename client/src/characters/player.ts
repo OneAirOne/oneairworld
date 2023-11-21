@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import { Physics } from "phaser";
 
 import { SpriteData } from "game.config";
 
@@ -23,6 +22,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     frame?: string | number
   ) {
     super(scene.matter.world, x, y, texture, frame);
+
     // Add sprite to the display list
     // Credits : https://github.com/photonstorm/phaser/issues/4255#issuecomment-586084493
     this.scene.add.existing(this);
@@ -35,13 +35,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         type: "rectangle",
         width: sharedConfig.SPRITE_SIZE,
         height: sharedConfig.SPRITE_SIZE,
-      },
-      {
-        restitution: 0,
-        friction: 0,
-        frictionAir: 0,
-        frictionStatic: 0,
       }
+      // {
+      //   restitution: 0,
+      //   friction: 0.8,
+      //   frictionAir: 1,
+      //   frictionStatic: 0,
+      // }
     );
   }
 
@@ -50,9 +50,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   }
 
   processAction(input: InputPayload, delta: number) {
-    console.log("in");
+    console.log("processAction delta", delta);
 
-    processPlayerAction(this.body, input, delta, (anim) =>
+    processPlayerAction(this.scene.matter, this.body, input, delta, (anim) =>
       this.updateAnim(anim)
     );
   }
@@ -93,57 +93,17 @@ export class Player extends Phaser.Physics.Matter.Sprite {
    *
    * Credits: https://learn.colyseus.io/phaser/2-linear-interpolation.html
    */
-  update(
-    field: string,
-    value: number | string | boolean,
-    deltaTime?: number
-  ): void {
-    let vx = 0;
-    let vy = 0;
-
+  update(field: string, value: number | string | boolean): void {
     switch (field) {
-      // Used form my player
-      case Anim.LEFT:
-        if (deltaTime) {
-        }
-        break;
-      case Anim.RIGHT:
-        if (deltaTime) {
-          vx = PLAYER_VELOCITY * deltaTime;
-          vy = 0;
-          this.updateAnim(Anim.RIGHT);
-        }
-        break;
-      case Anim.UP:
-        if (deltaTime) {
-          vx = 0;
-          vy = -(PLAYER_VELOCITY * deltaTime);
-          this.updateAnim(Anim.UP);
-        }
-        break;
-      case Anim.DOWN:
-        if (deltaTime) {
-          vx = 0;
-          vy = PLAYER_VELOCITY * deltaTime;
-          this.updateAnim(Anim.DOWN);
-        }
-        break;
-
       // Used for other players and player debugging with remoteRef
       case "x":
         if (typeof value === "number") {
-          console.log("X");
-
           this.setData(SpriteData.SERVER_X, value);
-          // @ts-ignore
-          this.scene.remoteRef.x = value;
         }
         break;
       case "y":
         if (typeof value === "number") {
           this.setData(SpriteData.SERVER_Y, value);
-          // @ts-ignore
-          this.scene.remoteRef.y = value;
         }
         break;
       case "anim":
@@ -152,6 +112,5 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         }
         break;
     }
-    // this.setVelocity(vx, vy);
   }
 }

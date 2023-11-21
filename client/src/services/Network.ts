@@ -88,6 +88,10 @@ export class Network {
           //   console.log("[Network] update ", field, value);
           // }
 
+          if (sessionId === this.room?.sessionId) {
+            phaserEvents.emit(Event.REMOTE_REF, player);
+          }
+
           phaserEvents.emit(Event.PLAYER_UPDATED, field, value, sessionId);
         });
       };
@@ -134,6 +138,13 @@ export class Network {
     context?: any
   ) {
     phaserEvents.on(Event.PLAYER_UPDATED, callback, context);
+  }
+
+  /**
+   * Register event listener and call back function when a remote ref updated
+   */
+  onRemoteRefUpdated(callback: (player: IPlayer) => void, context?: any) {
+    phaserEvents.on(Event.REMOTE_REF, callback, context);
   }
 
   onPlayerJoin(

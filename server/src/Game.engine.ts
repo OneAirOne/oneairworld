@@ -9,7 +9,11 @@ import {
   PLAYER_VELOCITY,
 } from "../../shared/types";
 import { processPlayerAction } from "../../shared/characters";
-
+/**
+ * All physics are opered on the game engine 2d MatterJs
+ *
+ * credits: https://www.imini.app/docs/tutorial-multiple-player/server-combine
+ */
 export class GameEngine {
   private world: Matter.World = null;
   private state: GameState = null;
@@ -74,45 +78,14 @@ export class GameEngine {
     if (!player || !playerState) return;
 
     processPlayerAction(
+      Matter,
       player,
       input,
       delta,
       (anim) => (playerState.anim = anim)
     );
+    this.debug();
   }
-
-  // processPlayerAction(sessionId: string, input: InputPayload) {
-  //   this.debug();
-  //   const player = this.players[sessionId];
-  //   const playerState = this.state.players.get(sessionId);
-
-  //   let vx = 0;
-  //   let vy = 0;
-
-  //   if (!player || !playerState) return;
-
-  //   if (input.left) {
-  //     vx = -PLAYER_VELOCITY;
-  //     vy = 0;
-  //     playerState.anim = Anim.LEFT;
-  //   } else if (input.right) {
-  //     vx = PLAYER_VELOCITY;
-  //     vy = 0;
-  //     playerState.anim = Anim.RIGHT;
-  //   }
-
-  //   if (input.up) {
-  //     vx = 0;
-  //     vy = -PLAYER_VELOCITY;
-  //     playerState.anim = Anim.UP;
-  //   } else if (input.down) {
-  //     vx = 0;
-  //     vy = PLAYER_VELOCITY;
-  //     playerState.anim = Anim.DOWN;
-  //   }
-
-  //   Matter.Body.setVelocity(player, { x: vx, y: vy });
-  // }
 
   addPlayer(sessionId: string, lauchOptions: LauchOptions) {
     const player = Matter.Bodies.rectangle(
@@ -125,6 +98,10 @@ export class GameEngine {
     Matter.Composite.add(this.world, [player]);
 
     this.state.createPlayer(sessionId, lauchOptions);
+  }
+
+  update(deltaTime: number): void {
+    Matter.Engine.update(this.engine, deltaTime);
   }
 
   private createWall() {

@@ -1,16 +1,16 @@
-import { Room, Client } from "colyseus";
-import { Dispatcher } from "@colyseus/command";
-import bcrypt from "bcrypt";
-import Matter from "matter-js";
+import { Room, Client } from 'colyseus';
+import { Dispatcher } from '@colyseus/command';
+import bcrypt from 'bcrypt';
+import Matter from 'matter-js';
 
 // Schemas
-import { GameState } from "./schema/GameState";
-import { Player } from "./schema/Player";
+import { GameState } from './schema/GameState';
+import { Player } from './schema/Player';
 
 // Commands
-import { PlayerUpdateCommand } from "./commands";
+import { PlayerUpdateCommand } from './commands';
 
-import { GameEngine } from "../GameEngine";
+import { GameEngine } from '../Game.engine';
 
 // Shared
 import {
@@ -20,8 +20,8 @@ import {
   LauchOptions,
   PLAYER_VELOCITY,
   Anim,
-} from "../../../shared/types";
-import { getIddleAnim } from "../../../shared/helpers";
+} from '../../../shared/types';
+import { getIddleAnim } from '../../../shared/helpers';
 
 /**
  * Game room
@@ -80,38 +80,21 @@ export class Game extends Room<GameState> {
         elapsedTime -= this.fixedTimeStep;
         this.update(this.fixedTimeStep);
       }
+
+      // this.engine.update(deltaTime);
     });
+
+    // Game loop
+    // this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }
 
   update(deltaTime: number) {
-    // Matter.Engine.update(this.engine.getEngine(), deltaTime);
-
     this.state.players.forEach((player, sessionId) => {
       let input: InputPayload;
 
-      console.log("---------------------");
-      console.log(`[${sessionId}] x:${player.x} y:${player.y}`);
-
       // Dequeue player inputs
       while ((input = player.inputQueue.shift())) {
-        // this.engine.processPlayerAction(sessionId, input);
-
-        // this.engine.processAction(sessionId, input, deltaTime);
-        if (input.left) {
-          player.x -= PLAYER_VELOCITY * deltaTime;
-          player.anim = Anim.LEFT;
-        } else if (input.right) {
-          player.x += PLAYER_VELOCITY * deltaTime;
-          player.anim = Anim.RIGHT;
-        }
-
-        if (input.up) {
-          player.y -= PLAYER_VELOCITY * deltaTime;
-          player.anim = Anim.UP;
-        } else if (input.down) {
-          player.y += PLAYER_VELOCITY * deltaTime;
-          player.anim = Anim.DOWN;
-        }
+        this.engine.processAction(sessionId, input, deltaTime);
 
         // Check for the iddle anim
         const iddleAnim = getIddleAnim(input, player.anim as Anim);
@@ -119,8 +102,9 @@ export class Game extends Room<GameState> {
         if (iddleAnim) {
           player.anim = iddleAnim;
         }
-
         player.tick = input.tick;
+
+        this.engine.update(deltaTime);
       }
     });
   }
@@ -129,7 +113,7 @@ export class Game extends Room<GameState> {
    * Call when a new player join a room
    */
   onJoin(client: Client, lauchOptions: LauchOptions) {
-    console.log(client.sessionId, "joined!", lauchOptions);
+    console.log(client.sessionId, 'joined!', lauchOptions);
 
     // const player = new Player();
 
@@ -160,6 +144,6 @@ export class Game extends Room<GameState> {
    * Call when a player dispose
    */
   onDispose() {
-    console.log("[GAME] onDispose");
+    console.log('[GAME] onDispose');
   }
 }

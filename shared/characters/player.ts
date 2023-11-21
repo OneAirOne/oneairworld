@@ -1,20 +1,20 @@
-import Matter from "matter-js";
-
 import { Anim, InputPayload, PLAYER_VELOCITY } from "../types";
 
 export function processPlayerAction(
+  matterInstance: any,
   body: any,
   input: InputPayload,
   delta: number,
   updateAnim: (anim: Anim) => void
 ) {
+  const { setVelocity } = matterInstance?.body || matterInstance?.Body;
+
   let vx = 0;
   let vy = 0;
 
-  if (!body) return;
+  if (!body || !matterInstance) return;
 
   if (input.left) {
-    console.log("hit", body);
     vx = -(PLAYER_VELOCITY * delta);
     vy = 0;
     updateAnim(Anim.LEFT);
@@ -34,5 +34,5 @@ export function processPlayerAction(
     updateAnim(Anim.DOWN);
   }
 
-  // Matter.Body.setVelocity(body, { x: vx, y: vy });
+  setVelocity(body, { x: vx, y: vy });
 }
