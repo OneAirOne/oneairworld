@@ -14,6 +14,15 @@ import { processPlayerAction } from "../../shared/characters";
  *
  * credits: https://www.imini.app/docs/tutorial-multiple-player/server-combine
  */
+
+const WALL_CONFIG = {
+  isStatic: true,
+  collisionFilter: {
+    category: 0x0001,
+  },
+  group: "wall",
+};
+
 export class GameEngine {
   private world: Matter.World = null;
   private state: GameState = null;
@@ -81,10 +90,9 @@ export class GameEngine {
       Matter,
       player,
       input,
-      delta,
       (anim) => (playerState.anim = anim)
     );
-    this.debug();
+    // this.debug();
   }
 
   addPlayer(sessionId: string, lauchOptions: LauchOptions) {
@@ -100,6 +108,17 @@ export class GameEngine {
     this.state.createPlayer(sessionId, lauchOptions);
   }
 
+  removePLayer(sessionId: string) {
+    if (this.state.players.has(sessionId)) {
+      this.state.players.delete(sessionId);
+    }
+
+    const player = this.players[sessionId];
+    if (player) {
+      Matter.Composite.remove(this.world, [player]);
+    }
+  }
+
   update(deltaTime: number): void {
     Matter.Engine.update(this.engine, deltaTime);
   }
@@ -107,7 +126,7 @@ export class GameEngine {
   private createWall() {
     let walls = [
       // Top wall
-      Matter.Bodies.rectangle(0, 0, sharedConfig.WORLD_WIDTH, 20, {
+      Matter.Bodies.rectangle(0, 0, sharedConfig.WORLD_WIDTH, 1, {
         isStatic: true,
       }),
       // Bottom wall
@@ -115,8 +134,8 @@ export class GameEngine {
         sharedConfig.WORLD_HEIGHT,
         sharedConfig.WORLD_HEIGHT,
         sharedConfig.WORLD_WIDTH,
-        sharedConfig.SPRITE_SIZE,
-        { isStatic: true }
+        sharedConfig.WORLD_WALL_SIZE,
+        WALL_CONFIG
       ),
       // Right wall
       Matter.Bodies.rectangle(
@@ -124,7 +143,7 @@ export class GameEngine {
         sharedConfig.WORLD_WIDTH,
         sharedConfig.WORLD_HEIGHT,
         sharedConfig.WORLD_WALL_SIZE,
-        { isStatic: true }
+        WALL_CONFIG
       ),
       // Left wall
       Matter.Bodies.rectangle(
@@ -132,9 +151,7 @@ export class GameEngine {
         sharedConfig.WORLD_HEIGHT,
         sharedConfig.WORLD_WIDTH,
         sharedConfig.WORLD_WALL_SIZE,
-        {
-          isStatic: true,
-        }
+        WALL_CONFIG
       ),
     ];
 

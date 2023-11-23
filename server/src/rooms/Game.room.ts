@@ -1,16 +1,16 @@
-import { Room, Client } from 'colyseus';
-import { Dispatcher } from '@colyseus/command';
-import bcrypt from 'bcrypt';
-import Matter from 'matter-js';
+import { Room, Client } from "colyseus";
+import { Dispatcher } from "@colyseus/command";
+import bcrypt from "bcrypt";
+import Matter from "matter-js";
 
 // Schemas
-import { GameState } from './schema/GameState';
-import { Player } from './schema/Player';
+import { GameState } from "./schema/GameState";
+import { Player } from "./schema/Player";
 
 // Commands
-import { PlayerUpdateCommand } from './commands';
+import { PlayerUpdateCommand } from "./commands";
 
-import { GameEngine } from '../Game.engine';
+import { GameEngine } from "../Game.engine";
 
 // Shared
 import {
@@ -20,8 +20,8 @@ import {
   LauchOptions,
   PLAYER_VELOCITY,
   Anim,
-} from '../../../shared/types';
-import { getIddleAnim } from '../../../shared/helpers';
+} from "../../../shared/types";
+import { getIddleAnim } from "../../../shared/helpers";
 
 /**
  * Game room
@@ -77,11 +77,13 @@ export class Game extends Room<GameState> {
       elapsedTime += deltaTime;
 
       while (elapsedTime >= this.fixedTimeStep) {
-        elapsedTime -= this.fixedTimeStep;
-        this.update(this.fixedTimeStep);
-      }
+        console.log(elapsedTime, this.fixedTimeStep);
 
-      // this.engine.update(deltaTime);
+        elapsedTime -= this.fixedTimeStep;
+
+        this.update(this.fixedTimeStep);
+        this.engine.update(deltaTime);
+      }
     });
 
     // Game loop
@@ -103,8 +105,6 @@ export class Game extends Room<GameState> {
           player.anim = iddleAnim;
         }
         player.tick = input.tick;
-
-        this.engine.update(deltaTime);
       }
     });
   }
@@ -113,7 +113,7 @@ export class Game extends Room<GameState> {
    * Call when a new player join a room
    */
   onJoin(client: Client, lauchOptions: LauchOptions) {
-    console.log(client.sessionId, 'joined!', lauchOptions);
+    console.log(client.sessionId, "joined!", lauchOptions);
 
     // const player = new Player();
 
@@ -135,15 +135,13 @@ export class Game extends Room<GameState> {
    * Call when a player leave the room
    */
   onLeave(client: Client, consented: boolean) {
-    if (this.state.players.has(client.sessionId)) {
-      this.state.players.delete(client.sessionId);
-    }
+    this.engine.removePLayer(client.sessionId);
   }
 
   /**
    * Call when a player dispose
    */
   onDispose() {
-    console.log('[GAME] onDispose');
+    console.log("[GAME] onDispose");
   }
 }

@@ -29,20 +29,17 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.playerId = id;
     this.playerTexture = texture;
     this.anims.play(`${this.playerTexture}${Anim.IDDLE_DOWN}`, true);
-    this.setBounce(0);
-    this.setBody(
-      {
-        type: "rectangle",
-        width: sharedConfig.SPRITE_SIZE,
-        height: sharedConfig.SPRITE_SIZE,
-      }
-      // {
-      //   restitution: 0,
-      //   friction: 0.8,
-      //   frictionAir: 1,
-      //   frictionStatic: 0,
-      // }
-    );
+
+    // Physic settings
+    this.setBody({
+      type: "rectangle",
+      width: sharedConfig.SPRITE_SIZE,
+      height: sharedConfig.SPRITE_SIZE,
+    });
+    // this.setFriction(0.05);
+    // this.setFrictionAir(0.0005);
+    // this.setBounce(0.9);
+    // this.setMass(5);
   }
 
   protected getBody(): MatterJS.Body {
@@ -50,9 +47,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   }
 
   processAction(input: InputPayload, delta: number) {
-    console.log("processAction delta", delta);
-
-    processPlayerAction(this.scene.matter, this.body, input, delta, (anim) =>
+    processPlayerAction(this.scene.matter, this.body, input, (anim) =>
       this.updateAnim(anim)
     );
   }
@@ -95,7 +90,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
    */
   update(field: string, value: number | string | boolean): void {
     switch (field) {
-      // Used for other players and player debugging with remoteRef
+      // Used for other players
       case "x":
         if (typeof value === "number") {
           this.setData(SpriteData.SERVER_X, value);

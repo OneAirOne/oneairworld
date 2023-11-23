@@ -1,19 +1,19 @@
-import Phaser from 'phaser';
+import Phaser from "phaser";
 
 // Network
-import { Network } from 'services/Network';
+import { Network } from "services/Network";
 
 // Characters
-import { createCharacterAnims, onairAnimsConfig, Player } from 'characters';
+import { createCharacterAnims, onairAnimsConfig, Player } from "characters";
 
 // Others
-import { SCENES } from './scene.config';
-import gameConfig, { SpriteData } from 'game.config';
-import { sharedConfig } from '../../../shared/config';
+import { SCENES } from "./scene.config";
+import gameConfig, { SpriteData } from "game.config";
+import { sharedConfig } from "../../../shared/config";
 
 // Shared
-import { type InputPayload, type IPlayer, Anim } from '../../../shared/types';
-import { getIddleAnim } from '../../../shared/helpers';
+import { type InputPayload, type IPlayer, Anim } from "../../../shared/types";
+import { getIddleAnim } from "../../../shared/helpers";
 
 export class GameScene extends Phaser.Scene {
   private network!: Network;
@@ -58,20 +58,29 @@ export class GameScene extends Phaser.Scene {
    */
   create(data: { network: Network }) {
     this.debugFPS = this.add
-      .text(190, 0, '', {
-        fontSize: '10px',
+      .text(190, 0, "", {
+        fontSize: "9px",
         padding: { x: 5, y: 5 },
-        backgroundColor: '#000000',
-        color: '#ffffff',
+        backgroundColor: "#000000",
+        color: "#ffffff",
       })
-      .setResolution(10);
+      .setResolution(12);
+
+    this.debugPlayer = this.add
+      .text(0, 0, "", {
+        fontSize: "9px",
+        padding: { x: 5, y: 5 },
+        backgroundColor: "#000000",
+        color: "#ffffff",
+      })
+      .setResolution(12);
 
     const { network } = data;
 
-    console.log('Create Game scene', network.sessionId);
+    console.log("Create Game scene", network.sessionId);
 
     if (!network) {
-      throw new Error('Network instance is missing');
+      throw new Error("Network instance is missing");
     } else {
       this.network = network;
     }
@@ -97,7 +106,7 @@ export class GameScene extends Phaser.Scene {
    * Call when networks left events are triggered
    */
   handleLeftPlayer(sessionId: string) {
-    console.log('player left room 1', sessionId);
+    console.log("player left room 1", sessionId);
 
     const player = this.players.get(sessionId);
     if (!player) return;
@@ -109,7 +118,7 @@ export class GameScene extends Phaser.Scene {
    * Call when networks join events are triggered
    */
   handleJoinPLayer(player: IPlayer, sessionId: string) {
-    console.log('[scene] join ', this.network.sessionId, sessionId);
+    console.log("[scene] join ", this.network.sessionId, sessionId);
 
     const newPlayer = new Player(
       this,
@@ -122,7 +131,7 @@ export class GameScene extends Phaser.Scene {
     if (sessionId === this.network.sessionId) {
       this.createWorld(newPlayer);
     } else {
-      console.log('[scene] NEW PLAYER');
+      console.log("[scene] NEW PLAYER");
       this.players.set(sessionId, newPlayer);
     }
   }
@@ -131,7 +140,7 @@ export class GameScene extends Phaser.Scene {
    * Create physic world and add my player
    */
   createWorld(myPlayer: Player) {
-    console.log('Create world ', myPlayer);
+    console.log("Create world ", myPlayer);
 
     // Setup physics parameters
     this.matter.world.setBounds(
@@ -141,8 +150,6 @@ export class GameScene extends Phaser.Scene {
       sharedConfig.WORLD_HEIGHT,
       1
     );
-
-    this.matter.world.disableGravity();
 
     // Register player
     this.myPlayer = myPlayer;
@@ -177,46 +184,35 @@ export class GameScene extends Phaser.Scene {
   processServerUpdates(field: string, value: number | string, id: string) {
     if (id === this.network.sessionId && !!this.myPlayer) {
       // Reconcile
-      if (field === 'x' && this.remoteRef) {
+      if (field === "x" && this.remoteRef) {
         this.remoteRef.x = Number(value);
         this.lastServerX = Number(value);
+        // this.myPlayer.lerpPositionX(Number(value));
       }
-      if (field === 'y' && this.remoteRef) {
+      if (field === "y" && this.remoteRef) {
         this.remoteRef.y = Number(value);
         this.lastServerY = Number(value);
       }
 
-      if (field !== 'tick') {
-        console.log('field', field, value);
-        console.log('me ', this.myPlayer.x);
-      }
+      // if (field !== "tick") {
+      //   console.log("field", field, value);
+      //   console.log("me ", this.myPlayer.x);
+      // }
     } else {
       const player = this.players.get(id);
 
       if (!player) return;
-      if (field !== 'tick') {
-        console.log('other ', field, value);
-      }
+      // if (field !== "tick") {
+      //   console.log("other ", field, value);
+      // }
 
       player.update(field, value);
     }
-    this.debugPlayer = this.add
-      .text(
-        0,
-        0,
-        `
+    if (this.debugPlayer) {
+      this.debugPlayer.text = `
 ServerX ${this.lastServerX.toFixed(2)}, ClientX ${this.myPlayer.x.toFixed(2)}
-ServerY ${this.lastServerY.toFixed(2)} ClientY ${this.myPlayer.y.toFixed(2)}
-          `,
-        {
-          // fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
-          fontSize: '10px',
-          padding: { x: 5, y: 5 },
-          backgroundColor: '#000000',
-          color: '#ffffff',
-        }
-      )
-      .setResolution(10);
+ServerY ${this.lastServerY.toFixed(2)} ClientY ${this.myPlayer.y.toFixed(2)}`;
+    }
   }
 
   /**
@@ -264,13 +260,17 @@ ServerY ${this.lastServerY.toFixed(2)} ClientY ${this.myPlayer.y.toFixed(2)}
 
   elapsedTime = 0;
   fixedTimeStep = 1000 / 60;
+
   update(time: number, delta: number): void {
     if (!this.myPlayer) return;
 
     this.elapsedTime += delta;
 
     while (this.elapsedTime >= this.fixedTimeStep) {
+      // console.log(this.elapsedTime, this.fixedTimeStep);
       this.elapsedTime -= this.fixedTimeStep;
+      // console.log(1000 / delta);
+
       this.fixedTick(time, this.fixedTimeStep);
     }
 
@@ -283,6 +283,13 @@ ServerY ${this.lastServerY.toFixed(2)} ClientY ${this.myPlayer.y.toFixed(2)}
     this.currentTick++;
 
     if (!this.myPlayer) return;
+
+    // if (this.debugFPS) {
+    //   this.debugFPS.text = `Frame rate: ${this.game.loop.actualFps.toFixed(2)}`;
+    // }
+
+    const deltaMatter = this.matter.world.getDelta();
+    console.log(delta);
 
     this.inputPayload.left = this.cursorKeys.left.isDown;
     this.inputPayload.right = this.cursorKeys.right.isDown;
@@ -305,21 +312,5 @@ ServerY ${this.lastServerY.toFixed(2)} ClientY ${this.myPlayer.y.toFixed(2)}
 
     // LERP other players
     this.updateOtherPlayers();
-
-    // if (this.inputPayload.left) {
-    //   this.myPlayer.x -= PLAYER_VELOCITY * delta;
-    //   this.myPlayer.updateAnim(Anim.LEFT);
-    // } else if (this.inputPayload.right) {
-    //   this.myPlayer.x += PLAYER_VELOCITY * delta;
-    //   this.myPlayer.updateAnim(Anim.RIGHT);
-    // }
-
-    // if (this.inputPayload.up) {
-    //   this.myPlayer.y -= PLAYER_VELOCITY * delta;
-    //   this.myPlayer.updateAnim(Anim.UP);
-    // } else if (this.inputPayload.down) {
-    //   this.myPlayer.y += PLAYER_VELOCITY * delta;
-    //   this.myPlayer.updateAnim(Anim.DOWN);
-    // }
   }
 }

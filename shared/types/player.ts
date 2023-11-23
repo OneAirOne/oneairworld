@@ -25,4 +25,4 @@ export interface IPlayer extends Schema {
   tick: number;
 }
 
-export const PLAYER_VELOCITY = 0.1;
+export const PLAYER_VELOCITY = 2;
