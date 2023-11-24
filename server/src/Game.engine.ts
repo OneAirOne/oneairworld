@@ -2,13 +2,8 @@ import Matter from "matter-js";
 
 import { GameState } from "./rooms/schema";
 import { sharedConfig } from "../../shared/config";
-import {
-  Anim,
-  InputPayload,
-  LauchOptions,
-  PLAYER_VELOCITY,
-} from "../../shared/types";
-import { processPlayerAction } from "../../shared/characters";
+import { InputPayload, LauchOptions } from "../../shared/types";
+import { processPlayerAction } from "./helpers";
 /**
  * All physics are opered on the game engine 2d MatterJs
  *
@@ -87,12 +82,11 @@ export class GameEngine {
     if (!player || !playerState) return;
 
     processPlayerAction(
-      Matter,
       player,
+      playerState,
       input,
       (anim) => (playerState.anim = anim)
     );
-    // this.debug();
   }
 
   addPlayer(sessionId: string, lauchOptions: LauchOptions) {
@@ -126,9 +120,7 @@ export class GameEngine {
   private createWall() {
     let walls = [
       // Top wall
-      Matter.Bodies.rectangle(0, 0, sharedConfig.WORLD_WIDTH, 1, {
-        isStatic: true,
-      }),
+      Matter.Bodies.rectangle(0, 0, sharedConfig.WORLD_WIDTH, 1, WALL_CONFIG),
       // Bottom wall
       Matter.Bodies.rectangle(
         sharedConfig.WORLD_HEIGHT,

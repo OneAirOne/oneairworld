@@ -18,10 +18,8 @@ import {
   IRoomData,
   InputPayload,
   LauchOptions,
-  PLAYER_VELOCITY,
   Anim,
 } from "../../../shared/types";
-import { getIddleAnim } from "../../../shared/helpers";
 
 /**
  * Game room
@@ -77,8 +75,6 @@ export class Game extends Room<GameState> {
       elapsedTime += deltaTime;
 
       while (elapsedTime >= this.fixedTimeStep) {
-        console.log(elapsedTime, this.fixedTimeStep);
-
         elapsedTime -= this.fixedTimeStep;
 
         this.update(this.fixedTimeStep);
@@ -98,13 +94,12 @@ export class Game extends Room<GameState> {
       while ((input = player.inputQueue.shift())) {
         this.engine.processAction(sessionId, input, deltaTime);
 
-        // Check for the iddle anim
-        const iddleAnim = getIddleAnim(input, player.anim as Anim);
+        // // Check for the iddle anim
+        // const iddleAnim = getIddleAnim(input, player.anim as Anim);
 
-        if (iddleAnim) {
-          player.anim = iddleAnim;
-        }
-        player.tick = input.tick;
+        // if (iddleAnim) {
+        //   player.anim = iddleAnim;
+        // }
       }
     });
   }

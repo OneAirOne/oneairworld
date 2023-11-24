@@ -1,23 +1,18 @@
 import { BootScene, BackgroundScene, SceneLevel1 } from "scenes";
+import { sharedConfig } from "../../shared/config";
 
 export const phaserConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: "game-container",
   backgroundColor: "012622",
   pixelArt: true,
+  width: sharedConfig.WORLD_WIDTH,
+  height: sharedConfig.WORLD_HEIGHT,
   scale: {
     mode: Phaser.Scale.ScaleModes.RESIZE,
     width: window.innerWidth,
     height: window.innerHeight,
   },
-  physics: {
-    default: "matter",
-    matter: {
-      gravity: { y: 0 },
-      debug: true,
-    },
-  },
-
   scene: [BootScene, BackgroundScene, SceneLevel1],
 };
 

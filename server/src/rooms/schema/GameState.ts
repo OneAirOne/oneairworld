@@ -5,8 +5,7 @@ import { sharedConfig } from "../../../../shared/config";
 import type {
   IGameState,
   IPlayer,
-  InputPayload,
-  LauchOptions,
+  LauchOptions, // Check if unused
 } from "../../../../shared/types";
 
 import { Player } from "./Player";

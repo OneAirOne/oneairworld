@@ -6,53 +6,50 @@ import { sharedConfig } from "../../../shared/config";
 import { Anim, InputPayload, PLAYER_VELOCITY } from "../../../shared/types";
 import { processPlayerAction } from "../../../shared/characters/player";
 
-/* -------------------------------- Constant -------------------------------- */
-
 const INTERPOLATION_PERCENT = 0.2;
 
-/* ---------------------------------- Class --------------------------------- */
-
-export class Player extends Phaser.GameObjects.Sprite {
-  private _playerId: string;
-  private _playerTexture: string;
+export class Player extends Phaser.Physics.Matter.Sprite {
+  playerId: string;
+  playerTexture: string;
   lastAnim: Anim = Anim.IDDLE_DOWN;
-  private _cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
     texture: string,
-    id: string
+    id: string,
+    frame?: string | number
   ) {
-    super(scene, x, y, texture);
-    console.log(texture);
+    super(scene.matter.world, x, y, texture, frame);
 
+    // Add sprite to the display list
+    // Credits : https://github.com/photonstorm/phaser/issues/4255#issuecomment-586084493
     this.scene.add.existing(this);
-    this._playerId = id;
-    this._playerTexture = texture;
-    this._cursors = this.scene.input.keyboard.createCursorKeys();
+    this.playerId = id;
+    this.playerTexture = texture;
+    this.anims.play(`${this.playerTexture}${Anim.IDDLE_DOWN}`, true);
 
-    // Add additional player setup here, such as animations or other properties
+    // Physic settings
+    this.setBody({
+      type: "rectangle",
+      width: sharedConfig.SPRITE_SIZE,
+      height: sharedConfig.SPRITE_SIZE,
+    });
+    // this.setFriction(0.05);
+    // this.setFrictionAir(0.0005);
+    // this.setBounce(0.9);
+    // this.setMass(5);
   }
 
-  // local input
-  inputPayload: InputPayload = {
-    left: false,
-    right: false,
-    up: false,
-    down: false,
-    tick: undefined,
-  };
+  protected getBody(): MatterJS.Body {
+    return this.body as MatterJS.Body;
+  }
 
-  handleInput(): InputPayload {
-    this.inputPayload.left = this._cursors.left.isDown;
-    this.inputPayload.right = this._cursors.right.isDown;
-    this.inputPayload.up = this._cursors.up.isDown;
-    this.inputPayload.down = this._cursors.down.isDown;
-    this.inputPayload.space = this._cursors.space.isDown;
-
-    return this.inputPayload;
+  processAction(input: InputPayload, delta: number) {
+    processPlayerAction(this.scene.matter, this.body, input, (anim) =>
+      this.updateAnim(anim)
+    );
   }
 
   /**
@@ -75,7 +72,7 @@ export class Player extends Phaser.GameObjects.Sprite {
    * Update sprite animation according to the direction
    */
   updateAnim(value: Anim) {
-    this.anims.play(`${this._playerTexture}${value}`, true);
+    this.anims.play(`${this.playerTexture}${value}`, true);
     this.lastAnim = value;
   }
 

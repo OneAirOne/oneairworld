@@ -16,21 +16,37 @@ export function processPlayerAction(
   if (input.left) {
     vx = -PLAYER_VELOCITY;
     vy = 0;
-    updateAnim(Anim.LEFT);
+    if (input.space) {
+      updateAnim(Anim.ATTACK_LEFT);
+    } else {
+      updateAnim(Anim.LEFT);
+    }
   } else if (input.right) {
     vx = PLAYER_VELOCITY;
     vy = 0;
-    updateAnim(Anim.RIGHT);
+    if (input.space) {
+      updateAnim(Anim.ATTACK_RIGHT);
+    } else {
+      updateAnim(Anim.RIGHT);
+    }
   }
 
   if (input.up) {
     vx = 0;
     vy = -PLAYER_VELOCITY;
-    updateAnim(Anim.UP);
+    if (input.space) {
+      updateAnim(Anim.ATTACK_UP);
+    } else {
+      updateAnim(Anim.UP);
+    }
   } else if (input.down) {
     vx = 0;
     vy = PLAYER_VELOCITY;
-    updateAnim(Anim.DOWN);
+    if (input.space) {
+      updateAnim(Anim.ATTACK_DOWN);
+    } else {
+      updateAnim(Anim.DOWN);
+    }
   }
 
   setVelocity(body, { x: vx, y: vy });

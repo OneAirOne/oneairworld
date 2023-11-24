@@ -8,19 +8,15 @@ import { createCharacterAnims, onairAnimsConfig, Player } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
-import gameConfig, { SpriteData } from "game.config";
-import { sharedConfig } from "../../../shared/config";
+import { SpriteData } from "game.config";
 
 // Shared
-import { type InputPayload, type IPlayer, Anim } from "../../../shared/types";
-import { getIddleAnim } from "../../../shared/helpers";
+import type { IPlayer } from "../../../shared/types";
 
 export class GameScene extends Phaser.Scene {
   private network!: Network;
   private players = new Map<string, Player>();
   private myPlayer!: Player;
-  private cursorKeys!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private lastAnim: Anim = Anim.IDDLE_DOWN;
 
   private lastServerX: number = 0;
   private lastServerY: number = 0;
@@ -29,15 +25,6 @@ export class GameScene extends Phaser.Scene {
 
   debugFPS: Phaser.GameObjects.Text | null = null;
   debugPlayer: Phaser.GameObjects.Text | null = null;
-
-  // local input
-  inputPayload: InputPayload = {
-    left: false,
-    right: false,
-    up: false,
-    down: false,
-    tick: undefined,
-  };
 
   currentTick: number = 0;
 
@@ -48,10 +35,7 @@ export class GameScene extends Phaser.Scene {
   /**
    * Call before scene creation
    */
-  preload() {
-    // Set up keyboard
-    this.cursorKeys = this.input.keyboard.createCursorKeys();
-  }
+  preload() {}
 
   /**
    * Create and initialize the scene
@@ -97,8 +81,7 @@ export class GameScene extends Phaser.Scene {
    */
   registerNetworkListeners() {
     this.network.onPlayerJoin(this.handleJoinPLayer, this);
-    this.network.onPlayerUpdated(this.processServerUpdates, this);
-    this.network.onRemoteRefUpdated(this.handleUpdateRemoteRef, this);
+    this.network.onPlayerUpdated(this.handleProcessServerUpdates, this);
     this.network.onPlayerLeft(this.handleLeftPlayer, this);
   }
 
@@ -110,7 +93,6 @@ export class GameScene extends Phaser.Scene {
 
     const player = this.players.get(sessionId);
     if (!player) return;
-    // TODO: check why the ref is not destroy
     player.destroy();
   }
 
@@ -129,82 +111,33 @@ export class GameScene extends Phaser.Scene {
     );
 
     if (sessionId === this.network.sessionId) {
-      this.createWorld(newPlayer);
+      this.myPlayer = newPlayer;
+      // Setup camera
+      this.cameras.main.setZoom(2);
+      this.cameras.main.startFollow(this.myPlayer, true);
     } else {
       console.log("[scene] NEW PLAYER");
       this.players.set(sessionId, newPlayer);
     }
+
+    // Set my player on top of other players
+    this?.myPlayer?.setDepth(this.players.size);
   }
 
-  /**
-   * Create physic world and add my player
-   */
-  createWorld(myPlayer: Player) {
-    console.log("Create world ", myPlayer);
-
-    // Setup physics parameters
-    this.matter.world.setBounds(
-      0,
-      0,
-      sharedConfig.WORLD_WIDTH,
-      sharedConfig.WORLD_HEIGHT,
-      1
-    );
-
-    // Register player
-    this.myPlayer = myPlayer;
-
-    // Setup camera
-    this.cameras.main.setZoom(2);
-    this.cameras.main.startFollow(this.myPlayer, true);
-
-    // Add remote ref to visualize server position
-    this.remoteRef = this.add.rectangle(
-      sharedConfig.WORLD_WIDTH / 2,
-      sharedConfig.WORLD_HEIGHT / 2,
-      sharedConfig.SPRITE_SIZE,
-      sharedConfig.SPRITE_SIZE
-    );
-    this?.remoteRef?.setStrokeStyle(1, 0xff0000);
-    this?.remoteRef?.setOrigin(0.5, 0.5);
-  }
-
-  /**
-   * Call when networks update ref events is triggered
-   */
-  handleUpdateRemoteRef(player: IPlayer) {
-    if (this.remoteRef) {
-      this.remoteRef.x = player.x;
-      this.remoteRef.y = player.y;
-    }
-  }
   /**
    * Call when networks update events are triggered
    */
-  processServerUpdates(field: string, value: number | string, id: string) {
+  handleProcessServerUpdates(
+    field: string,
+    value: number | string,
+    id: string
+  ) {
     if (id === this.network.sessionId && !!this.myPlayer) {
-      // Reconcile
-      if (field === "x" && this.remoteRef) {
-        this.remoteRef.x = Number(value);
-        this.lastServerX = Number(value);
-        // this.myPlayer.lerpPositionX(Number(value));
-      }
-      if (field === "y" && this.remoteRef) {
-        this.remoteRef.y = Number(value);
-        this.lastServerY = Number(value);
-      }
-
-      // if (field !== "tick") {
-      //   console.log("field", field, value);
-      //   console.log("me ", this.myPlayer.x);
-      // }
+      this.myPlayer.update(field, value);
     } else {
       const player = this.players.get(id);
 
       if (!player) return;
-      // if (field !== "tick") {
-      //   console.log("other ", field, value);
-      // }
 
       player.update(field, value);
     }
@@ -216,34 +149,39 @@ ServerY ${this.lastServerY.toFixed(2)} ClientY ${this.myPlayer.y.toFixed(2)}`;
   }
 
   /**
+   * Update my player
+   */
+  updateMyPlayers() {
+    const serverX = this.myPlayer?.getData(SpriteData.SERVER_X);
+    const serverY = this.myPlayer?.getData(SpriteData.SERVER_Y);
+    const serverAnim = this.myPlayer?.getData(SpriteData.SERVER_ANIM);
+    this.lastServerX = serverX;
+    this.lastServerY = serverY;
+
+    if (serverX) {
+      this.myPlayer.lerpPositionX(serverX);
+    }
+    if (serverY) {
+      this.myPlayer.lerpPositionY(serverY);
+    }
+    if (serverAnim) {
+      this.myPlayer.updateAnim(serverAnim);
+    }
+  }
+
+  /**
    * Update other players using LERP
    */
   updateOtherPlayers() {
-    // const serverX = this.myPlayer?.getData(SpriteData.SERVER_X);
-    // const serverY = this.myPlayer?.getData(SpriteData.SERVER_Y);
-    // const serverAnim = this.myPlayer?.getData(SpriteData.SERVER_ANIM);
-
-    // if (serverX) {
-    //   this.myPlayer.lerpPositionX(serverX);
-    // }
-    // if (serverY) {
-    //   this.myPlayer.lerpPositionY(serverY);
-    // }
-    // if (serverAnim) {
-    //   this.myPlayer.updateAnim(serverAnim);
-    // }
-
     this.players.forEach((player) => {
       const serverX = player?.getData(SpriteData.SERVER_X);
       const serverY = player?.getData(SpriteData.SERVER_Y);
       const serverAnim = player?.getData(SpriteData.SERVER_ANIM);
 
       if (serverX) {
-        // player.x = serverX;
         player.lerpPositionX(serverX);
       }
       if (serverY) {
-        // player.y = serverY;
         player.lerpPositionY(serverY);
       }
       if (serverAnim) {
@@ -257,60 +195,20 @@ ServerY ${this.lastServerY.toFixed(2)} ClientY ${this.myPlayer.y.toFixed(2)}`;
    * Client-side re-renders at every 16.6ms (60fps).
    * Credits: https://learn.colyseus.io/phaser/2-linear-interpolation
    */
-
-  elapsedTime = 0;
-  fixedTimeStep = 1000 / 60;
-
-  update(time: number, delta: number): void {
+  update(_time: number, delta: number) {
     if (!this.myPlayer) return;
-
-    this.elapsedTime += delta;
-
-    while (this.elapsedTime >= this.fixedTimeStep) {
-      // console.log(this.elapsedTime, this.fixedTimeStep);
-      this.elapsedTime -= this.fixedTimeStep;
-      // console.log(1000 / delta);
-
-      this.fixedTick(time, this.fixedTimeStep);
-    }
 
     if (this.debugFPS) {
       this.debugFPS.text = `Frame rate: ${this.game.loop.actualFps.toFixed(2)}`;
     }
-  }
 
-  fixedTick(_time: number, delta: number) {
-    this.currentTick++;
-
-    if (!this.myPlayer) return;
-
-    // if (this.debugFPS) {
-    //   this.debugFPS.text = `Frame rate: ${this.game.loop.actualFps.toFixed(2)}`;
-    // }
-
-    const deltaMatter = this.matter.world.getDelta();
-    console.log(delta);
-
-    this.inputPayload.left = this.cursorKeys.left.isDown;
-    this.inputPayload.right = this.cursorKeys.right.isDown;
-    this.inputPayload.up = this.cursorKeys.up.isDown;
-    this.inputPayload.down = this.cursorKeys.down.isDown;
-    this.inputPayload.tick = this.currentTick;
+    const inputs = this.myPlayer.handleInput();
 
     // Send input to the server at every tick
-    this.network.updatePlayer(this.inputPayload);
+    this.network.updatePlayer(inputs);
 
-    // Apply prediction
-    this.myPlayer.processAction(this.inputPayload, delta);
-
-    // Check for the iddle anim
-    const iddleAnim = getIddleAnim(this.inputPayload, this.myPlayer.lastAnim);
-
-    if (iddleAnim) {
-      this?.myPlayer.updateAnim(iddleAnim);
-    }
-
-    // LERP other players
+    // LERP  players
     this.updateOtherPlayers();
+    this.updateMyPlayers();
   }
 }
