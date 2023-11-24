@@ -75,6 +75,9 @@ export class GameEngine {
     });
   }
 
+  /**
+   * Execute inqueued player inputs
+   */
   processAction(sessionId: string, input: InputPayload, delta: number) {
     const player = this.players[sessionId];
     const playerState = this.state.players.get(sessionId);

@@ -120,7 +120,7 @@ export class GameScene extends Phaser.Scene {
       this.players.set(sessionId, newPlayer);
     }
 
-    // Set my player on top of other players
+    // Set my player on top of others
     this?.myPlayer?.setDepth(this.players.size);
   }
 

@@ -3,12 +3,18 @@ import Matter from "matter-js";
 import { Anim, InputPayload, PLAYER_VELOCITY } from "../../shared/types";
 import { Player } from "./rooms/schema";
 
+/**
+ * Check when no input key are pressed
+ */
 function noPressKeys(input: InputPayload): boolean {
   return (
     !input.left && !input.right && !input.up && !input.down && !input.space
   );
 }
 
+/**
+ * Update body according to the input
+ */
 export function processPlayerAction(
   body: Matter.Body,
   player: Player,
@@ -85,6 +91,9 @@ export function getIddleAnim(lastAnim: Anim) {
   return iddleAnim;
 }
 
+/**
+ * Check if last direction was left
+ */
 export function isLeft(lastAnim: Anim) {
   if (
     lastAnim === Anim.IDDLE_LEFT ||
@@ -97,6 +106,9 @@ export function isLeft(lastAnim: Anim) {
   }
 }
 
+/**
+ * Check if last direction was right
+ */
 export function isRight(lastAnim: Anim) {
   if (
     lastAnim === Anim.IDDLE_RIGHT ||
@@ -109,6 +121,9 @@ export function isRight(lastAnim: Anim) {
   }
 }
 
+/**
+ * Check if last direction was up
+ */
 export function isUp(lastAnim: Anim) {
   if (
     lastAnim === Anim.IDDLE_UP ||
@@ -121,6 +136,9 @@ export function isUp(lastAnim: Anim) {
   }
 }
 
+/**
+ * Check if last direction was down
+ */
 export function isDown(lastAnim: Anim) {
   if (
     lastAnim === Anim.IDDLE_DOWN ||

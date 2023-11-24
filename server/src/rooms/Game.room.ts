@@ -35,8 +35,6 @@ export class Game extends Room<GameState> {
 
   private engine: GameEngine = null;
 
-  fixedTimeStep = 1000 / 60;
-
   /**
    * Create the room and all messages dispatcher
    * according to the "command pattern"
@@ -68,22 +66,8 @@ export class Game extends Room<GameState> {
       });
     });
 
-    // Fix the tick rate with the client
-    let elapsedTime = 0;
-
-    this.setSimulationInterval((deltaTime) => {
-      elapsedTime += deltaTime;
-
-      while (elapsedTime >= this.fixedTimeStep) {
-        elapsedTime -= this.fixedTimeStep;
-
-        this.update(this.fixedTimeStep);
-        this.engine.update(deltaTime);
-      }
-    });
-
     // Game loop
-    // this.setSimulationInterval((deltaTime) => this.update(deltaTime));
+    this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }
 
   update(deltaTime: number) {
@@ -93,15 +77,10 @@ export class Game extends Room<GameState> {
       // Dequeue player inputs
       while ((input = player.inputQueue.shift())) {
         this.engine.processAction(sessionId, input, deltaTime);
-
-        // // Check for the iddle anim
-        // const iddleAnim = getIddleAnim(input, player.anim as Anim);
-
-        // if (iddleAnim) {
-        //   player.anim = iddleAnim;
-        // }
       }
     });
+
+    this.engine.update(deltaTime);
   }
 
   /**
@@ -109,14 +88,6 @@ export class Game extends Room<GameState> {
    */
   onJoin(client: Client, lauchOptions: LauchOptions) {
     console.log(client.sessionId, "joined!", lauchOptions);
-
-    // const player = new Player();
-
-    // // Set player with client options
-    // player.name = lauchOptions.name;
-    // player.texture = lauchOptions.texture;
-
-    // this.state.players.set(client.sessionId, player);
 
     this.engine.addPlayer(client.sessionId, lauchOptions);
 
