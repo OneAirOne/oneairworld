@@ -2,21 +2,24 @@ import Phaser from "phaser";
 
 import { SpriteData } from "game.config";
 
-import { sharedConfig } from "../../../shared/config";
-import { Anim, InputPayload, PLAYER_VELOCITY } from "../../../shared/types";
-import { processPlayerAction } from "../../../shared/characters/player";
+import { Anim, InputPayload } from "../../../shared/types";
+import { onairAnimsConfig } from "characters";
 
 /* -------------------------------- Constant -------------------------------- */
 
 const INTERPOLATION_PERCENT = 0.2;
+const ANIM_SUFFIX_ATTACK = "Attack";
 
 /* ---------------------------------- Class --------------------------------- */
 
 export class Player extends Phaser.GameObjects.Sprite {
   private _playerId: string;
   private _playerTexture: string;
-  lastAnim: Anim = Anim.IDDLE_DOWN;
   private _cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  private _animKeys: string[] = [];
+
+  lastAnim: Anim = Anim.IDDLE_DOWN;
+  private canUpdateAnim: boolean = true;
 
   constructor(
     scene: Phaser.Scene,
@@ -26,14 +29,40 @@ export class Player extends Phaser.GameObjects.Sprite {
     id: string
   ) {
     super(scene, x, y, texture);
-    console.log(texture);
 
     this.scene.add.existing(this);
     this._playerId = id;
     this._playerTexture = texture;
     this._cursors = this.scene.input.keyboard.createCursorKeys();
 
-    // Add additional player setup here, such as animations or other properties
+    this._animKeys = Object.keys(onairAnimsConfig).map(
+      (key) => onairAnimsConfig[key].key
+    );
+    const isAttackAnim = (anim: Phaser.Animations.Animation) => {
+      return this._animKeys
+        .filter((key) => key.endsWith(ANIM_SUFFIX_ATTACK))
+        .includes(anim?.key || "");
+    };
+
+    // Block anims when attack animation START
+    this.on(
+      Phaser.Animations.Events.ANIMATION_START,
+      (anim: Phaser.Animations.Animation) => {
+        if (isAttackAnim(anim)) {
+          this.canUpdateAnim = false;
+        }
+      }
+    );
+
+    // Release anims when attack animation COMPLETE
+    this.on(
+      Phaser.Animations.Events.ANIMATION_COMPLETE,
+      (anim: Phaser.Animations.Animation) => {
+        if (isAttackAnim(anim)) {
+          this.canUpdateAnim = true;
+        }
+      }
+    );
   }
 
   // local input
@@ -42,9 +71,16 @@ export class Player extends Phaser.GameObjects.Sprite {
     right: false,
     up: false,
     down: false,
-    tick: undefined,
+    space: false,
   };
 
+  getPlayerId() {
+    return this._playerId;
+  }
+
+  /**
+   * Synx player input payload with phaser cursors
+   */
   handleInput(): InputPayload {
     this.inputPayload.left = this._cursors.left.isDown;
     this.inputPayload.right = this._cursors.right.isDown;
@@ -75,7 +111,10 @@ export class Player extends Phaser.GameObjects.Sprite {
    * Update sprite animation according to the direction
    */
   updateAnim(value: Anim) {
-    this.anims.play(`${this._playerTexture}${value}`, true);
+    if (this.canUpdateAnim) {
+      this.play(`${this._playerTexture}${value}`, true);
+    }
+
     this.lastAnim = value;
   }
 

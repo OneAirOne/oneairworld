@@ -4,7 +4,7 @@ import Phaser from "phaser";
 import { Network } from "services/Network";
 
 // Characters
-import { createCharacterAnims, onairAnimsConfig, Player } from "characters";
+import { createAnim, onairAnimsConfig, Player } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
@@ -70,7 +70,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Create Oneair animation
-    createCharacterAnims(onairAnimsConfig, 10, this.anims);
+    createAnim(onairAnimsConfig, 10, this);
 
     // Register network event listener
     this.registerNetworkListeners();
@@ -112,6 +112,10 @@ export class GameScene extends Phaser.Scene {
 
     if (sessionId === this.network.sessionId) {
       this.myPlayer = newPlayer;
+
+      // this.myPlayer.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+      //   console.log("complete");
+      // });
       // Setup camera
       this.cameras.main.setZoom(2);
       this.cameras.main.startFollow(this.myPlayer, true);

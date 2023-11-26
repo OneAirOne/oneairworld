@@ -1,11 +1,9 @@
 import { Room, Client } from "colyseus";
 import { Dispatcher } from "@colyseus/command";
 import bcrypt from "bcrypt";
-import Matter from "matter-js";
 
 // Schemas
 import { GameState } from "./schema/GameState";
-import { Player } from "./schema/Player";
 
 // Commands
 import { PlayerUpdateCommand } from "./commands";
@@ -18,7 +16,6 @@ import {
   IRoomData,
   InputPayload,
   LauchOptions,
-  Anim,
 } from "../../../shared/types";
 
 /**
@@ -31,7 +28,6 @@ export class Game extends Room<GameState> {
   private dispatcher = new Dispatcher(this);
   private name: string;
   private password: string | null = null;
-  private lastAnim: Anim = Anim.IDDLE_DOWN;
 
   private engine: GameEngine = null;
 

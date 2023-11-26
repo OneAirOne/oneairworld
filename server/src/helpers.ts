@@ -24,6 +24,7 @@ export function processPlayerAction(
   let vx = 0;
   let vy = 0;
 
+  // MOVES
   if (input.left) {
     vx = -PLAYER_VELOCITY;
     vy = 0;
@@ -44,7 +45,10 @@ export function processPlayerAction(
     updateAnim(Anim.DOWN);
   }
 
+  // ATTACK
   if (input.space) {
+    vx = 0;
+    vy = 0;
     if (isLeft(player.anim as Anim)) {
       updateAnim(Anim.ATTACK_LEFT);
     }
@@ -59,6 +63,7 @@ export function processPlayerAction(
     }
   }
 
+  // NO KEY PRESSED
   if (noPressKeys(input)) {
     const iddleAnim = getIddleAnim(player.anim as Anim);
     if (iddleAnim) {

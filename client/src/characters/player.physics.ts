@@ -3,7 +3,7 @@ import Phaser from "phaser";
 import { SpriteData } from "game.config";
 
 import { sharedConfig } from "../../../shared/config";
-import { Anim, InputPayload, PLAYER_VELOCITY } from "../../../shared/types";
+import { Anim, InputPayload } from "../../../shared/types";
 import { processPlayerAction } from "../../../shared/characters/player";
 
 const INTERPOLATION_PERCENT = 0.2;
