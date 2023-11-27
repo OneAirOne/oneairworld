@@ -1,14 +1,18 @@
 import Phaser from "phaser";
 
-// Network
+// Services
 import { Network } from "services/Network";
+import ComponentService from "services/Component.service";
 
 // Characters
 import { createAnim, onairAnimsConfig, Player } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
-import { SpriteData } from "game.config";
+import gameConfig, { SpriteData } from "game.config";
+
+// Components
+import { ClickOnMeComponent } from "components/phaser/ClicOnMeComponent";
 
 // Shared
 import type { IPlayer } from "../../../shared/types";
@@ -17,6 +21,7 @@ export class GameScene extends Phaser.Scene {
   private network!: Network;
   private players = new Map<string, Player>();
   private myPlayer!: Player;
+  private components!: ComponentService;
 
   private lastServerX: number = 0;
   private lastServerY: number = 0;
@@ -30,6 +35,15 @@ export class GameScene extends Phaser.Scene {
 
   constructor() {
     super(SCENES.GAME);
+  }
+
+  init() {
+    // Create components service
+    this.components = new ComponentService();
+
+    this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.components.destroy();
+    });
   }
 
   /**
@@ -109,6 +123,9 @@ export class GameScene extends Phaser.Scene {
       player.texture,
       sessionId
     );
+
+    const image = this.add.image(0, 0, gameConfig.ITEMS.HEART_FILLED.NAME);
+    this.components.addComponent(image, new ClickOnMeComponent());
 
     if (sessionId === this.network.sessionId) {
       this.myPlayer = newPlayer;
@@ -216,5 +233,8 @@ Player ID : ${this.myPlayer.id}
     // LERP  players
     this.updateOtherPlayers();
     this.updateMyPlayers();
+
+    // Update components
+    this.components.update(delta);
   }
 }
