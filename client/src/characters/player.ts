@@ -13,7 +13,7 @@ const ANIM_SUFFIX_ATTACK = "Attack";
 /* ---------------------------------- Class --------------------------------- */
 
 export class Player extends Phaser.GameObjects.Sprite {
-  private _playerId: string;
+  id: string;
   private _playerTexture: string;
   private _cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   private _animKeys: string[] = [];
@@ -31,7 +31,7 @@ export class Player extends Phaser.GameObjects.Sprite {
     super(scene, x, y, texture);
 
     this.scene.add.existing(this);
-    this._playerId = id;
+    this.id = id;
     this._playerTexture = texture;
     this._cursors = this.scene.input.keyboard.createCursorKeys();
 
@@ -75,7 +75,7 @@ export class Player extends Phaser.GameObjects.Sprite {
   };
 
   getPlayerId() {
-    return this._playerId;
+    return this.id;
   }
 
   /**

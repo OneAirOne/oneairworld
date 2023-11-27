@@ -148,7 +148,9 @@ export class GameScene extends Phaser.Scene {
     if (this.debugPlayer) {
       this.debugPlayer.text = `
 ServerX ${this.lastServerX.toFixed(2)}, ClientX ${this.myPlayer.x.toFixed(2)}
-ServerY ${this.lastServerY.toFixed(2)} ClientY ${this.myPlayer.y.toFixed(2)}`;
+ServerY ${this.lastServerY.toFixed(2)} ClientY ${this.myPlayer.y.toFixed(2)}
+Player ID : ${this.myPlayer.id}
+`;
     }
   }
 

@@ -18,7 +18,8 @@
     "phaser": "^3.55.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.10.0"
+    "react-router-dom": "^6.10.0",
+    "short-uuid": "^4.2.2"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",

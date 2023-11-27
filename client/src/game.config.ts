@@ -34,6 +34,16 @@ const gameConfig = {
     SPRITE_SHEET_ATLAS_PATH: `assets/characters/characters.json`,
     SPRITE_SHEET_TEXTURE_PATH: `assets/characters/characters.png`,
   },
+  ITEMS: {
+    HEART: {
+      NAME: "heart",
+      PATH: "assets/items/heart.png",
+    },
+    HEART_FILLED: {
+      NAME: "heart-filled",
+      PATH: "assets/items/heart-filled.png",
+    },
+  },
   BACKGROUND: {
     BACKDROP: {
       NAME: "backdrop",

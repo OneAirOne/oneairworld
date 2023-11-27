@@ -1,7 +1,13 @@
 import Matter from "matter-js";
 
-import { Anim, InputPayload, PLAYER_VELOCITY } from "../../shared/types";
+import {
+  Anim,
+  DIRECTION,
+  InputPayload,
+  PLAYER_VELOCITY,
+} from "../../shared/types";
 import { Player } from "./rooms/schema";
+import { SwordMan } from "./characters";
 
 /**
  * Check when no input key are pressed
@@ -16,7 +22,7 @@ function noPressKeys(input: InputPayload): boolean {
  * Update body according to the input
  */
 export function processPlayerAction(
-  body: Matter.Body,
+  body: SwordMan,
   player: Player,
   input: InputPayload,
   updateAnim: (anim: Anim) => void
@@ -29,26 +35,32 @@ export function processPlayerAction(
     vx = -PLAYER_VELOCITY;
     vy = 0;
     updateAnim(Anim.LEFT);
+    player.direction = DIRECTION.WEST;
   } else if (input.right) {
     vx = PLAYER_VELOCITY;
     vy = 0;
     updateAnim(Anim.RIGHT);
+    player.direction = DIRECTION.EAST;
   }
 
   if (input.up) {
     vx = 0;
     vy = -PLAYER_VELOCITY;
     updateAnim(Anim.UP);
+    player.direction = DIRECTION.NORD;
   } else if (input.down) {
     vx = 0;
     vy = PLAYER_VELOCITY;
     updateAnim(Anim.DOWN);
+    player.direction = DIRECTION.SUD;
   }
 
   // ATTACK
   if (input.space) {
     vx = 0;
     vy = 0;
+    player.isAttacking = true;
+
     if (isLeft(player.anim as Anim)) {
       updateAnim(Anim.ATTACK_LEFT);
     }
@@ -61,6 +73,8 @@ export function processPlayerAction(
     if (isDown(player.anim as Anim)) {
       updateAnim(Anim.ATTACK_DOWN);
     }
+  } else {
+    player.isAttacking = false;
   }
 
   // NO KEY PRESSED
@@ -71,7 +85,8 @@ export function processPlayerAction(
     }
   }
 
-  Matter.Body.setVelocity(body, { x: vx, y: vy });
+  // TODO: create a fonction in player
+  Matter.Body.setVelocity(body.getBody(), { x: vx, y: vy });
 }
 
 /**

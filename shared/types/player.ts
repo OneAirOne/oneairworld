@@ -20,12 +20,20 @@ export enum Anim {
   IDDLE_DOWN = "IdleDown",
 }
 
+export enum DIRECTION {
+  NORD = "NORD",
+  SUD = "SUD",
+  WEST = "WEST",
+  EAST = "EAST",
+}
+
 export interface IPlayer extends Schema {
   name: string;
   x: number;
   y: number;
   anim: string;
   texture: Characters;
+  direction: DIRECTION;
 
   inputQueue: any[];
 }

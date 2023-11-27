@@ -8,7 +8,7 @@ import { GameState } from "./schema/GameState";
 // Commands
 import { PlayerUpdateCommand } from "./commands";
 
-import { GameEngine } from "../Game.engine";
+import { GameEngine } from "../engine/Game.engine";
 
 // Shared
 import {

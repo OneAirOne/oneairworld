@@ -41,6 +41,13 @@ export class BootScene extends Phaser.Scene {
       gameConfig.BACKGROUND.CLOUD.SPRITE_SHEET_ATLAS_PATH
     );
 
+    // Items
+    this.load.image(gameConfig.ITEMS.HEART.NAME, gameConfig.ITEMS.HEART.PATH);
+    this.load.image(
+      gameConfig.ITEMS.HEART_FILLED.NAME,
+      gameConfig.ITEMS.HEART_FILLED.PATH
+    );
+
     // Map
     this.load.image(gameConfig.MAP.NAME, gameConfig.MAP.TILESET_PATH);
     this.load.tilemapTiledJSON(
