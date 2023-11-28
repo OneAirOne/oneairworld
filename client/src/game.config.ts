@@ -1,4 +1,4 @@
-import { BootScene, BackgroundScene, SceneLevel1 } from "scenes";
+import { BootScene, BackgroundScene, GameScene, UIScene } from "scenes";
 import { sharedConfig } from "../../shared/config";
 
 export const phaserConfig: Phaser.Types.Core.GameConfig = {
@@ -12,14 +12,17 @@ export const phaserConfig: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.ScaleModes.RESIZE,
     width: window.innerWidth,
     height: window.innerHeight,
+    // zoom: 2,
   },
-  scene: [BootScene, BackgroundScene, SceneLevel1],
+  scene: [BootScene, BackgroundScene, GameScene, UIScene],
 };
 
-export enum SpriteData {
-  SERVER_X = "serverX",
-  SERVER_Y = "serverY",
-  SERVER_ANIM = "serverAnim",
+export enum SERVER_DATA {
+  X = "x",
+  Y = "y",
+  ANIM = "anim",
+  LIFE = "life",
+  IS_COLLIDED = "isCollided",
 }
 
 const gameConfig = {

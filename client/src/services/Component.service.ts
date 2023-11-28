@@ -13,9 +13,15 @@ export interface IComponent {
   destroy?: () => void;
 }
 
+/**
+ * Following component pattern, this service enable to share logic
+ * and follow life cicle component
+ *
+ * Credits : https://www.youtube.com/watch?v=qzsbGLghrMM
+ */
 export default class ComponentService {
-  private componentsByGameObject = new Map<string, IComponent[]>();
-  private queuedForStart: IComponent[] = [];
+  private _componentsByGameObject = new Map<string, IComponent[]>();
+  private _queuedForStart: IComponent[] = [];
 
   addComponent(go: Phaser.GameObjects.GameObject, component: IComponent) {
     // Give our gameObject a unique name
@@ -24,12 +30,12 @@ export default class ComponentService {
     }
 
     // Make sure there is a list of components for the gameObject
-    if (!this.componentsByGameObject.has(go.name)) {
-      this.componentsByGameObject.set(go.name, []);
+    if (!this._componentsByGameObject.has(go.name)) {
+      this._componentsByGameObject.set(go.name, []);
     }
 
     // Add new component to this gameobject's list
-    const list = this.componentsByGameObject.get(go.name) as IComponent[];
+    const list = this._componentsByGameObject.get(go.name) as IComponent[];
     list.push(component);
 
     component.init(go);
@@ -39,22 +45,22 @@ export default class ComponentService {
     }
 
     if (component.start) {
-      this.queuedForStart.push(component);
+      this._queuedForStart.push(component);
     }
   }
 
-  findComponent<ComponentType>(
+  findComponent(
     go: Phaser.GameObjects.GameObject,
     componentType: Constructor<any>
   ) {
-    const components = this.componentsByGameObject.get(go.name);
+    const components = this._componentsByGameObject.get(go.name);
     if (!components) return null;
 
     return components.find((component) => components instanceof componentType);
   }
 
   destroy() {
-    const entries = this.componentsByGameObject.entries();
+    const entries = this._componentsByGameObject.entries();
     for (const [, components] of entries) {
       components.forEach((component) => {
         if (component.destroy) {
@@ -65,15 +71,15 @@ export default class ComponentService {
   }
 
   update(dt: number) {
-    while (this.queuedForStart.length > 0) {
-      const component = this.queuedForStart.shift();
+    while (this._queuedForStart.length > 0) {
+      const component = this._queuedForStart.shift();
       if (component?.start) {
         component.start();
       }
     }
 
     // Update each component on each gameobject
-    const entries = this.componentsByGameObject.entries();
+    const entries = this._componentsByGameObject.entries();
     for (const [, components] of entries) {
       components.forEach((component) => {
         if (component.update) {

@@ -5,7 +5,7 @@ import { sharedConfig } from "../../../../shared/config";
 import type {
   IGameState,
   IPlayer,
-  LauchOptions, // Check if unused
+  LauchOptions,
 } from "../../../../shared/types";
 
 import { Player } from "./Player";
@@ -21,5 +21,7 @@ export class GameState extends Schema implements IGameState {
     newPlayer.name = lauchOptions.name;
     newPlayer.texture = lauchOptions.texture = lauchOptions.texture;
     this.players.set(sessionId, newPlayer);
+
+    return newPlayer;
   }
 }

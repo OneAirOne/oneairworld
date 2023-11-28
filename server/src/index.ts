@@ -16,7 +16,7 @@ const gameServer = new Server({
 });
 
 // DEBUG
-// gameServer.simulateLatency(200);
+gameServer.simulateLatency(0);
 
 // registry room handlers
 gameServer.define(RoomType.LOBBY, LobbyRoom);

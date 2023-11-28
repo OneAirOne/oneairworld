@@ -9,10 +9,10 @@ import { createAnim, onairAnimsConfig, Player } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
-import gameConfig, { SpriteData } from "game.config";
+import gameConfig, { SERVER_DATA } from "game.config";
 
 // Components
-import { ClickOnMeComponent } from "components/phaser/ClicOnMeComponent";
+import { ClickOnMeComponent, UiBarComponent } from "components/phaser";
 
 // Shared
 import type { IPlayer } from "../../../shared/types";
@@ -26,12 +26,8 @@ export class GameScene extends Phaser.Scene {
   private lastServerX: number = 0;
   private lastServerY: number = 0;
 
-  remoteRef: Phaser.GameObjects.Rectangle | null = null;
-
   debugFPS: Phaser.GameObjects.Text | null = null;
   debugPlayer: Phaser.GameObjects.Text | null = null;
-
-  currentTick: number = 0;
 
   constructor() {
     super(SCENES.GAME);
@@ -41,9 +37,14 @@ export class GameScene extends Phaser.Scene {
     // Create components service
     this.components = new ComponentService();
 
+    // Destroy all components of components services on scene shutdown
     this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.components.destroy();
+      this.scene.stop(SCENES.UI);
     });
+
+    // Update component after the scene loop
+    this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.lateUpdate, this);
   }
 
   /**
@@ -55,6 +56,7 @@ export class GameScene extends Phaser.Scene {
    * Create and initialize the scene
    */
   create(data: { network: Network }) {
+    // Debug
     this.debugFPS = this.add
       .text(190, 0, "", {
         fontSize: "9px",
@@ -72,6 +74,9 @@ export class GameScene extends Phaser.Scene {
         color: "#ffffff",
       })
       .setResolution(12);
+
+    // UI
+    this.scene.run(SCENES.UI);
 
     const { network } = data;
 
@@ -114,7 +119,7 @@ export class GameScene extends Phaser.Scene {
    * Call when networks join events are triggered
    */
   handleJoinPLayer(player: IPlayer, sessionId: string) {
-    console.log("[scene] join ", this.network.sessionId, sessionId);
+    console.log("[scene] join ", this.network.sessionId, sessionId, player);
 
     const newPlayer = new Player(
       this,
@@ -124,15 +129,12 @@ export class GameScene extends Phaser.Scene {
       sessionId
     );
 
-    const image = this.add.image(0, 0, gameConfig.ITEMS.HEART_FILLED.NAME);
-    this.components.addComponent(image, new ClickOnMeComponent());
+    this.components.addComponent(newPlayer, new UiBarComponent());
+    this.components.addComponent(newPlayer, new ClickOnMeComponent());
 
     if (sessionId === this.network.sessionId) {
       this.myPlayer = newPlayer;
 
-      // this.myPlayer.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-      //   console.log("complete");
-      // });
       // Setup camera
       this.cameras.main.setZoom(2);
       this.cameras.main.startFollow(this.myPlayer, true);
@@ -175,9 +177,12 @@ Player ID : ${this.myPlayer.id}
    * Update my player
    */
   updateMyPlayers() {
-    const serverX = this.myPlayer?.getData(SpriteData.SERVER_X);
-    const serverY = this.myPlayer?.getData(SpriteData.SERVER_Y);
-    const serverAnim = this.myPlayer?.getData(SpriteData.SERVER_ANIM);
+    const serverX = this.myPlayer?.getData(SERVER_DATA.X);
+    const serverY = this.myPlayer?.getData(SERVER_DATA.Y);
+    const serverAnim = this.myPlayer?.getData(SERVER_DATA.ANIM);
+    const serverLife = this.myPlayer?.getData(SERVER_DATA.LIFE);
+    const serverIsCollided = this.myPlayer?.getData(SERVER_DATA.IS_COLLIDED);
+
     this.lastServerX = serverX;
     this.lastServerY = serverY;
 
@@ -190,6 +195,12 @@ Player ID : ${this.myPlayer.id}
     if (serverAnim) {
       this.myPlayer.updateAnim(serverAnim);
     }
+    if (serverLife >= 0) {
+      this.myPlayer.updateLife(serverLife);
+    }
+    if (serverIsCollided) {
+      this.myPlayer.updateIsCollided(serverLife);
+    }
   }
 
   /**
@@ -197,9 +208,10 @@ Player ID : ${this.myPlayer.id}
    */
   updateOtherPlayers() {
     this.players.forEach((player) => {
-      const serverX = player?.getData(SpriteData.SERVER_X);
-      const serverY = player?.getData(SpriteData.SERVER_Y);
-      const serverAnim = player?.getData(SpriteData.SERVER_ANIM);
+      const serverX = player?.getData(SERVER_DATA.X);
+      const serverY = player?.getData(SERVER_DATA.Y);
+      const serverAnim = player?.getData(SERVER_DATA.ANIM);
+      const serverLife = player?.getData(SERVER_DATA.LIFE);
 
       if (serverX) {
         player.lerpPositionX(serverX);
@@ -209,6 +221,9 @@ Player ID : ${this.myPlayer.id}
       }
       if (serverAnim) {
         player.updateAnim(serverAnim);
+      }
+      if (serverLife >= 0) {
+        player.updateLife(serverLife);
       }
     });
   }
@@ -233,7 +248,9 @@ Player ID : ${this.myPlayer.id}
     // LERP  players
     this.updateOtherPlayers();
     this.updateMyPlayers();
+  }
 
+  lateUpdate(_time: number, delta: number) {
     // Update components
     this.components.update(delta);
   }

@@ -7,8 +7,6 @@ import Network, { Network as NetworkType } from "services/Network";
 import gameConfig from "game.config";
 import { SCENES } from "./scene.config";
 
-import { Characters, IPlayer, LauchOptions } from "../../../shared/types";
-
 export class BootScene extends Phaser.Scene {
   private preloadComplete = false;
   network!: NetworkType;

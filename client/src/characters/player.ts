@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-import { SpriteData } from "game.config";
+import { SERVER_DATA } from "game.config";
 
 import { Anim, InputPayload } from "../../../shared/types";
 import { onairAnimsConfig } from "characters";
@@ -13,13 +13,21 @@ const ANIM_SUFFIX_ATTACK = "Attack";
 /* ---------------------------------- Class --------------------------------- */
 
 export class Player extends Phaser.GameObjects.Sprite {
-  id: string;
   private _playerTexture: string;
   private _cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   private _animKeys: string[] = [];
-
+  private _canUpdateAnim: boolean = true;
+  private _inputPayload: InputPayload = {
+    left: false,
+    right: false,
+    up: false,
+    down: false,
+    space: false,
+  };
+  id: string;
   lastAnim: Anim = Anim.IDDLE_DOWN;
-  private canUpdateAnim: boolean = true;
+  life: number = 100;
+  isCollided: boolean = false;
 
   constructor(
     scene: Phaser.Scene,
@@ -49,7 +57,9 @@ export class Player extends Phaser.GameObjects.Sprite {
       Phaser.Animations.Events.ANIMATION_START,
       (anim: Phaser.Animations.Animation) => {
         if (isAttackAnim(anim)) {
-          this.canUpdateAnim = false;
+          console.log({});
+
+          this._canUpdateAnim = false;
         }
       }
     );
@@ -59,36 +69,31 @@ export class Player extends Phaser.GameObjects.Sprite {
       Phaser.Animations.Events.ANIMATION_COMPLETE,
       (anim: Phaser.Animations.Animation) => {
         if (isAttackAnim(anim)) {
-          this.canUpdateAnim = true;
+          this._canUpdateAnim = true;
         }
       }
     );
-  }
-
-  // local input
-  inputPayload: InputPayload = {
-    left: false,
-    right: false,
-    up: false,
-    down: false,
-    space: false,
-  };
-
-  getPlayerId() {
-    return this.id;
   }
 
   /**
    * Synx player input payload with phaser cursors
    */
   handleInput(): InputPayload {
-    this.inputPayload.left = this._cursors.left.isDown;
-    this.inputPayload.right = this._cursors.right.isDown;
-    this.inputPayload.up = this._cursors.up.isDown;
-    this.inputPayload.down = this._cursors.down.isDown;
-    this.inputPayload.space = this._cursors.space.isDown;
+    this._inputPayload.left = this._cursors.left.isDown;
+    this._inputPayload.right = this._cursors.right.isDown;
+    this._inputPayload.up = this._cursors.up.isDown;
+    this._inputPayload.down = this._cursors.down.isDown;
+    this._inputPayload.space = this._cursors.space.isDown;
 
-    return this.inputPayload;
+    return this._inputPayload;
+  }
+
+  updateLife(newLife: number) {
+    this.life = newLife;
+  }
+
+  updateIsCollided(isCollided: boolean) {
+    this.isCollided = isCollided;
   }
 
   /**
@@ -111,7 +116,7 @@ export class Player extends Phaser.GameObjects.Sprite {
    * Update sprite animation according to the direction
    */
   updateAnim(value: Anim) {
-    if (this.canUpdateAnim) {
+    if (this._canUpdateAnim) {
       this.play(`${this._playerTexture}${value}`, true);
     }
 
@@ -132,20 +137,27 @@ export class Player extends Phaser.GameObjects.Sprite {
    */
   update(field: string, value: number | string | boolean): void {
     switch (field) {
-      // Used for other players
-      case "x":
+      case SERVER_DATA.X:
         if (typeof value === "number") {
-          this.setData(SpriteData.SERVER_X, value);
+          this.setData(SERVER_DATA.X, value);
         }
         break;
-      case "y":
+      case SERVER_DATA.Y:
         if (typeof value === "number") {
-          this.setData(SpriteData.SERVER_Y, value);
+          this.setData(SERVER_DATA.Y, value);
         }
         break;
-      case "anim":
+      case SERVER_DATA.ANIM:
         if (typeof value === "string") {
-          this.setData(SpriteData.SERVER_ANIM, value);
+          this.setData(SERVER_DATA.ANIM, value);
+        }
+      case SERVER_DATA.LIFE:
+        if (typeof value === "number") {
+          this.setData(SERVER_DATA.LIFE, value);
+        }
+      case SERVER_DATA.IS_COLLIDED:
+        if (typeof value === "number") {
+          this.setData(SERVER_DATA.IS_COLLIDED, value);
         }
         break;
     }

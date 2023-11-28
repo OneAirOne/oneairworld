@@ -21,10 +21,10 @@ export enum Anim {
 }
 
 export enum DIRECTION {
-  NORD = "NORD",
-  SUD = "SUD",
-  WEST = "WEST",
-  EAST = "EAST",
+  UP = "UP",
+  DOWN = "DOWN",
+  LEFT = "LEFT",
+  RIGHT = "RIGHT",
 }
 
 export interface IPlayer extends Schema {
@@ -34,6 +34,11 @@ export interface IPlayer extends Schema {
   anim: string;
   texture: Characters;
   direction: DIRECTION;
+  isAttacking: boolean;
+  life: number;
+  isDead: boolean;
+  isCollided: boolean;
+  collisionDirection: DIRECTION;
 
   inputQueue: any[];
 }
