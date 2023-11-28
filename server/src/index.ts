@@ -6,6 +6,8 @@ import { RoomType } from "../../shared/types/room";
 
 import { Game } from "./rooms/Game.room";
 
+import { SERVER_CONFIG } from "./config";
+
 const port = Number(process.env.port) || 2567;
 const app = express();
 
@@ -16,7 +18,9 @@ const gameServer = new Server({
 });
 
 // DEBUG
-gameServer.simulateLatency(0);
+if (SERVER_CONFIG.debug) {
+  gameServer.simulateLatency(SERVER_CONFIG.latency ?? 0);
+}
 
 // registry room handlers
 gameServer.define(RoomType.LOBBY, LobbyRoom);

@@ -18,6 +18,10 @@ export enum Anim {
   IDDLE_RIGHT = "IdleRight",
   IDDLE_UP = "IdleUp",
   IDDLE_DOWN = "IdleDown",
+  HIT_UP = "UpHit",
+  HIT_DOWN = "DownHit",
+  HIT_LEFT = "LeftHit",
+  HIT_RIGHT = "RightHit",
 }
 
 export enum DIRECTION {

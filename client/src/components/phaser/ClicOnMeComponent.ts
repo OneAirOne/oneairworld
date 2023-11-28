@@ -8,12 +8,9 @@ export class ClickOnMeComponent implements IComponent {
     this.gameObject = go;
   }
 
-  awake() {
-    console.log("awake");
-  }
+  awake() {}
 
   start() {
-    console.log("start");
     this.gameObject
       .setInteractive()
       .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, this.handleClick, this);
