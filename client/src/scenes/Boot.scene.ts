@@ -7,8 +7,6 @@ import Network, { Network as NetworkType } from "services/Network";
 import gameConfig from "game.config";
 import { SCENES } from "./scene.config";
 
-import { Characters, IPlayer, LauchOptions } from "../../../shared/types";
-
 export class BootScene extends Phaser.Scene {
   private preloadComplete = false;
   network!: NetworkType;
@@ -39,6 +37,13 @@ export class BootScene extends Phaser.Scene {
       gameConfig.BACKGROUND.CLOUD.NAME,
       gameConfig.BACKGROUND.CLOUD.SPRITE_SHEET_TEXTURE_PATH,
       gameConfig.BACKGROUND.CLOUD.SPRITE_SHEET_ATLAS_PATH
+    );
+
+    // Items
+    this.load.image(gameConfig.ITEMS.HEART.NAME, gameConfig.ITEMS.HEART.PATH);
+    this.load.image(
+      gameConfig.ITEMS.HEART_FILLED.NAME,
+      gameConfig.ITEMS.HEART_FILLED.PATH
     );
 
     // Map

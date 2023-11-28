@@ -3,5 +3,5 @@ export interface InputPayload {
   right: boolean;
   up: boolean;
   down: boolean;
-  tick: number | undefined;
+  space: boolean;
 }

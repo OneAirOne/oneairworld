@@ -4,10 +4,11 @@ import bcrypt from "bcrypt";
 
 // Schemas
 import { GameState } from "./schema/GameState";
-import { Player } from "./schema/Player";
 
 // Commands
 import { PlayerUpdateCommand } from "./commands";
+
+import { GameEngine } from "../engine/Game.engine";
 
 // Shared
 import {
@@ -15,10 +16,7 @@ import {
   IRoomData,
   InputPayload,
   LauchOptions,
-  PLAYER_VELOCITY,
-  Anim,
 } from "../../../shared/types";
-import { getIddleAnim } from "../../../shared/helpers";
 
 /**
  * Game room
@@ -30,9 +28,8 @@ export class Game extends Room<GameState> {
   private dispatcher = new Dispatcher(this);
   private name: string;
   private password: string | null = null;
-  private lastAnim: Anim = Anim.IDDLE_DOWN;
 
-  fixedTimeStep = 1000 / 60;
+  private engine: GameEngine = null;
 
   /**
    * Create the room and all messages dispatcher
@@ -47,6 +44,7 @@ export class Game extends Room<GameState> {
     this.autoDispose = autoDispose;
 
     let hasPassword = false;
+
     if (password) {
       const salt = await bcrypt.genSalt(10);
       hasPassword = true;
@@ -55,6 +53,8 @@ export class Game extends Room<GameState> {
 
     this.setState(new GameState());
 
+    this.engine = new GameEngine(this.state);
+
     this.onMessage(Message.UPDATE_PLAYER, (client, data: InputPayload) => {
       this.dispatcher.dispatch(new PlayerUpdateCommand(), {
         client,
@@ -62,51 +62,21 @@ export class Game extends Room<GameState> {
       });
     });
 
-    // Fix the tick rate with the client
-    let elapsedTime = 0;
-
-    this.setSimulationInterval((deltaTime) => {
-      elapsedTime += deltaTime;
-
-      while (elapsedTime >= this.fixedTimeStep) {
-        elapsedTime -= this.fixedTimeStep;
-        this.fixedTick(this.fixedTimeStep);
-      }
-    });
+    // Game loop
+    this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }
 
-  fixedTick(deltaTime: number) {
-    this.state.players.forEach((player) => {
+  update(deltaTime: number) {
+    this.state.players.forEach((player, sessionId) => {
       let input: InputPayload;
 
       // Dequeue player inputs
       while ((input = player.inputQueue.shift())) {
-        if (input.left) {
-          player.x -= PLAYER_VELOCITY;
-          player.anim = Anim.LEFT;
-        } else if (input.right) {
-          player.x += PLAYER_VELOCITY;
-          player.anim = Anim.RIGHT;
-        }
-
-        if (input.up) {
-          player.y -= PLAYER_VELOCITY;
-          player.anim = Anim.UP;
-        } else if (input.down) {
-          player.y += PLAYER_VELOCITY;
-          player.anim = Anim.DOWN;
-        }
-
-        // Check for the iddle anim
-        const iddleAnim = getIddleAnim(input, player.anim as Anim);
-
-        if (iddleAnim) {
-          player.anim = iddleAnim;
-        }
-
-        player.tick = input.tick;
+        this.engine.processAction(sessionId, input, deltaTime);
       }
     });
+
+    this.engine.update(deltaTime);
   }
 
   /**
@@ -115,13 +85,7 @@ export class Game extends Room<GameState> {
   onJoin(client: Client, lauchOptions: LauchOptions) {
     console.log(client.sessionId, "joined!", lauchOptions);
 
-    const player = new Player();
-
-    // Set player with client options
-    player.name = lauchOptions.name;
-    player.texture = lauchOptions.texture;
-
-    this.state.players.set(client.sessionId, player);
+    this.engine.addPlayer(client.sessionId, lauchOptions);
 
     client.send(Message.SEND_ROOM_DATA, {
       id: this.roomId,
@@ -133,9 +97,7 @@ export class Game extends Room<GameState> {
    * Call when a player leave the room
    */
   onLeave(client: Client, consented: boolean) {
-    if (this.state.players.has(client.sessionId)) {
-      this.state.players.delete(client.sessionId);
-    }
+    this.engine.removePLayer(client.sessionId);
   }
 
   /**

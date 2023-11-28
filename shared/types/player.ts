@@ -6,6 +6,10 @@ export enum Characters {
 }
 
 export enum Anim {
+  ATTACK_LEFT = "LeftAttack",
+  ATTACK_RIGHT = "RightAttack",
+  ATTACK_UP = "UpAttack",
+  ATTACK_DOWN = "DownAttack",
   LEFT = "Left",
   RIGHT = "Right",
   UP = "Up",
@@ -16,13 +20,27 @@ export enum Anim {
   IDDLE_DOWN = "IdleDown",
 }
 
+export enum DIRECTION {
+  UP = "UP",
+  DOWN = "DOWN",
+  LEFT = "LEFT",
+  RIGHT = "RIGHT",
+}
+
 export interface IPlayer extends Schema {
   name: string;
   x: number;
   y: number;
   anim: string;
   texture: Characters;
-  tick: number;
+  direction: DIRECTION;
+  isAttacking: boolean;
+  life: number;
+  isDead: boolean;
+  isCollided: boolean;
+  collisionDirection: DIRECTION;
+
+  inputQueue: any[];
 }
 
 export const PLAYER_VELOCITY = 2;
