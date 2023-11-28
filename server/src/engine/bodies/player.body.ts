@@ -27,12 +27,11 @@ const PLAYER_CONFIG = {
 const FORCE = 0.002;
 
 export class Player {
-  id: string;
-  _world: Matter.World;
+  protected _world: Matter.World;
   protected _body: Matter.Body;
   protected _engine: Matter.Engine;
   protected _playerState: PlayerState;
-
+  id: string;
   isAttacking: boolean = false;
 
   constructor(

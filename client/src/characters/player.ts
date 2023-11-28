@@ -57,8 +57,6 @@ export class Player extends Phaser.GameObjects.Sprite {
       Phaser.Animations.Events.ANIMATION_START,
       (anim: Phaser.Animations.Animation) => {
         if (isAttackAnim(anim)) {
-          console.log({});
-
           this._canUpdateAnim = false;
         }
       }
