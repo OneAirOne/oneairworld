@@ -5,6 +5,7 @@ import { sharedConfig } from "../../../../shared/config";
 import { Characters, DIRECTION, type IPlayer } from "../../../../shared/types";
 
 import { ANIM_START } from "../../constants";
+import { SERVER_CONFIG } from "../../config";
 
 export class Player extends Schema implements IPlayer {
   @type("string") name = "";
@@ -24,12 +25,14 @@ export class Player extends Schema implements IPlayer {
   decreaseLife() {
     const unit = 5;
     if (this.life - unit <= 0) {
-      // this.life = 0;
-      this.life = 100;
+      if (SERVER_CONFIG.debug) {
+        this.life = 100;
+      } else {
+        this.life = 0;
+      }
       this.isDead = true;
     } else {
       this.life -= unit;
     }
-    console.log(this.life);
   }
 }

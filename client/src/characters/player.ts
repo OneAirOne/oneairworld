@@ -9,6 +9,7 @@ import { onairAnimsConfig } from "characters";
 
 const INTERPOLATION_PERCENT = 0.2;
 const ANIM_SUFFIX_ATTACK = "Attack";
+const ANIM_SUFFIX_HIT = "Hit";
 
 /* ---------------------------------- Class --------------------------------- */
 
@@ -51,14 +52,21 @@ export class Player extends Phaser.GameObjects.Sprite {
         .filter((key) => key.endsWith(ANIM_SUFFIX_ATTACK))
         .includes(anim?.key || "");
     };
+    const isHitAnim = (anim: Phaser.Animations.Animation) => {
+      return this._animKeys
+        .filter((key) => key.endsWith(ANIM_SUFFIX_HIT))
+        .includes(anim?.key || "");
+    };
 
     // Block anims when attack animation START
     this.on(
       Phaser.Animations.Events.ANIMATION_START,
       (anim: Phaser.Animations.Animation) => {
         if (isAttackAnim(anim)) {
-          console.log({});
+          this._canUpdateAnim = false;
+        }
 
+        if (isHitAnim(anim)) {
           this._canUpdateAnim = false;
         }
       }
@@ -69,6 +77,9 @@ export class Player extends Phaser.GameObjects.Sprite {
       Phaser.Animations.Events.ANIMATION_COMPLETE,
       (anim: Phaser.Animations.Animation) => {
         if (isAttackAnim(anim)) {
+          this._canUpdateAnim = true;
+        }
+        if (isHitAnim(anim)) {
           this._canUpdateAnim = true;
         }
       }

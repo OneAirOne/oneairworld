@@ -8,6 +8,6 @@ export class UIScene extends Phaser.Scene {
   }
 
   create() {
-    console.log("running ui scene");
+    console.log("Running ui scene");
   }
 }

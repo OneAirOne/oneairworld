@@ -47,7 +47,8 @@ function isLeft(lastAnim: Anim) {
   if (
     lastAnim === Anim.IDDLE_LEFT ||
     lastAnim === Anim.LEFT ||
-    lastAnim === Anim.ATTACK_LEFT
+    lastAnim === Anim.ATTACK_LEFT ||
+    lastAnim === Anim.HIT_LEFT
   ) {
     return true;
   } else {
@@ -62,7 +63,8 @@ function isRight(lastAnim: Anim) {
   if (
     lastAnim === Anim.IDDLE_RIGHT ||
     lastAnim === Anim.RIGHT ||
-    lastAnim === Anim.ATTACK_RIGHT
+    lastAnim === Anim.ATTACK_RIGHT ||
+    lastAnim === Anim.HIT_RIGHT
   ) {
     return true;
   } else {
@@ -77,7 +79,8 @@ function isUp(lastAnim: Anim) {
   if (
     lastAnim === Anim.IDDLE_UP ||
     lastAnim === Anim.UP ||
-    lastAnim === Anim.ATTACK_UP
+    lastAnim === Anim.ATTACK_UP ||
+    lastAnim === Anim.HIT_UP
   ) {
     return true;
   } else {
@@ -92,7 +95,8 @@ function isDown(lastAnim: Anim) {
   if (
     lastAnim === Anim.IDDLE_DOWN ||
     lastAnim === Anim.DOWN ||
-    lastAnim === Anim.ATTACK_DOWN
+    lastAnim === Anim.ATTACK_DOWN ||
+    lastAnim === Anim.HIT_DOWN
   ) {
     return true;
   } else {

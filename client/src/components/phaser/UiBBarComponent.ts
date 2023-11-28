@@ -44,7 +44,6 @@ export class UiBarComponent implements IComponent {
     const scene = this._scene ?? this._gameObject.scene;
 
     this._graphics = scene.add.graphics();
-    console.log(this._scene?.cameras.main);
   }
 
   update(dt: number) {

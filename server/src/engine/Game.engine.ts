@@ -1,12 +1,13 @@
 import Matter from "matter-js";
 
 import { GameState } from "../rooms/schema";
-import { sharedConfig } from "../../../shared/config";
 import { InputPayload, LauchOptions } from "../../../shared/types";
 import { processPlayerAction, collisionPlayers } from "./actions";
 
 import { SwordMan, createWall } from "./bodies";
 import { COLLISION_CATEGORY } from "./config";
+import { SERVER_CONFIG } from "../config";
+
 /**
  * All physics are opered on the game engine 2d MatterJs
  *
@@ -23,9 +24,7 @@ export class GameEngine {
   constructor(gameState: GameState) {
     this.engine = Matter.Engine.create();
     this.world = this.engine.world;
-
     this.state = gameState;
-
     this.engine.gravity.y = 0;
     this.setup();
 
@@ -62,7 +61,9 @@ export class GameEngine {
      * COLLISION END LISTENER
      */
     Matter.Events.on(this.engine, "collisionEnd", (_event) => {
-      console.log("Collision end ");
+      if (SERVER_CONFIG.debug) {
+        console.log("Collision end ");
+      }
     });
   }
 
@@ -140,6 +141,10 @@ export class GameEngine {
     );
 
     this.players[sessionId] = player;
+    if (SERVER_CONFIG.debug) {
+      const numberOfBodies = this.world.bodies.length;
+      console.log(`[on join] Number of bodies in the world: ${numberOfBodies}`);
+    }
   }
 
   /**
@@ -151,6 +156,10 @@ export class GameEngine {
 
     if (this.state.players.has(sessionId)) {
       this.state.players.delete(sessionId);
+    }
+    if (SERVER_CONFIG.debug) {
+      const numberOfBodies = this.world.bodies.length;
+      console.log(`[on left] Number of bodies in the world: ${numberOfBodies}`);
     }
   }
 

@@ -16,7 +16,6 @@ export function createAnim(
   for (let key of Object.keys(animConfig)) {
     const anim = animConfig[key];
 
-    console.log(anim.key);
     let frames = scene.anims.generateFrameNames(gameConfig.CHARACTERS.NAME, {
       start: anim.start,
       end: anim.end,

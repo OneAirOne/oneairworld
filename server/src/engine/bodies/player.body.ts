@@ -27,12 +27,11 @@ const PLAYER_CONFIG = {
 const FORCE = 0.002;
 
 export class Player {
-  id: string;
-  _world: Matter.World;
+  protected _world: Matter.World;
   protected _body: Matter.Body;
   protected _engine: Matter.Engine;
   protected _playerState: PlayerState;
-
+  id: string;
   isAttacking: boolean = false;
 
   constructor(
@@ -64,7 +63,6 @@ export class Player {
         this?._playerState?.collisionDirection === DIRECTION.DOWN &&
         this?._playerState?.isCollided
       ) {
-        console.log("FORCE UP");
         Matter.Body.applyForce(this._body, this._body.position, {
           x: 0,
           y: -FORCE,
@@ -78,7 +76,6 @@ export class Player {
         this?._playerState?.collisionDirection === DIRECTION.UP &&
         this?._playerState?.isCollided
       ) {
-        console.log("FORCE DOWN");
         Matter.Body.applyForce(this._body, this._body.position, {
           x: 0,
           y: +FORCE,
@@ -92,7 +89,6 @@ export class Player {
         this?._playerState?.collisionDirection === DIRECTION.LEFT &&
         this?._playerState?.isCollided
       ) {
-        console.log("FORCE RIGHT");
         Matter.Body.applyForce(this._body, this._body.position, {
           x: FORCE,
           y: 0,
@@ -106,7 +102,6 @@ export class Player {
         this?._playerState?.collisionDirection === DIRECTION.RIGHT &&
         this?._playerState?.isCollided
       ) {
-        console.log("FORCE LEFT");
         Matter.Body.applyForce(this._body, this._body.position, {
           x: -FORCE,
           y: 0,

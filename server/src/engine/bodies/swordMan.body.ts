@@ -14,12 +14,12 @@ const HIT_BOX_CONFIG = {
   },
 };
 
-const HIT_BOX_OFFSET = 16;
+const HIT_BOX_OFFSET = 15;
 
 export class SwordMan extends Player {
-  id: string;
-  _world: Matter.World;
+  protected _world: Matter.World;
   private _hitBox: Matter.Body;
+  id: string;
 
   constructor(
     id: string,

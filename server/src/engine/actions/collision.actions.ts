@@ -1,6 +1,11 @@
-import { DIRECTION } from "../../../../shared/types";
+import { Anim, DIRECTION } from "../../../../shared/types";
 import { GameState } from "../../rooms/schema";
 
+import { SERVER_CONFIG } from "../../config";
+
+/**
+ * Log collision data
+ */
 function logCollision(
   bodyA: Matter.Body,
   bodyB: Matter.Body,
@@ -32,6 +37,9 @@ function logCollision(
   }
 }
 
+/**
+ * Excute collision operations on the two bodies
+ */
 export function collisionPlayers(
   bodyA: Matter.Body,
   bodyB: Matter.Body,
@@ -40,7 +48,9 @@ export function collisionPlayers(
   const playerStateA = gameState.players.get(bodyA.label);
   const playerStateB = gameState.players.get(bodyB.label);
 
-  logCollision(bodyA, bodyB, gameState);
+  if (SERVER_CONFIG.debug) {
+    logCollision(bodyA, bodyB, gameState);
+  }
 
   const haveStates = playerStateA && playerStateB;
 
@@ -48,7 +58,9 @@ export function collisionPlayers(
 
   // BODY A
   if (playerStateA?.isAttacking) {
-    console.log("🔥 player A attacking", bodyA.position);
+    if (SERVER_CONFIG.debug) {
+      console.log("🔥 player A attacking", bodyA.position);
+    }
 
     playerStateB.decreaseLife();
     playerStateB.isCollided = true;
@@ -67,9 +79,26 @@ export function collisionPlayers(
     }
   }
 
+  if (playerStateB.isCollided) {
+    if (playerStateA.direction === DIRECTION.UP) {
+      playerStateB.anim = Anim.HIT_DOWN;
+    }
+    if (playerStateA.direction === DIRECTION.DOWN) {
+      playerStateB.anim = Anim.HIT_UP;
+    }
+    if (playerStateA.direction === DIRECTION.LEFT) {
+      playerStateB.anim = Anim.HIT_RIGHT;
+    }
+    if (playerStateA.direction === DIRECTION.RIGHT) {
+      playerStateB.anim = Anim.HIT_LEFT;
+    }
+  }
+
   // BODY B
   if (playerStateB?.isAttacking) {
-    console.log("🔥 player B attacking", bodyB.position);
+    if (SERVER_CONFIG.debug) {
+      console.log("🔥 player B attacking", bodyB.position);
+    }
 
     playerStateA.decreaseLife();
     playerStateA.isCollided = true;
@@ -85,6 +114,21 @@ export function collisionPlayers(
     }
     if (playerStateB.direction === DIRECTION.RIGHT) {
       playerStateA.collisionDirection = DIRECTION.LEFT;
+    }
+  }
+
+  if (playerStateA.isCollided) {
+    if (playerStateB.direction === DIRECTION.UP) {
+      playerStateA.anim = Anim.HIT_DOWN;
+    }
+    if (playerStateB.direction === DIRECTION.DOWN) {
+      playerStateA.anim = Anim.HIT_UP;
+    }
+    if (playerStateB.direction === DIRECTION.LEFT) {
+      playerStateA.anim = Anim.HIT_RIGHT;
+    }
+    if (playerStateB.direction === DIRECTION.RIGHT) {
+      playerStateA.anim = Anim.HIT_LEFT;
     }
   }
 }

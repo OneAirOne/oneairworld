@@ -119,7 +119,7 @@ export class GameScene extends Phaser.Scene {
    * Call when networks join events are triggered
    */
   handleJoinPLayer(player: IPlayer, sessionId: string) {
-    console.log("[scene] join ", this.network.sessionId, sessionId, player);
+    console.log("[scene] join ", this.network.sessionId, sessionId);
 
     const newPlayer = new Player(
       this,
