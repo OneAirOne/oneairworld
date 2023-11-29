@@ -1,18 +1,28 @@
-import { BootScene, BackgroundScene, GameScene, UIScene } from "scenes";
-import { sharedConfig } from "../../shared/config";
+// @ts-ignore
+import PhaserAnimatedTiles from "phaser-animated-tiles/src/plugin/main";
 
-export const phaserConfig: Phaser.Types.Core.GameConfig = {
+import { BootScene, BackgroundScene, GameScene, UIScene } from "scenes";
+
+export const PHASER_CONFIG: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: "game-container",
   backgroundColor: "012622",
   pixelArt: true,
-  width: sharedConfig.WORLD_WIDTH,
-  height: sharedConfig.WORLD_HEIGHT,
+  width: window.innerWidth,
+  height: window.innerWidth,
   scale: {
-    mode: Phaser.Scale.ScaleModes.RESIZE,
-    width: window.innerWidth,
-    height: window.innerHeight,
-    // zoom: 2,
+    mode: Phaser.Scale.ScaleModes.RESIZE, // Place the player on center of screen with camera startFollow
+  },
+  // https://phaser.discourse.group/t/how-to-show-tilemap-animated-tiles-in-phaser-game/9972
+  plugins: {
+    scene: [
+      {
+        key: "animatedTiles",
+        plugin: PhaserAnimatedTiles,
+        start: true,
+        mapping: "animatedTiles",
+      },
+    ],
   },
   scene: [BootScene, BackgroundScene, GameScene, UIScene],
 };
@@ -25,12 +35,22 @@ export enum SERVER_DATA {
   IS_COLLIDED = "isCollided",
 }
 
-const gameConfig = {
+const GAME_CONFIG = {
   MAP: {
-    NAME: "tiles_dungeon",
-    FILE: "tiles_dungeon",
-    TILESET_PATH: `assets/map/tiles_dungeon.png`,
-    TILEMAP_PATH: `assets/map/map.json`,
+    TILEMAP: {
+      NAME: "map",
+      PAHT: `assets/map/map.json`,
+    },
+    TILESETS: {
+      CITY_JAP: {
+        NAME: "city-jap",
+        PATH: "assets/map/city-jap.png",
+      },
+      MODERN_CITY: {
+        NAME: "city-modern",
+        PATH: "assets/map/city-modern.png",
+      },
+    },
   },
   CHARACTERS: {
     NAME: "characters",
@@ -60,4 +80,4 @@ const gameConfig = {
   },
 };
 
-export default gameConfig;
+export default GAME_CONFIG;

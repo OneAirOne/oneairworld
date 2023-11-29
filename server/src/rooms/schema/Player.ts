@@ -1,6 +1,6 @@
 import { Schema, type } from "@colyseus/schema";
 
-import { sharedConfig } from "../../../../shared/config";
+import { SHARED_CONFIG } from "../../../../shared/shared.config";
 
 import { Characters, DIRECTION, type IPlayer } from "../../../../shared/types";
 
@@ -9,8 +9,10 @@ import { SERVER_CONFIG } from "../../config";
 
 export class Player extends Schema implements IPlayer {
   @type("string") name = "";
-  @type("number") x = sharedConfig.WORLD_WIDTH / 2;
-  @type("number") y = sharedConfig.WORLD_HEIGHT / 2;
+  @type("number") x =
+    SHARED_CONFIG.WORLD_WIDTH / 2 - SHARED_CONFIG.TILE_SIZE / 2;
+  @type("number") y =
+    SHARED_CONFIG.WORLD_HEIGHT / 2 - SHARED_CONFIG.TILE_SIZE / 2;
   @type("string") anim = ANIM_START;
   @type("string") texture = Characters.ONEAIR;
   @type("string") direction = DIRECTION.DOWN;

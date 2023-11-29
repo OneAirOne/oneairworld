@@ -9,13 +9,14 @@ import { createAnim, onairAnimsConfig, Player } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
-import gameConfig, { SERVER_DATA } from "game.config";
+import GAME_CONFIG, { SERVER_DATA } from "client.config";
 
 // Components
 import { ClickOnMeComponent, UiBarComponent } from "components/phaser";
 
 // Shared
 import type { IPlayer } from "../../../shared/types";
+import { TiledLayer, TiledObjectType } from "../../../shared/map.config";
 
 export class GameScene extends Phaser.Scene {
   private network!: Network;
@@ -28,6 +29,8 @@ export class GameScene extends Phaser.Scene {
 
   debugFPS: Phaser.GameObjects.Text | null = null;
   debugPlayer: Phaser.GameObjects.Text | null = null;
+  sceneMap!: Phaser.Tilemaps.Tilemap;
+  rooms: Phaser.GameObjects.GameObject[] = [];
 
   constructor() {
     super(SCENES.GAME);
@@ -52,10 +55,46 @@ export class GameScene extends Phaser.Scene {
    */
   preload() {}
 
+  displayMap() {
+    this.sceneMap = this.make.tilemap({
+      key: GAME_CONFIG.MAP.TILEMAP.NAME,
+    });
+    console.log("tilemap", this.sceneMap);
+
+    const CITY_JAP = this.sceneMap.addTilesetImage(
+      GAME_CONFIG.MAP.TILESETS.CITY_JAP.NAME,
+      GAME_CONFIG.MAP.TILESETS.CITY_JAP.NAME
+    );
+    const MODERN_CITY = this.sceneMap.addTilesetImage(
+      GAME_CONFIG.MAP.TILESETS.MODERN_CITY.NAME,
+      GAME_CONFIG.MAP.TILESETS.MODERN_CITY.NAME
+    );
+
+    // Create all map layers
+    this.sceneMap.createLayer(TiledLayer.GROUND, CITY_JAP);
+    this.sceneMap.createLayer(TiledLayer.WALL, CITY_JAP);
+    this.sceneMap.createLayer(TiledLayer.STUFF, CITY_JAP);
+    this.sceneMap
+      .createLayer(TiledLayer.ABOVE_PLAYER, MODERN_CITY)
+      .setDepth(50);
+
+    // Analyse map objects
+    this.sceneMap.findObject(TiledLayer.OBJECTS, (object) => {
+      if (object.type === TiledObjectType.ROOM) {
+        this.rooms.push(object);
+      }
+    });
+
+    // @ts-ignore (PhaserAnimatedTiles types not defined)
+    // this.animatedTiles.init(this.sceneMap);
+  }
+
   /**
    * Create and initialize the scene
    */
   create(data: { network: Network }) {
+    this.displayMap();
+
     // Debug
     this.debugFPS = this.add
       .text(190, 0, "", {

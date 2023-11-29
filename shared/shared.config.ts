@@ -1,0 +1,8 @@
+export const SHARED_CONFIG = {
+  // Unit = pixel
+  SPRITE_SIZE: 12,
+  TILE_SIZE: 16,
+  WORLD_WIDTH: 1600,
+  WORLD_HEIGHT: 1600,
+  WORLD_WALL_SIZE: 1,
+};

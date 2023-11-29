@@ -1,7 +1,7 @@
 import Phaser from "phaser";
-import { phaserConfig } from "./game.config";
+import { PHASER_CONFIG } from "./client.config";
 
-const phaserGame = new Phaser.Game(phaserConfig);
+const phaserGame = new Phaser.Game(PHASER_CONFIG);
 
 (window as any).game = phaserGame;
 

@@ -1,7 +1,7 @@
 import Matter from "matter-js";
 
-import { COLLISION_CATEGORY } from "../config";
-import { sharedConfig } from "../../../../shared/config";
+import { COLLISION_CATEGORY } from "../engine.config";
+import { SHARED_CONFIG } from "../../../../shared/shared.config";
 
 const WALL_CONFIG = {
   isStatic: true,
@@ -14,10 +14,10 @@ export function createWall(world: Matter.World) {
   const walls = [
     // Top wall
     Matter.Bodies.rectangle(
-      sharedConfig.WORLD_WIDTH / 2,
+      SHARED_CONFIG.WORLD_WIDTH / 2,
       0,
-      sharedConfig.WORLD_WIDTH,
-      sharedConfig.WORLD_WALL_SIZE,
+      SHARED_CONFIG.WORLD_WIDTH,
+      SHARED_CONFIG.WORLD_WALL_SIZE,
       {
         ...WALL_CONFIG,
         label: "wall-top",
@@ -25,26 +25,26 @@ export function createWall(world: Matter.World) {
     ),
     // Bottom wall
     Matter.Bodies.rectangle(
-      sharedConfig.WORLD_WIDTH / 2,
-      sharedConfig.WORLD_HEIGHT,
-      sharedConfig.WORLD_WIDTH,
-      sharedConfig.WORLD_WALL_SIZE,
+      SHARED_CONFIG.WORLD_WIDTH / 2,
+      SHARED_CONFIG.WORLD_HEIGHT,
+      SHARED_CONFIG.WORLD_WIDTH,
+      SHARED_CONFIG.WORLD_WALL_SIZE,
       { ...WALL_CONFIG, label: "wall-bottom" }
     ),
     // Right wall
     Matter.Bodies.rectangle(
-      sharedConfig.WORLD_WIDTH,
-      sharedConfig.WORLD_HEIGHT / 2,
-      sharedConfig.WORLD_WALL_SIZE,
-      sharedConfig.WORLD_HEIGHT,
+      SHARED_CONFIG.WORLD_WIDTH,
+      SHARED_CONFIG.WORLD_HEIGHT / 2,
+      SHARED_CONFIG.WORLD_WALL_SIZE,
+      SHARED_CONFIG.WORLD_HEIGHT,
       { ...WALL_CONFIG, label: "wall-right" }
     ),
     // Left wall
     Matter.Bodies.rectangle(
       0,
-      sharedConfig.WORLD_HEIGHT / 2,
-      sharedConfig.WORLD_WALL_SIZE,
-      sharedConfig.WORLD_HEIGHT,
+      SHARED_CONFIG.WORLD_HEIGHT / 2,
+      SHARED_CONFIG.WORLD_WALL_SIZE,
+      SHARED_CONFIG.WORLD_HEIGHT,
       { ...WALL_CONFIG, label: "wall-left" }
     ),
   ];

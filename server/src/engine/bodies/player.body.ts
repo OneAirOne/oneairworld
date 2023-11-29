@@ -1,9 +1,9 @@
 import Matter from "matter-js";
 
 import { Player as PlayerState } from "../../rooms/schema/Player";
-import { COLLISION_CATEGORY } from "../config";
+import { COLLISION_CATEGORY } from "../engine.config";
 
-import { sharedConfig } from "../../../../shared/config";
+import { SHARED_CONFIG } from "../../../../shared/shared.config";
 import { DIRECTION } from "../../../../shared/types";
 
 export interface BodyConfig {
@@ -46,10 +46,10 @@ export class Player {
     this._playerState = playerState;
 
     this._body = Matter.Bodies.rectangle(
-      sharedConfig.WORLD_WIDTH / 2,
-      sharedConfig.WORLD_HEIGHT / 2,
-      sharedConfig.SPRITE_SIZE,
-      sharedConfig.SPRITE_SIZE,
+      SHARED_CONFIG.WORLD_WIDTH / 2,
+      SHARED_CONFIG.WORLD_HEIGHT / 2,
+      SHARED_CONFIG.SPRITE_SIZE,
+      SHARED_CONFIG.SPRITE_SIZE,
       {
         label: id,
         ...PLAYER_CONFIG,

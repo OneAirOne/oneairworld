@@ -4,7 +4,7 @@ import Phaser from "phaser";
 import Network, { Network as NetworkType } from "services/Network";
 
 // Others
-import gameConfig from "game.config";
+import GAME_CONFIG from "client.config";
 import { SCENES } from "./scene.config";
 
 export class BootScene extends Phaser.Scene {
@@ -28,36 +28,45 @@ export class BootScene extends Phaser.Scene {
   }
 
   loadAssets() {
-    // Background
+    // Load Background
     this.load.image(
-      gameConfig.BACKGROUND.BACKDROP.NAME,
-      gameConfig.BACKGROUND.BACKDROP.PATH
+      GAME_CONFIG.BACKGROUND.BACKDROP.NAME,
+      GAME_CONFIG.BACKGROUND.BACKDROP.PATH
     );
     this.load.atlas(
-      gameConfig.BACKGROUND.CLOUD.NAME,
-      gameConfig.BACKGROUND.CLOUD.SPRITE_SHEET_TEXTURE_PATH,
-      gameConfig.BACKGROUND.CLOUD.SPRITE_SHEET_ATLAS_PATH
+      GAME_CONFIG.BACKGROUND.CLOUD.NAME,
+      GAME_CONFIG.BACKGROUND.CLOUD.SPRITE_SHEET_TEXTURE_PATH,
+      GAME_CONFIG.BACKGROUND.CLOUD.SPRITE_SHEET_ATLAS_PATH
     );
 
-    // Items
-    this.load.image(gameConfig.ITEMS.HEART.NAME, gameConfig.ITEMS.HEART.PATH);
+    // Load Items
+    this.load.image(GAME_CONFIG.ITEMS.HEART.NAME, GAME_CONFIG.ITEMS.HEART.PATH);
     this.load.image(
-      gameConfig.ITEMS.HEART_FILLED.NAME,
-      gameConfig.ITEMS.HEART_FILLED.PATH
+      GAME_CONFIG.ITEMS.HEART_FILLED.NAME,
+      GAME_CONFIG.ITEMS.HEART_FILLED.PATH
     );
 
-    // Map
-    this.load.image(gameConfig.MAP.NAME, gameConfig.MAP.TILESET_PATH);
+    // Load Tileset
+    this.load.image(
+      GAME_CONFIG.MAP.TILESETS.MODERN_CITY.NAME,
+      GAME_CONFIG.MAP.TILESETS.MODERN_CITY.PATH
+    );
+    this.load.image(
+      GAME_CONFIG.MAP.TILESETS.CITY_JAP.NAME,
+      GAME_CONFIG.MAP.TILESETS.CITY_JAP.PATH
+    );
+
+    // Load Tilemap
     this.load.tilemapTiledJSON(
-      gameConfig.MAP.NAME,
-      gameConfig.MAP.TILEMAP_PATH
+      GAME_CONFIG.MAP.TILEMAP.NAME,
+      GAME_CONFIG.MAP.TILEMAP.PAHT
     );
 
-    // Characteres
+    // Load characteres sprite-sheets
     this.load.atlas(
-      gameConfig.CHARACTERS.NAME,
-      gameConfig.CHARACTERS.SPRITE_SHEET_TEXTURE_PATH,
-      gameConfig.CHARACTERS.SPRITE_SHEET_ATLAS_PATH
+      GAME_CONFIG.CHARACTERS.NAME,
+      GAME_CONFIG.CHARACTERS.SPRITE_SHEET_TEXTURE_PATH,
+      GAME_CONFIG.CHARACTERS.SPRITE_SHEET_ATLAS_PATH
     );
 
     this.load.on("complete", () => {

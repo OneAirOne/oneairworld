@@ -1,2 +1,2 @@
 export * from "./swordMan.body";
-export * from "./map.body";
+export * from "./map/map.body";

@@ -2,7 +2,7 @@ import Phaser from "phaser";
 
 import { Anim } from "./characters.types";
 
-import gameConfig from "game.config";
+import GAME_CONFIG from "client.config";
 
 /**
  *  Use the "characters" sprite sheet and create anims
@@ -16,7 +16,7 @@ export function createAnim(
   for (let key of Object.keys(animConfig)) {
     const anim = animConfig[key];
 
-    let frames = scene.anims.generateFrameNames(gameConfig.CHARACTERS.NAME, {
+    let frames = scene.anims.generateFrameNames(GAME_CONFIG.CHARACTERS.NAME, {
       start: anim.start,
       end: anim.end,
       zeroPad: anim.zeroPad,
