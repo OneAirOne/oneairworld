@@ -1,7 +1,9 @@
 export enum TiledLayer {
   GROUND = "ground",
   WALL = "wall",
-  STUFF = "stuff",
+  STUFF_CITY_MODERN = "stuff_city_modern",
+  STUFF_CITY_MODERN_ABOVE_PLAYER = "stuff_city_modern_above_player",
+  STUFF_CITY_JAP = "stuff_city_jap",
   ANIMATED = "animated",
   OBJECTS = "objects",
   ABOVE_PLAYER = "above_player",

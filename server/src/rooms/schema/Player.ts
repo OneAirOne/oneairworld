@@ -5,7 +5,7 @@ import { SHARED_CONFIG } from "../../../../shared/shared.config";
 import { Characters, DIRECTION, type IPlayer } from "../../../../shared/types";
 
 import { ANIM_START } from "../../constants";
-import { SERVER_CONFIG } from "../../config";
+import { SERVER_CONFIG } from "../../server.config";
 
 export class Player extends Schema implements IPlayer {
   @type("string") name = "";

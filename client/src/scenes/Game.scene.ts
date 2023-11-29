@@ -56,11 +56,12 @@ export class GameScene extends Phaser.Scene {
   preload() {}
 
   displayMap() {
+    // Create Tilemap
     this.sceneMap = this.make.tilemap({
       key: GAME_CONFIG.MAP.TILEMAP.NAME,
     });
-    console.log("tilemap", this.sceneMap);
 
+    // Create Tilesets
     const CITY_JAP = this.sceneMap.addTilesetImage(
       GAME_CONFIG.MAP.TILESETS.CITY_JAP.NAME,
       GAME_CONFIG.MAP.TILESETS.CITY_JAP.NAME
@@ -70,10 +71,15 @@ export class GameScene extends Phaser.Scene {
       GAME_CONFIG.MAP.TILESETS.MODERN_CITY.NAME
     );
 
-    // Create all map layers
+    // Create layer
     this.sceneMap.createLayer(TiledLayer.GROUND, CITY_JAP);
     this.sceneMap.createLayer(TiledLayer.WALL, CITY_JAP);
-    this.sceneMap.createLayer(TiledLayer.STUFF, CITY_JAP);
+
+    this.sceneMap.createLayer(TiledLayer.STUFF_CITY_MODERN, MODERN_CITY);
+    const modernCityLayerAbovePlayer = this.sceneMap
+      .createLayer(TiledLayer.STUFF_CITY_MODERN_ABOVE_PLAYER, MODERN_CITY)
+      .setDepth(50);
+    this.sceneMap.createLayer(TiledLayer.STUFF_CITY_JAP, CITY_JAP);
     this.sceneMap
       .createLayer(TiledLayer.ABOVE_PLAYER, MODERN_CITY)
       .setDepth(50);
@@ -87,6 +93,14 @@ export class GameScene extends Phaser.Scene {
 
     // @ts-ignore (PhaserAnimatedTiles types not defined)
     // this.animatedTiles.init(this.sceneMap);
+
+    const debugGraphics = this.add.graphics().setAlpha(0.7);
+    modernCityLayerAbovePlayer.setCollisionByProperty({ collide: true });
+    modernCityLayerAbovePlayer.renderDebug(debugGraphics, {
+      tileColor: null,
+      collidingTileColor: new Phaser.Display.Color(243, 234, 40, 255),
+      faceColor: new Phaser.Display.Color(40, 39, 37, 255),
+    });
   }
 
   /**

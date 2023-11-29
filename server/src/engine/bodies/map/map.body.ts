@@ -7,7 +7,8 @@ import { TiledLayer, TiledRoomObject } from "../../../../../shared/map.config";
 const COLLISION_LAYERS = [
   TiledLayer.WALL,
   TiledLayer.ANIMATED,
-  TiledLayer.STUFF,
+  TiledLayer.STUFF_CITY_MODERN,
+  TiledLayer.STUFF_CITY_MODERN_ABOVE_PLAYER,
 ];
 const COLLISION_OFFSET_X = 0.5;
 const MAP_NAME = "map";
@@ -16,6 +17,7 @@ const MAP_CONFIG = {
   isStatic: true,
   collisionFilter: {
     category: COLLISION_CATEGORY.WALL,
+    mask: COLLISION_CATEGORY.PLAYER,
   },
 };
 
@@ -65,6 +67,7 @@ export function createMap(world: Matter.World) {
   map.layers.forEach((layer: TiledData) => {
     // TODO: use collide custom propertie from tiled
     const hasCollision = COLLISION_LAYERS.includes(layer.name);
+    // console.log(layer);
 
     if (hasCollision) {
       let layerWidth = layer.width;

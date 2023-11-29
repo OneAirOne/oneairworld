@@ -5,7 +5,7 @@ import { processPlayerAction, collisionPlayers } from "./actions";
 
 import { SwordMan, createMap, getTiledObjects } from "./bodies";
 import { COLLISION_CATEGORY } from "./engine.config";
-import { SERVER_CONFIG } from "../config";
+import { SERVER_CONFIG } from "../server.config";
 
 import { InputPayload, LauchOptions } from "../../../shared/types";
 
