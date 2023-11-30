@@ -5,6 +5,9 @@ import { COLLISION_CATEGORY } from "../engine.config";
 
 import { SHARED_CONFIG } from "../../../../shared/shared.config";
 import { DIRECTION } from "../../../../shared/types";
+import { getTiledInfos } from "./map/map.body";
+
+const { start } = getTiledInfos();
 
 export interface BodyConfig {
   label: string;
@@ -46,8 +49,8 @@ export class Player {
     this._playerState = playerState;
 
     this._body = Matter.Bodies.rectangle(
-      SHARED_CONFIG.WORLD_WIDTH / 2,
-      SHARED_CONFIG.WORLD_HEIGHT / 2,
+      start.x,
+      start.y,
       SHARED_CONFIG.SPRITE_SIZE,
       SHARED_CONFIG.SPRITE_SIZE,
       {

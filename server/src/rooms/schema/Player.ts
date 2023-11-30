@@ -6,13 +6,15 @@ import { Characters, DIRECTION, type IPlayer } from "../../../../shared/types";
 
 import { ANIM_START } from "../../constants";
 import { SERVER_CONFIG } from "../../server.config";
+import { getTiledInfos } from "../../engine/bodies";
+
+const { start } = getTiledInfos();
 
 export class Player extends Schema implements IPlayer {
   @type("string") name = "";
-  @type("number") x =
-    SHARED_CONFIG.WORLD_WIDTH / 2 - SHARED_CONFIG.TILE_SIZE / 2;
-  @type("number") y =
-    SHARED_CONFIG.WORLD_HEIGHT / 2 - SHARED_CONFIG.TILE_SIZE / 2;
+  @type("number") x = start.x;
+  @type("number") y = start.y;
+
   @type("string") anim = ANIM_START;
   @type("string") texture = Characters.ONEAIR;
   @type("string") direction = DIRECTION.DOWN;

@@ -3,11 +3,13 @@ import Matter from "matter-js";
 import { GameState } from "../rooms/schema";
 import { processPlayerAction, collisionPlayers } from "./actions";
 
-import { SwordMan, createMap, getTiledObjects } from "./bodies";
+import { SwordMan, createMap, getTiledInfos } from "./bodies";
 import { COLLISION_CATEGORY } from "./engine.config";
 import { SERVER_CONFIG } from "../server.config";
 
 import { InputPayload, LauchOptions } from "../../../shared/types";
+import { createRectangle } from "./bodies";
+import { SHARED_CONFIG } from "../../../shared/shared.config";
 
 /**
  * All physics are opered on the game engine 2d MatterJs
@@ -21,7 +23,6 @@ export class GameEngine {
   private engine: Matter.Engine = null;
   private maxPlayerSize = 7;
   private players: Record<string, SwordMan> = {};
-  private rooms: any;
 
   constructor(gameState: GameState) {
     this.engine = Matter.Engine.create();
@@ -74,10 +75,16 @@ export class GameEngine {
    */
   setup() {
     createMap(this.world);
+    // Add camera bounds
+    createRectangle(
+      this.world,
+      0,
+      0,
+      SHARED_CONFIG.CAMERA_MAX_WIDTH,
+      SHARED_CONFIG.CAMERA_MAX_HEIGHT
+    );
     this.engine.gravity.y = 0;
     this.setupUpdateEvents();
-    this.rooms = getTiledObjects();
-    console.log("rooms", this.rooms);
   }
 
   /**

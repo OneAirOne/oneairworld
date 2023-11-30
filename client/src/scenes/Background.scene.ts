@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-import GAME_CONFIG from "client.config";
+import CLIENT_CONFIG from "client.config";
 import { SCENES } from "./scene.config";
 
 const NB_CLOUDS = 20;

@@ -1,21 +1,35 @@
 export enum TiledLayer {
   GROUND = "ground",
   WALL = "wall",
-  STUFF_CITY_MODERN = "stuff_city_modern",
-  STUFF_CITY_MODERN_ABOVE_PLAYER = "stuff_city_modern_above_player",
-  STUFF_CITY_JAP = "stuff_city_jap",
+  STUFF_ABOVE_PLAYER_WITH_COLLISION = "stuff_above_player_with_collision",
+  STUFF_ABOVE_PLAYER_WITHOUT_COLLISON = "stuff_above_player_without_collision",
+  STUFF_UNDER_PLAYER = "stuff_under_player",
   ANIMATED = "animated",
-  OBJECTS = "objects",
-  ABOVE_PLAYER = "above_player",
+  ABOVE = "above",
+  BEHIND = "behind",
+  INFO = "info",
 }
 
 export enum TiledObjectType {
-  ROOM = "room",
+  START = "start",
 }
 
 export interface TiledRoomObject {
   name: string;
-  type: TiledObjectType.ROOM;
+  type: string;
+  height: number;
+  id: number;
+  properties: any[];
+  rotation: number;
+  visible: boolean;
+  width: number;
+  x: number;
+  y: number;
+}
+
+export interface TiledInfoObject {
+  name: string;
+  type: string;
   height: number;
   id: number;
   properties: any[];

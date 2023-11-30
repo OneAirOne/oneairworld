@@ -35,7 +35,8 @@ export enum SERVER_DATA {
   IS_COLLIDED = "isCollided",
 }
 
-const GAME_CONFIG = {
+const CLIENT_CONFIG = {
+  DEBUG: true,
   MAP: {
     TILEMAP: {
       NAME: "map",
@@ -49,6 +50,10 @@ const GAME_CONFIG = {
       MODERN_CITY: {
         NAME: "city-modern",
         PATH: "assets/map/city-modern.png",
+      },
+      ARCADE: {
+        NAME: "arcade",
+        PATH: "assets/map/arcade.png",
       },
     },
   },
@@ -80,4 +85,4 @@ const GAME_CONFIG = {
   },
 };
 
-export default GAME_CONFIG;
+export default CLIENT_CONFIG;

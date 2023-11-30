@@ -2,13 +2,17 @@ import Matter from "matter-js";
 const fs = require("fs");
 
 import { COLLISION_CATEGORY } from "../../engine.config";
-import { TiledLayer, TiledRoomObject } from "../../../../../shared/map.config";
+import {
+  TiledInfoObject,
+  TiledLayer,
+  TiledObjectType,
+  TiledRoomObject,
+} from "../../../../../shared/map.config";
 
 const COLLISION_LAYERS = [
   TiledLayer.WALL,
   TiledLayer.ANIMATED,
-  TiledLayer.STUFF_CITY_MODERN,
-  TiledLayer.STUFF_CITY_MODERN_ABOVE_PLAYER,
+  TiledLayer.STUFF_ABOVE_PLAYER_WITH_COLLISION,
 ];
 const COLLISION_OFFSET_X = 0.5;
 const MAP_NAME = "map";
@@ -64,21 +68,46 @@ export function createMap(world: Matter.World) {
   let tileWidth = map.tilewidth;
   let tileHeight = map.tileheight;
 
+  let tileByID: any = {};
+
+  // Check collide property of the sprite and create a map with this result
+  map?.tilesets?.forEach((tileset: any) => {
+    tileset?.tiles?.forEach((tile: any) => {
+      let isCollide = false;
+      if (tile) {
+        const collideProperty = tile?.properties.find(
+          (property: any) => property.name === "collide"
+        );
+        // if (tile.id === 30367) {
+        //   console.log(collideProperty);
+        // }
+        if (collideProperty) {
+          isCollide = collideProperty.value;
+          // if (tile.id === 30367) {
+          //   console.log({ isCollide });
+          // }
+        }
+        tileByID[tile.id] = isCollide;
+      }
+    });
+  });
+
   map.layers.forEach((layer: TiledData) => {
     // TODO: use collide custom propertie from tiled
     const hasCollision = COLLISION_LAYERS.includes(layer.name);
-    // console.log(layer);
 
     if (hasCollision) {
       let layerWidth = layer.width;
-      let layerHeight = layer.height;
-
-      console.log("Create collision layer", layerWidth, layerHeight);
 
       layer?.data?.forEach((tiledData: TileRefOnTileset, index: number) => {
         let tileX = (index % layerWidth) + COLLISION_OFFSET_X;
         let tileY = index / layerWidth;
 
+        // TODO: find a way to eveluate collide property
+        const isCollide = tileByID[tiledData];
+        // if (isCollide) {
+        //   console.log("hit", isCollide);
+        // }
         if (tiledData > 0) {
           Matter.World.addBody(
             world,
@@ -99,12 +128,23 @@ export function createMap(world: Matter.World) {
   });
 }
 
+interface ObjectInfo {
+  start: {
+    x: number;
+    y: number;
+  };
+}
 /**
- * Get objets from Tiled
+ * Get objet name "info" from Tiled
  */
-export function getTiledObjects() {
+export function getTiledInfos() {
   let map: any;
-  let meta: TiledRoomObject[];
+  let result: ObjectInfo = {
+    start: {
+      x: 0,
+      y: 0,
+    },
+  };
 
   try {
     const tilemapFile = `${__dirname}/${MAP_NAME}.json`;
@@ -117,13 +157,15 @@ export function getTiledObjects() {
   }
 
   map.layers.forEach((layer: TiledData) => {
-    if (layer.name === TiledLayer.OBJECTS) {
-      console.log(layer.objects);
-      console.log(layer);
-
-      meta = layer.objects as TiledRoomObject[];
+    if (layer.name === TiledLayer.INFO) {
+      const infos = layer.objects as TiledInfoObject[];
+      const start = infos.find((info) => info.name === TiledObjectType.START);
+      if (start) {
+        result.start.x = start.x;
+        result.start.y = start.y;
+      }
     }
   });
 
-  return meta;
+  return result;
 }

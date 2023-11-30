@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 
 import { SCENES } from "./scene.config";
+import CLIENT_CONFIG from "client.config";
 
 export class UIScene extends Phaser.Scene {
   constructor() {
@@ -19,5 +20,6 @@ export class UIScene extends Phaser.Scene {
 
   create() {
     console.log("Running ui scene");
+    // this.add.image(20, 20, GAME_CONFIG.ITEMS.HEART_FILLED.NAME);
   }
 }

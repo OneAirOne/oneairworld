@@ -2,11 +2,7 @@ import { Schema, MapSchema, type } from "@colyseus/schema";
 
 import { SHARED_CONFIG } from "../../../../shared/shared.config";
 
-import type {
-  IGameState,
-  IPlayer,
-  LauchOptions,
-} from "../../../../shared/types";
+import type { IGameState, LauchOptions } from "../../../../shared/types";
 
 import { Player } from "./Player";
 

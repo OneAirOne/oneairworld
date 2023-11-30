@@ -1,11 +1,12 @@
 import Phaser from "phaser";
 import { IComponent } from "services/Component.service";
 import { SHARED_CONFIG } from "../../../../shared/shared.config";
-import GAME_CONFIG from "client.config";
+import CLIENT_CONFIG from "client.config";
 import { Player } from "characters";
 
 const BAR_WIDHT = 25;
 const BAR_HEIGHT = 4;
+const BAR_DEPHT = 51;
 
 export class UiBarComponent implements IComponent {
   private _scene?: Phaser.Scene;
@@ -42,6 +43,7 @@ export class UiBarComponent implements IComponent {
     this._graphics?.lineStyle(0.5, 0x333333);
     this._graphics?.strokeRect(0, 0, BAR_WIDHT * percent, BAR_HEIGHT);
     this._graphics?.fillRect(0, 0, BAR_WIDHT * percent, BAR_HEIGHT);
+    this._graphics?.setDepth(BAR_DEPHT);
   }
 
   start() {
