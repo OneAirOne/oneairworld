@@ -5,7 +5,7 @@ import { Network } from "services/Network";
 import ComponentService from "services/Component.service";
 
 // Characters
-import { createAnim, onairAnimsConfig, Player } from "characters";
+import { createAnim, anims, Player } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
@@ -21,7 +21,6 @@ import {
 // Shared
 import type { IPlayer } from "../../../shared/types";
 import {
-  COLLIDE_LAYERS,
   LAYERS,
   TiledLayer,
   TiledObjectType,
@@ -103,7 +102,6 @@ export class GameScene extends Phaser.Scene {
             faceColor: new Phaser.Display.Color(40, 39, 37, 255),
           });
         }
-        console.log("layer name ", layer.name);
 
         // Debug collision ABOVE YELLOW
         if (layer.name === TiledLayer.COLLIDE_ABOVE_PLAYER) {
@@ -135,6 +133,9 @@ export class GameScene extends Phaser.Scene {
    * Create and initialize the scene
    */
   create(data: { network: Network }) {
+    // Fade in
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
+
     this.displayMap();
 
     // UI
@@ -150,8 +151,9 @@ export class GameScene extends Phaser.Scene {
       this.network = network;
     }
 
-    // Create Oneair animation
-    createAnim(onairAnimsConfig, 10, this);
+    // Create animations
+    createAnim(anims.animOneAir, 10, this);
+    createAnim(anims.animFluppy, 10, this);
 
     // Register network event listener
     this.registerNetworkListeners();

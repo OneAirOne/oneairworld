@@ -11,7 +11,7 @@ import { ThemeOptions, createTheme } from "@mui/material/styles";
 
 const getDesignTokens = (mode: PaletteMode) => ({
   typography: {
-    fontFamily: ["Nunito"].join(","),
+    fontFamily: ["Karla", "Nunito"].join(","),
   },
   palette: {
     mode,
