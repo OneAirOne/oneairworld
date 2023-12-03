@@ -7,13 +7,9 @@ import {
   TiledLayer,
   TiledObjectType,
   TiledRoomObject,
+  COLLIDE_LAYERS,
 } from "../../../../../shared/map.config";
 
-const COLLISION_LAYERS = [
-  TiledLayer.WALL,
-  TiledLayer.ANIMATED,
-  TiledLayer.STUFF_ABOVE_PLAYER_WITH_COLLISION,
-];
 const COLLISION_OFFSET_X = 0.5;
 const MAP_NAME = "map";
 
@@ -94,7 +90,7 @@ export function createMap(world: Matter.World) {
 
   map.layers.forEach((layer: TiledData) => {
     // TODO: use collide custom propertie from tiled
-    const hasCollision = COLLISION_LAYERS.includes(layer.name);
+    const hasCollision = COLLIDE_LAYERS.includes(layer.name);
 
     if (hasCollision) {
       let layerWidth = layer.width;
@@ -122,7 +118,7 @@ export function createMap(world: Matter.World) {
         }
       });
     }
-    if (layer.name === TiledLayer.WALL) {
+    if (layer.name === TiledLayer.COLLIDE_ABOVE_PLAYER) {
       console.log("Create layer wall");
     }
   });

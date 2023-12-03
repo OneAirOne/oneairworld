@@ -62,6 +62,10 @@ export class BootScene extends Phaser.Scene {
       CLIENT_CONFIG.MAP.TILESETS.ARCADE.NAME,
       CLIENT_CONFIG.MAP.TILESETS.ARCADE.PATH
     );
+    this.load.image(
+      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.PATH
+    );
 
     // Load Tilemap
     this.load.tilemapTiledJSON(

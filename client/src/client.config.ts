@@ -55,6 +55,10 @@ const CLIENT_CONFIG = {
         NAME: "arcade",
         PATH: "assets/map/arcade.png",
       },
+      INTERIOR_JAP: {
+        NAME: "interior-jap",
+        PATH: "assets/map/interior-jap.png",
+      },
     },
   },
   CHARACTERS: {

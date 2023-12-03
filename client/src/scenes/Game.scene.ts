@@ -20,7 +20,12 @@ import {
 
 // Shared
 import type { IPlayer } from "../../../shared/types";
-import { TiledLayer, TiledObjectType } from "../../../shared/map.config";
+import {
+  COLLIDE_LAYERS,
+  LAYERS,
+  TiledLayer,
+  TiledObjectType,
+} from "../../../shared/map.config";
 import { SHARED_CONFIG } from "../../../shared/shared.config";
 
 export class GameScene extends Phaser.Scene {
@@ -75,32 +80,45 @@ export class GameScene extends Phaser.Scene {
       CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME,
       CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME
     );
+    const INTERIOR_JAP = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.NAME
+    );
 
-    const LAYERS = [MODERN_CITY, CITY_JAP, ARCADE];
+    const TiledSets = [MODERN_CITY, CITY_JAP, ARCADE, INTERIOR_JAP];
 
-    // Create layer
-    this.sceneMap.createLayer(TiledLayer.GROUND, LAYERS);
-    this.sceneMap.createLayer(TiledLayer.WALL, LAYERS);
-    this.sceneMap.createLayer(TiledLayer.STUFF_UNDER_PLAYER, [
-      MODERN_CITY,
-      CITY_JAP,
-      ARCADE,
-    ]);
-    const stuffAbovePlayer = this.sceneMap
-      .createLayer(TiledLayer.STUFF_ABOVE_PLAYER_WITH_COLLISION, [
-        MODERN_CITY,
-        CITY_JAP,
-        ARCADE,
-      ])
-      .setDepth(50);
-    this.sceneMap
-      .createLayer(TiledLayer.STUFF_ABOVE_PLAYER_WITHOUT_COLLISON, [
-        MODERN_CITY,
-        CITY_JAP,
-      ])
-      .setDepth(50);
-    this.sceneMap.createLayer(TiledLayer.ABOVE, LAYERS).setDepth(50);
-    this.sceneMap.createLayer(TiledLayer.BEHIND, LAYERS);
+    // Create layers
+    LAYERS.forEach((layer) => {
+      const phaserLayer = this.sceneMap.createLayer(layer.name, TiledSets);
+
+      const debugGraphics = this.add.graphics().setAlpha(0.7);
+
+      if (CLIENT_CONFIG.DEBUG) {
+        // Debug collision UNDER GREEN
+        if (layer.name === TiledLayer.COLLIDE_UNDER_PLAYER) {
+          phaserLayer.setCollisionByProperty({ collide: true });
+          phaserLayer.renderDebug(debugGraphics, {
+            tileColor: null,
+            collidingTileColor: new Phaser.Display.Color(139, 233, 40, 255),
+            faceColor: new Phaser.Display.Color(40, 39, 37, 255),
+          });
+        }
+        console.log("layer name ", layer.name);
+
+        // Debug collision ABOVE YELLOW
+        if (layer.name === TiledLayer.COLLIDE_ABOVE_PLAYER) {
+          phaserLayer.setCollisionByProperty({ collide: true });
+          phaserLayer.renderDebug(debugGraphics, {
+            tileColor: null,
+            collidingTileColor: new Phaser.Display.Color(243, 234, 40, 255),
+            faceColor: new Phaser.Display.Color(40, 39, 37, 255),
+          });
+        }
+      }
+      if (layer?.depth && layer?.depth > 0) {
+        phaserLayer.setDepth(this.players.size + layer.depth);
+      }
+    });
 
     // Analyse map objects
     this.sceneMap.findObject(TiledLayer.INFO, (object) => {
@@ -111,16 +129,6 @@ export class GameScene extends Phaser.Scene {
 
     // @ts-ignore (PhaserAnimatedTiles types not defined)
     // this.animatedTiles.init(this.sceneMap);
-
-    if (CLIENT_CONFIG.DEBUG) {
-      const debugGraphics = this.add.graphics().setAlpha(0.7);
-      stuffAbovePlayer.setCollisionByProperty({ collide: true });
-      stuffAbovePlayer.renderDebug(debugGraphics, {
-        tileColor: null,
-        collidingTileColor: new Phaser.Display.Color(243, 234, 40, 255),
-        faceColor: new Phaser.Display.Color(40, 39, 37, 255),
-      });
-    }
   }
 
   /**

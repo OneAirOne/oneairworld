@@ -1,14 +1,59 @@
 export enum TiledLayer {
-  GROUND = "ground",
-  WALL = "wall",
-  STUFF_ABOVE_PLAYER_WITH_COLLISION = "stuff_above_player_with_collision",
-  STUFF_ABOVE_PLAYER_WITHOUT_COLLISON = "stuff_above_player_without_collision",
-  STUFF_UNDER_PLAYER = "stuff_under_player",
-  ANIMATED = "animated",
-  ABOVE = "above",
-  BEHIND = "behind",
   INFO = "info",
+  ABOVE = "above",
+  COLLIDE_ABOVE_PLAYER = "collide_above_player",
+  COLLIDE_UNDER_PLAYER = "collide_under_player",
+  STUFF_ABOVE_PLAYER = "stuff_above_player",
+  STUFF_UNDER_PLAYER = "stuff_under_player",
+  BEHIND_STUFF = "behind_stuff",
+  ANIMATED = "animated",
+  BEHIND = "behind",
+  GROUND = "ground",
 }
+
+interface LayerConfig {
+  name: TiledLayer;
+  depth?: number;
+}
+
+export const LAYERS: LayerConfig[] = [
+  {
+    name: TiledLayer.GROUND,
+  },
+  {
+    name: TiledLayer.BEHIND_STUFF,
+    depth: 1,
+  },
+  {
+    name: TiledLayer.STUFF_ABOVE_PLAYER,
+    depth: 2,
+  },
+  {
+    name: TiledLayer.STUFF_UNDER_PLAYER,
+  },
+  {
+    name: TiledLayer.COLLIDE_UNDER_PLAYER,
+  },
+  {
+    name: TiledLayer.COLLIDE_ABOVE_PLAYER,
+  },
+  {
+    name: TiledLayer.ABOVE,
+    depth: 3,
+  },
+
+  {
+    name: TiledLayer.ANIMATED,
+  },
+  {
+    name: TiledLayer.BEHIND,
+  },
+];
+
+export const COLLIDE_LAYERS = [
+  TiledLayer.COLLIDE_ABOVE_PLAYER,
+  TiledLayer.COLLIDE_UNDER_PLAYER,
+];
 
 export enum TiledObjectType {
   START = "start",
