@@ -6,7 +6,7 @@ import { RoomType } from "../../shared/types/room";
 
 import { Game } from "./rooms/Game.room";
 
-import { SERVER_CONFIG } from "./config";
+import { SERVER_CONFIG } from "./server.config";
 
 const port = Number(process.env.port) || 2567;
 const app = express();

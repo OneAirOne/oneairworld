@@ -9,13 +9,24 @@ import { createAnim, onairAnimsConfig, Player } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
-import gameConfig, { SERVER_DATA } from "game.config";
+import CLIENT_CONFIG, { SERVER_DATA } from "client.config";
 
 // Components
-import { ClickOnMeComponent, UiBarComponent } from "components/phaser";
+import {
+  ClickOnMeComponent,
+  DebugPlayer,
+  UiBarComponent,
+} from "components/phaser";
 
 // Shared
 import type { IPlayer } from "../../../shared/types";
+import {
+  COLLIDE_LAYERS,
+  LAYERS,
+  TiledLayer,
+  TiledObjectType,
+} from "../../../shared/map.config";
+import { SHARED_CONFIG } from "../../../shared/shared.config";
 
 export class GameScene extends Phaser.Scene {
   private network!: Network;
@@ -23,11 +34,9 @@ export class GameScene extends Phaser.Scene {
   private myPlayer!: Player;
   private components!: ComponentService;
 
-  private lastServerX: number = 0;
-  private lastServerY: number = 0;
-
-  debugFPS: Phaser.GameObjects.Text | null = null;
-  debugPlayer: Phaser.GameObjects.Text | null = null;
+  sceneMap!: Phaser.Tilemaps.Tilemap;
+  lastServerX: number = 0;
+  lastServerY: number = 0;
 
   constructor() {
     super(SCENES.GAME);
@@ -52,28 +61,81 @@ export class GameScene extends Phaser.Scene {
    */
   preload() {}
 
+  displayMap() {
+    // Create Tilemap
+    this.sceneMap = this.make.tilemap({
+      key: CLIENT_CONFIG.MAP.TILEMAP.NAME,
+    });
+
+    // Create Tilesets
+    const CITY_JAP = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILESETS.CITY_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILESETS.CITY_JAP.NAME
+    );
+    const MODERN_CITY = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME,
+      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME
+    );
+    const ARCADE = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME,
+      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME
+    );
+    const INTERIOR_JAP = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.NAME
+    );
+
+    const TiledSets = [MODERN_CITY, CITY_JAP, ARCADE, INTERIOR_JAP];
+
+    // Create layers
+    LAYERS.forEach((layer) => {
+      const phaserLayer = this.sceneMap.createLayer(layer.name, TiledSets);
+
+      const debugGraphics = this.add.graphics().setAlpha(0.7);
+
+      if (CLIENT_CONFIG.DEBUG) {
+        // Debug collision UNDER GREEN
+        if (layer.name === TiledLayer.COLLIDE_UNDER_PLAYER) {
+          phaserLayer.setCollisionByProperty({ collide: true });
+          phaserLayer.renderDebug(debugGraphics, {
+            tileColor: null,
+            collidingTileColor: new Phaser.Display.Color(139, 233, 40, 255),
+            faceColor: new Phaser.Display.Color(40, 39, 37, 255),
+          });
+        }
+        console.log("layer name ", layer.name);
+
+        // Debug collision ABOVE YELLOW
+        if (layer.name === TiledLayer.COLLIDE_ABOVE_PLAYER) {
+          phaserLayer.setCollisionByProperty({ collide: true });
+          phaserLayer.renderDebug(debugGraphics, {
+            tileColor: null,
+            collidingTileColor: new Phaser.Display.Color(243, 234, 40, 255),
+            faceColor: new Phaser.Display.Color(40, 39, 37, 255),
+          });
+        }
+      }
+      if (layer?.depth && layer?.depth > 0) {
+        phaserLayer.setDepth(this.players.size + layer.depth);
+      }
+    });
+
+    // Analyse map objects
+    this.sceneMap.findObject(TiledLayer.INFO, (object) => {
+      if (object.type === TiledObjectType.START) {
+        console.log("Start position ", object.type);
+      }
+    });
+
+    // @ts-ignore (PhaserAnimatedTiles types not defined)
+    // this.animatedTiles.init(this.sceneMap);
+  }
+
   /**
    * Create and initialize the scene
    */
   create(data: { network: Network }) {
-    // Debug
-    this.debugFPS = this.add
-      .text(190, 0, "", {
-        fontSize: "9px",
-        padding: { x: 5, y: 5 },
-        backgroundColor: "#000000",
-        color: "#ffffff",
-      })
-      .setResolution(12);
-
-    this.debugPlayer = this.add
-      .text(0, 0, "", {
-        fontSize: "9px",
-        padding: { x: 5, y: 5 },
-        backgroundColor: "#000000",
-        color: "#ffffff",
-      })
-      .setResolution(12);
+    this.displayMap();
 
     // UI
     this.scene.run(SCENES.UI);
@@ -135,9 +197,12 @@ export class GameScene extends Phaser.Scene {
     if (sessionId === this.network.sessionId) {
       this.myPlayer = newPlayer;
 
-      // Setup camera
-      this.cameras.main.setZoom(2);
-      this.cameras.main.startFollow(this.myPlayer, true);
+      if (CLIENT_CONFIG.DEBUG) {
+        this.components.addComponent(
+          this.myPlayer,
+          new DebugPlayer(this.scene.get(SCENES.UI))
+        );
+      }
     } else {
       console.log("[scene] NEW PLAYER");
       this.players.set(sessionId, newPlayer);
@@ -163,13 +228,6 @@ export class GameScene extends Phaser.Scene {
       if (!player) return;
 
       player.update(field, value);
-    }
-    if (this.debugPlayer) {
-      this.debugPlayer.text = `
-ServerX ${this.lastServerX.toFixed(2)}, ClientX ${this.myPlayer.x.toFixed(2)}
-ServerY ${this.lastServerY.toFixed(2)} ClientY ${this.myPlayer.y.toFixed(2)}
-Player ID : ${this.myPlayer.id}
-`;
     }
   }
 
@@ -228,6 +286,19 @@ Player ID : ${this.myPlayer.id}
     });
   }
 
+  setupCamera() {
+    const camera = this.cameras.main;
+
+    camera.setBounds(
+      0,
+      0,
+      SHARED_CONFIG.CAMERA_MAX_WIDTH,
+      SHARED_CONFIG.CAMERA_MAX_HEIGHT
+    );
+    camera.startFollow(this.myPlayer, true);
+    this.cameras.main.setZoom(2);
+  }
+
   /**
    * Update the scene, call at every tick
    * Client-side re-renders at every 16.6ms (60fps).
@@ -236,20 +307,25 @@ Player ID : ${this.myPlayer.id}
   update(_time: number, delta: number) {
     if (!this.myPlayer) return;
 
-    if (this.debugFPS) {
-      this.debugFPS.text = `Frame rate: ${this.game.loop.actualFps.toFixed(2)}`;
-    }
+    // CAMERA
+    this.setupCamera();
 
+    // INPUTS
     const inputs = this.myPlayer.handleInput();
 
-    // Send input to the server at every tick
+    // SEND INPUT TO BACKEND
     this.network.updatePlayer(inputs);
 
-    // LERP  players
+    // LERP MY PLAYER
     this.updateOtherPlayers();
+
+    // LERP OTHER PLAYERS
     this.updateMyPlayers();
   }
 
+  /**
+   * Update components after Game loop update
+   */
   lateUpdate(_time: number, delta: number) {
     // Update components
     this.components.update(delta);

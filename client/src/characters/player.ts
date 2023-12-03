@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-import { SERVER_DATA } from "game.config";
+import { SERVER_DATA } from "client.config";
 
 import { Anim, InputPayload } from "../../../shared/types";
 import { onairAnimsConfig } from "characters";

@@ -1,7 +1,7 @@
 import { Anim, DIRECTION } from "../../../../shared/types";
 import { GameState } from "../../rooms/schema";
 
-import { SERVER_CONFIG } from "../../config";
+import { SERVER_CONFIG } from "../../server.config";
 
 /**
  * Log collision data

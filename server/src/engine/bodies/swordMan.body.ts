@@ -2,7 +2,7 @@ import Matter from "matter-js";
 
 import { Player as PlayerState } from "../../rooms/schema/Player";
 import { Player } from "./player.body";
-import { COLLISION_CATEGORY } from "../config";
+import { COLLISION_CATEGORY } from "../engine.config";
 
 import { DIRECTION } from "../../../../shared/types";
 

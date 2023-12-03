@@ -4,7 +4,7 @@ import Phaser from "phaser";
 import Network, { Network as NetworkType } from "services/Network";
 
 // Others
-import gameConfig from "game.config";
+import CLIENT_CONFIG from "client.config";
 import { SCENES } from "./scene.config";
 
 export class BootScene extends Phaser.Scene {
@@ -28,36 +28,56 @@ export class BootScene extends Phaser.Scene {
   }
 
   loadAssets() {
-    // Background
+    // Load Background
     this.load.image(
-      gameConfig.BACKGROUND.BACKDROP.NAME,
-      gameConfig.BACKGROUND.BACKDROP.PATH
+      CLIENT_CONFIG.BACKGROUND.BACKDROP.NAME,
+      CLIENT_CONFIG.BACKGROUND.BACKDROP.PATH
     );
     this.load.atlas(
-      gameConfig.BACKGROUND.CLOUD.NAME,
-      gameConfig.BACKGROUND.CLOUD.SPRITE_SHEET_TEXTURE_PATH,
-      gameConfig.BACKGROUND.CLOUD.SPRITE_SHEET_ATLAS_PATH
+      CLIENT_CONFIG.BACKGROUND.CLOUD.NAME,
+      CLIENT_CONFIG.BACKGROUND.CLOUD.SPRITE_SHEET_TEXTURE_PATH,
+      CLIENT_CONFIG.BACKGROUND.CLOUD.SPRITE_SHEET_ATLAS_PATH
     );
 
-    // Items
-    this.load.image(gameConfig.ITEMS.HEART.NAME, gameConfig.ITEMS.HEART.PATH);
+    // Load Items
     this.load.image(
-      gameConfig.ITEMS.HEART_FILLED.NAME,
-      gameConfig.ITEMS.HEART_FILLED.PATH
+      CLIENT_CONFIG.ITEMS.HEART.NAME,
+      CLIENT_CONFIG.ITEMS.HEART.PATH
+    );
+    this.load.image(
+      CLIENT_CONFIG.ITEMS.HEART_FILLED.NAME,
+      CLIENT_CONFIG.ITEMS.HEART_FILLED.PATH
     );
 
-    // Map
-    this.load.image(gameConfig.MAP.NAME, gameConfig.MAP.TILESET_PATH);
+    // Load Tileset
+    this.load.image(
+      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME,
+      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.PATH
+    );
+    this.load.image(
+      CLIENT_CONFIG.MAP.TILESETS.CITY_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILESETS.CITY_JAP.PATH
+    );
+    this.load.image(
+      CLIENT_CONFIG.MAP.TILESETS.ARCADE.NAME,
+      CLIENT_CONFIG.MAP.TILESETS.ARCADE.PATH
+    );
+    this.load.image(
+      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.PATH
+    );
+
+    // Load Tilemap
     this.load.tilemapTiledJSON(
-      gameConfig.MAP.NAME,
-      gameConfig.MAP.TILEMAP_PATH
+      CLIENT_CONFIG.MAP.TILEMAP.NAME,
+      CLIENT_CONFIG.MAP.TILEMAP.PAHT
     );
 
-    // Characteres
+    // Load characteres sprite-sheets
     this.load.atlas(
-      gameConfig.CHARACTERS.NAME,
-      gameConfig.CHARACTERS.SPRITE_SHEET_TEXTURE_PATH,
-      gameConfig.CHARACTERS.SPRITE_SHEET_ATLAS_PATH
+      CLIENT_CONFIG.CHARACTERS.NAME,
+      CLIENT_CONFIG.CHARACTERS.SPRITE_SHEET_TEXTURE_PATH,
+      CLIENT_CONFIG.CHARACTERS.SPRITE_SHEET_ATLAS_PATH
     );
 
     this.load.on("complete", () => {
