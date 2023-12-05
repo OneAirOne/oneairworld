@@ -37,6 +37,7 @@ export enum SERVER_DATA {
 
 const CLIENT_CONFIG = {
   DEBUG: true,
+  DEBUG_LAYER: 7,
   MAP: {
     TILEMAP: {
       NAME: "map",

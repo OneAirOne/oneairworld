@@ -71,9 +71,9 @@ export function StartGame() {
                   Hi,
                 </Typography>
                 <Typography variant="h6" paragraph>
-                  I'm Erwan a french software developper. I really enjoy working
-                  on digital projects, especially immervsive experiences like
-                  gaming.
+                  I'm Erwan a software developer from France. I really enjoy
+                  working on digital projects, especially immervsive experiences
+                  like gaming.
                 </Typography>
 
                 <Typography variant="h6" paragraph>

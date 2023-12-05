@@ -16,17 +16,18 @@ interface LayerConfig {
   depth?: number;
 }
 
-export const LAYERS: LayerConfig[] = [
+export const GAME_SCENE_LAYERS: LayerConfig[] = [
+  {
+    name: TiledLayer.BEHIND,
+  },
   {
     name: TiledLayer.GROUND,
   },
   {
-    name: TiledLayer.BEHIND_STUFF,
-    depth: 1,
+    name: TiledLayer.ANIMATED,
   },
   {
-    name: TiledLayer.STUFF_ABOVE_PLAYER,
-    depth: 2,
+    name: TiledLayer.BEHIND_STUFF,
   },
   {
     name: TiledLayer.STUFF_UNDER_PLAYER,
@@ -35,18 +36,16 @@ export const LAYERS: LayerConfig[] = [
     name: TiledLayer.COLLIDE_UNDER_PLAYER,
   },
   {
+    name: TiledLayer.STUFF_ABOVE_PLAYER,
+    depth: 1,
+  },
+  {
     name: TiledLayer.COLLIDE_ABOVE_PLAYER,
+    depth: 2,
   },
   {
     name: TiledLayer.ABOVE,
-    depth: 3,
-  },
-
-  {
-    name: TiledLayer.ANIMATED,
-  },
-  {
-    name: TiledLayer.BEHIND,
+    depth: 2,
   },
 ];
 

@@ -21,7 +21,7 @@ import {
 // Shared
 import type { IPlayer } from "../../../shared/types";
 import {
-  LAYERS,
+  GAME_SCENE_LAYERS,
   TiledLayer,
   TiledObjectType,
 } from "../../../shared/map.config";
@@ -87,10 +87,17 @@ export class GameScene extends Phaser.Scene {
     const TiledSets = [MODERN_CITY, CITY_JAP, ARCADE, INTERIOR_JAP];
 
     // Create layers
-    LAYERS.forEach((layer) => {
+    GAME_SCENE_LAYERS.forEach((layer) => {
       const phaserLayer = this.sceneMap.createLayer(layer.name, TiledSets);
 
-      const debugGraphics = this.add.graphics().setAlpha(0.7);
+      const debugGraphics = this.add
+        .graphics()
+        .setAlpha(0.7)
+        .setDepth(CLIENT_CONFIG.DEBUG_LAYER);
+
+      if (layer?.depth && layer?.depth > 0) {
+        phaserLayer.setDepth(this.players.size + layer.depth);
+      }
 
       if (CLIENT_CONFIG.DEBUG) {
         // Debug collision UNDER GREEN
@@ -112,9 +119,6 @@ export class GameScene extends Phaser.Scene {
             faceColor: new Phaser.Display.Color(40, 39, 37, 255),
           });
         }
-      }
-      if (layer?.depth && layer?.depth > 0) {
-        phaserLayer.setDepth(this.players.size + layer.depth);
       }
     });
 

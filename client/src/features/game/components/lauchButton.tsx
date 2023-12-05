@@ -18,8 +18,6 @@ const Pushable = styled("button")({
   "&:focus:not(:focus-visible)": {
     outline: "none",
   },
-
-  cursor: "pointer",
 });
 
 const Front = styled("div")({
