@@ -45,6 +45,8 @@ export interface IPlayer extends Schema {
   collisionDirection: DIRECTION;
 
   inputQueue: any[];
+
+  decreaseLife: () => void;
 }
 
 export const PLAYER_VELOCITY = 2;

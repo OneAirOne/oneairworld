@@ -44,7 +44,9 @@ export default function LaunchButton({ onClick }: Props) {
   return (
     <Pushable onClick={handleClick}>
       <Front className="front">
-        <Typography>Go ?</Typography>
+        <Typography variant="button" fontSize={20}>
+          Go
+        </Typography>
       </Front>
     </Pushable>
   );

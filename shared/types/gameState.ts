@@ -1,7 +1,7 @@
 import { MapSchema, Schema } from "@colyseus/schema";
 
-import { Player } from "characters";
+import { IPlayer } from "./player";
 
 export interface IGameState extends Schema {
-  players: MapSchema<Player>;
+  players: MapSchema<IPlayer>;
 }
