@@ -39,26 +39,38 @@ const CLIENT_CONFIG = {
   DEBUG: true,
   DEBUG_LAYER: 7,
   MAP: {
-    TILEMAP: {
+    TILE_MAP: {
       NAME: "map",
       PAHT: `assets/map/map.json`,
     },
-    TILESETS: {
+    TILE_SETS: {
+      MODERN_CITY: {
+        NAME: "city-modern",
+        PATH: "assets/map/city-modern.png",
+      },
       CITY_JAP: {
         NAME: "city-jap",
         PATH: "assets/map/city-jap.png",
       },
-      MODERN_CITY: {
-        NAME: "city-modern",
-        PATH: "assets/map/city-modern.png",
+      INTERIOR_JAP: {
+        NAME: "interior-jap",
+        PATH: "assets/map/interior-jap.png",
+      },
+      RURAL_JAP: {
+        NAME: "rural-jap",
+        PATH: "assets/map/rural-jap.png",
       },
       ARCADE: {
         NAME: "arcade",
         PATH: "assets/map/arcade.png",
       },
-      INTERIOR_JAP: {
-        NAME: "interior-jap",
-        PATH: "assets/map/interior-jap.png",
+      OSAKA: {
+        NAME: "osaka",
+        PATH: "assets/map/osaka.png",
+      },
+      TEST: {
+        NAME: "test",
+        PATH: "assets/map/test.png",
       },
     },
   },

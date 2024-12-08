@@ -3,7 +3,10 @@ import { Schema } from "@colyseus/schema";
 export enum Characters {
   ONEAIR = "oneair",
   LINK = "link",
+  FLUPPY = "fluppy",
 }
+
+export type EnemyTextures = Characters.FLUPPY;
 
 export enum Anim {
   ATTACK_LEFT = "LeftAttack",
@@ -49,4 +52,21 @@ export interface IPlayer extends Schema {
   decreaseLife: () => void;
 }
 
+export interface IEnemy extends Schema {
+  id: string;
+  x: number;
+  y: number;
+  anim: string;
+  texture: Characters;
+  direction: DIRECTION;
+  isAttacking: boolean;
+  life: number;
+  isDead: boolean;
+  isCollided: boolean;
+  collisionDirection: DIRECTION;
+
+  decreaseLife: () => void;
+}
+
 export const PLAYER_VELOCITY = 2;
+export const ENEMY_VELOCITY = 2;

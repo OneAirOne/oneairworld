@@ -63,32 +63,52 @@ export class GameScene extends Phaser.Scene {
   displayMap() {
     // Create Tilemap
     this.sceneMap = this.make.tilemap({
-      key: CLIENT_CONFIG.MAP.TILEMAP.NAME,
+      key: CLIENT_CONFIG.MAP.TILE_MAP.NAME,
     });
 
     // Create Tilesets
-    const CITY_JAP = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILESETS.CITY_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILESETS.CITY_JAP.NAME
-    );
     const MODERN_CITY = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME,
-      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME
+      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME
     );
-    const ARCADE = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME,
-      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME
+    const CITY_JAP = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.CITY_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.CITY_JAP.NAME
     );
     const INTERIOR_JAP = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.NAME
+      CLIENT_CONFIG.MAP.TILE_SETS.INTERIOR_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.INTERIOR_JAP.NAME
+    );
+    const RURAL_JAP = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME
+    );
+    const ARCADE = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME
+    );
+    const OSAKA = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME
+    );
+    const TEST = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.TEST.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.TEST.NAME
     );
 
-    const TiledSets = [MODERN_CITY, CITY_JAP, ARCADE, INTERIOR_JAP];
+    const tileSets = [
+      MODERN_CITY,
+      CITY_JAP,
+      INTERIOR_JAP,
+      RURAL_JAP,
+      ARCADE,
+      OSAKA,
+      TEST,
+    ];
 
     // Create layers
     GAME_SCENE_LAYERS.forEach((layer) => {
-      const phaserLayer = this.sceneMap.createLayer(layer.name, TiledSets);
+      const phaserLayer = this.sceneMap.createLayer(layer.name, tileSets);
 
       const debugGraphics = this.add
         .graphics()

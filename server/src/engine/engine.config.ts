@@ -2,6 +2,7 @@ export enum COLLISION_CATEGORY {
   WALL = 0x0001,
   PLAYER = 0x0002,
   HIT_BOX = 0x0003,
+  ENEMY = 0x0004,
 }
 
 export enum COLLISION_GROUP {

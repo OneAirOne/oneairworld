@@ -16,6 +16,7 @@ import {
   IRoomData,
   InputPayload,
   LauchOptions,
+  Characters,
 } from "../../../shared/types";
 
 /**
@@ -55,6 +56,10 @@ export class Game extends Room<GameState> {
 
     this.engine = new GameEngine(this.state);
 
+    // Create enemies
+    this.engine.addEnemy(Characters.FLUPPY);
+
+    // Enqueue player actions
     this.onMessage(Message.UPDATE_PLAYER, (client, data: InputPayload) => {
       this.dispatcher.dispatch(new PlayerUpdateCommand(), {
         client,
@@ -62,10 +67,13 @@ export class Game extends Room<GameState> {
       });
     });
 
-    // Game loop
+    // Run update loop at 60 fps
     this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }
 
+  /**
+   * Game loop
+   */
   update(deltaTime: number) {
     this.state.players.forEach((player, sessionId) => {
       let input: InputPayload;
@@ -84,6 +92,8 @@ export class Game extends Room<GameState> {
    */
   onJoin(client: Client, lauchOptions: LauchOptions) {
     console.log(client.sessionId, "joined!", lauchOptions);
+
+    console.log({ lauchOptions });
 
     this.engine.addPlayer(client.sessionId, lauchOptions);
 
