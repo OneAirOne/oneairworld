@@ -5,7 +5,7 @@ import { Network } from "services/Network";
 import ComponentService from "services/Component.service";
 
 // Characters
-import { createAnim, onairAnimsConfig, Player } from "characters";
+import { createAnim, anims, Player } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
@@ -21,8 +21,7 @@ import {
 // Shared
 import type { IPlayer } from "../../../shared/types";
 import {
-  COLLIDE_LAYERS,
-  LAYERS,
+  GAME_SCENE_LAYERS,
   TiledLayer,
   TiledObjectType,
 } from "../../../shared/map.config";
@@ -64,34 +63,61 @@ export class GameScene extends Phaser.Scene {
   displayMap() {
     // Create Tilemap
     this.sceneMap = this.make.tilemap({
-      key: CLIENT_CONFIG.MAP.TILEMAP.NAME,
+      key: CLIENT_CONFIG.MAP.TILE_MAP.NAME,
     });
 
     // Create Tilesets
-    const CITY_JAP = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILESETS.CITY_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILESETS.CITY_JAP.NAME
-    );
     const MODERN_CITY = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME,
-      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME
+      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME
     );
-    const ARCADE = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME,
-      CLIENT_CONFIG.MAP.TILESETS.MODERN_CITY.NAME
+    const CITY_JAP = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.CITY_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.CITY_JAP.NAME
     );
     const INTERIOR_JAP = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILESETS.INTERIOR_JAP.NAME
+      CLIENT_CONFIG.MAP.TILE_SETS.INTERIOR_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.INTERIOR_JAP.NAME
+    );
+    const RURAL_JAP = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME
+    );
+    const ARCADE = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME
+    );
+    const OSAKA = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME
+    );
+    const TEST = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.TEST.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.TEST.NAME
     );
 
-    const TiledSets = [MODERN_CITY, CITY_JAP, ARCADE, INTERIOR_JAP];
+    const tileSets = [
+      MODERN_CITY,
+      CITY_JAP,
+      INTERIOR_JAP,
+      RURAL_JAP,
+      ARCADE,
+      OSAKA,
+      TEST,
+    ];
 
     // Create layers
-    LAYERS.forEach((layer) => {
-      const phaserLayer = this.sceneMap.createLayer(layer.name, TiledSets);
+    GAME_SCENE_LAYERS.forEach((layer) => {
+      const phaserLayer = this.sceneMap.createLayer(layer.name, tileSets);
 
-      const debugGraphics = this.add.graphics().setAlpha(0.7);
+      const debugGraphics = this.add
+        .graphics()
+        .setAlpha(0.7)
+        .setDepth(CLIENT_CONFIG.DEBUG_LAYER);
+
+      if (layer?.depth && layer?.depth > 0) {
+        phaserLayer.setDepth(this.players.size + layer.depth);
+      }
 
       if (CLIENT_CONFIG.DEBUG) {
         // Debug collision UNDER GREEN
@@ -103,7 +129,6 @@ export class GameScene extends Phaser.Scene {
             faceColor: new Phaser.Display.Color(40, 39, 37, 255),
           });
         }
-        console.log("layer name ", layer.name);
 
         // Debug collision ABOVE YELLOW
         if (layer.name === TiledLayer.COLLIDE_ABOVE_PLAYER) {
@@ -114,9 +139,6 @@ export class GameScene extends Phaser.Scene {
             faceColor: new Phaser.Display.Color(40, 39, 37, 255),
           });
         }
-      }
-      if (layer?.depth && layer?.depth > 0) {
-        phaserLayer.setDepth(this.players.size + layer.depth);
       }
     });
 
@@ -135,6 +157,9 @@ export class GameScene extends Phaser.Scene {
    * Create and initialize the scene
    */
   create(data: { network: Network }) {
+    // Fade in
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
+
     this.displayMap();
 
     // UI
@@ -150,8 +175,9 @@ export class GameScene extends Phaser.Scene {
       this.network = network;
     }
 
-    // Create Oneair animation
-    createAnim(onairAnimsConfig, 10, this);
+    // Create animations
+    createAnim(anims.animOneAir, 10, this);
+    createAnim(anims.animFluppy, 10, this);
 
     // Register network event listener
     this.registerNetworkListeners();

@@ -1,3 +1,3 @@
 export * from "./characters.helper";
-export { default as onairAnimsConfig } from "./oneair/oneair.anims";
+export * as anims from "./anims";
 export * from "./player";

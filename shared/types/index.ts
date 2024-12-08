@@ -1,5 +1,5 @@
 export * from "./gameState";
-export * from "./player";
+export * from "./characters";
 export * from "./room";
 export * from "./message";
 export * from "./inputPayload";

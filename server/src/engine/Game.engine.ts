@@ -3,11 +3,16 @@ import Matter from "matter-js";
 import { GameState } from "../rooms/schema";
 import { processPlayerAction, collisionPlayers } from "./actions";
 
-import { SwordMan, createMap, getTiledInfos } from "./bodies";
+import { SwordMan, createMap, Fluppy } from "./bodies";
 import { COLLISION_CATEGORY } from "./engine.config";
 import { SERVER_CONFIG } from "../server.config";
 
-import { InputPayload, LauchOptions } from "../../../shared/types";
+import {
+  Characters,
+  EnemyTextures,
+  InputPayload,
+  LauchOptions,
+} from "../../../shared/types";
 import { createRectangle } from "./bodies";
 import { SHARED_CONFIG } from "../../../shared/shared.config";
 
@@ -23,6 +28,7 @@ export class GameEngine {
   private engine: Matter.Engine = null;
   private maxPlayerSize = 7;
   private players: Record<string, SwordMan> = {};
+  private enemies: Record<string, Fluppy> = {};
 
   constructor(gameState: GameState) {
     this.engine = Matter.Engine.create();
@@ -157,6 +163,23 @@ export class GameEngine {
       const numberOfBodies = this.world.bodies.length;
       console.log(`[on join] Number of bodies in the world: ${numberOfBodies}`);
     }
+  }
+
+  /**
+   * Create a player with the session id
+   * TODO: use lauchOptions to choose the player
+   */
+  addEnemy(texture: EnemyTextures) {
+    const enemyState = this.state.createEnemy(texture);
+
+    const enemy = new Fluppy(
+      enemyState.id,
+      this.world,
+      this.engine,
+      enemyState
+    );
+
+    this.enemies[enemy.id] = enemy;
   }
 
   /**

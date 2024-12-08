@@ -32,6 +32,8 @@ After working on `.tmx` files inside `tools/map`:
 ./udpateMap.sh
 ```
 
+- Restart the server
+
 #### Credit
 
 https://darties.fr/creer-une-carte-sur-tiled-et-lintegrer-en-phaser-3/

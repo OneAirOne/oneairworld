@@ -15,3 +15,11 @@ ServerY ${options.lastServerY.toFixed(2)} ClientY ${options.clientY.toFixed(
     2
   )}`;
 }
+
+export async function waitFor(time: number = 500): Promise<void> {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, time);
+  });
+}

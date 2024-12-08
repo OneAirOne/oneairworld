@@ -1,4 +1,4 @@
-import { Characters } from "./player";
+import { Characters } from "./characters";
 
 export interface LauchOptions {
   name: string;

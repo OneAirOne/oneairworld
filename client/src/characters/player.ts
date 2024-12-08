@@ -3,7 +3,7 @@ import Phaser from "phaser";
 import { SERVER_DATA } from "client.config";
 
 import { Anim, InputPayload } from "../../../shared/types";
-import { onairAnimsConfig } from "characters";
+import { anims } from "characters";
 
 /* -------------------------------- Constant -------------------------------- */
 
@@ -44,8 +44,8 @@ export class Player extends Phaser.GameObjects.Sprite {
     this._playerTexture = texture;
     this._cursors = this.scene.input.keyboard.createCursorKeys();
 
-    this._animKeys = Object.keys(onairAnimsConfig).map(
-      (key) => onairAnimsConfig[key].key
+    this._animKeys = Object.keys(anims.animOneAir).map(
+      (key) => anims.animOneAir[key].key
     );
     const isAttackAnim = (anim: Phaser.Animations.Animation) => {
       return this._animKeys

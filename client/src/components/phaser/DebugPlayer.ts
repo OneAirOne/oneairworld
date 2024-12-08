@@ -59,19 +59,24 @@ ServerY ${this._gameObject.scene.lastServerY.toFixed()} ClientY ${this._gameObje
   }
 
   start() {
-    this._debugPlayer = this._scene.add.text(0, 0, "", {
+    this._debugPlayer = this._scene.add.text(window.innerWidth - 320, 10, "", {
       fontSize: "15px",
       padding: { x: 10, y: 0 },
       backgroundColor: "#000000",
       color: "#ffffff",
     });
 
-    this._debugFPS = this._scene.add.text(window.innerWidth - 210, 0, "", {
-      fontSize: "15px",
-      padding: { x: 10, y: 5 },
-      backgroundColor: "#000000",
-      color: "#ffffff",
-    });
+    this._debugFPS = this._scene.add.text(
+      window.innerWidth - 210,
+      window.innerHeight - 50,
+      "",
+      {
+        fontSize: "15px",
+        padding: { x: 10, y: 5 },
+        backgroundColor: "#000000",
+        color: "#ffffff",
+      }
+    );
   }
 
   update(dt: number) {
