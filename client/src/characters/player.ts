@@ -40,9 +40,14 @@ export class Player extends Phaser.GameObjects.Sprite {
     super(scene, x, y, texture);
 
     this.scene.add.existing(this);
+    this.scene as Phaser.Scene;
     this.id = id;
     this._playerTexture = texture;
-    this._cursors = this.scene.input.keyboard.createCursorKeys();
+    if (this.scene) {
+      this._cursors = this.scene!.input!.keyboard!.createCursorKeys();
+    } else {
+      throw new Error("Scene is not initialized");
+    }
 
     this._animKeys = Object.keys(anims.animOneAir).map(
       (key) => anims.animOneAir[key].key

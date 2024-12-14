@@ -25,7 +25,7 @@ export class Network {
   constructor() {
     const protocol = window.location.protocol.replace("http", "ws");
     const endpoint = import.meta.env.PROD
-      ? "TODO : define the endpoint"
+      ? `${protocol}//${window.location.hostname}:2567` // Configure if not used in container environment
       : `${protocol}//${window.location.hostname}:2567`;
     this.client = new Client(endpoint);
     this.joinLobbyRoom().then(() => {

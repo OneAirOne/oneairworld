@@ -1,0 +1,19 @@
+# Build Starge
+FROM node:16-alpine
+
+ENV PORT 2567
+
+# Shared folder setup
+WORKDIR /app/shared
+COPY ./shared/ ./
+
+# Server setup
+WORKDIR /app/server
+COPY ./server .
+RUN npm ci
+
+# Expose the server's port
+EXPOSE 2567
+
+# Start the Colyseus server
+CMD ["npm", "start" ]

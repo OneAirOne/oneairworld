@@ -1,0 +1,16 @@
+# Client
+./client/node_modules
+./client/npm-debug.log
+./client/.env
+
+# Server
+./server/node_modules
+./server/npm-debug.log
+./server/.env
+
+# Root
+Dockerfile*
+.dockerignore
+.git
+.gitignore
+.env
