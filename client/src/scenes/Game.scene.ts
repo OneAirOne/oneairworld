@@ -108,7 +108,10 @@ export class GameScene extends Phaser.Scene {
 
     // Create layers
     GAME_SCENE_LAYERS.forEach((layer) => {
-      const phaserLayer = this.sceneMap.createLayer(layer.name, tileSets);
+      const phaserLayer = this.sceneMap.createLayer(
+        layer.name,
+        tileSets as Phaser.Tilemaps.Tileset[]
+      );
 
       const debugGraphics = this.add
         .graphics()
@@ -116,14 +119,14 @@ export class GameScene extends Phaser.Scene {
         .setDepth(CLIENT_CONFIG.DEBUG_LAYER);
 
       if (layer?.depth && layer?.depth > 0) {
-        phaserLayer.setDepth(this.players.size + layer.depth);
+        phaserLayer!.setDepth(this.players.size + layer.depth);
       }
 
       if (CLIENT_CONFIG.DEBUG) {
         // Debug collision UNDER GREEN
         if (layer.name === TiledLayer.COLLIDE_UNDER_PLAYER) {
-          phaserLayer.setCollisionByProperty({ collide: true });
-          phaserLayer.renderDebug(debugGraphics, {
+          phaserLayer!.setCollisionByProperty({ collide: true });
+          phaserLayer!.renderDebug(debugGraphics, {
             tileColor: null,
             collidingTileColor: new Phaser.Display.Color(139, 233, 40, 255),
             faceColor: new Phaser.Display.Color(40, 39, 37, 255),
@@ -132,8 +135,8 @@ export class GameScene extends Phaser.Scene {
 
         // Debug collision ABOVE YELLOW
         if (layer.name === TiledLayer.COLLIDE_ABOVE_PLAYER) {
-          phaserLayer.setCollisionByProperty({ collide: true });
-          phaserLayer.renderDebug(debugGraphics, {
+          phaserLayer!.setCollisionByProperty({ collide: true });
+          phaserLayer!.renderDebug(debugGraphics, {
             tileColor: null,
             collidingTileColor: new Phaser.Display.Color(243, 234, 40, 255),
             faceColor: new Phaser.Display.Color(40, 39, 37, 255),
@@ -143,6 +146,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     // Analyse map objects
+    // @ts-ignore
     this.sceneMap.findObject(TiledLayer.INFO, (object) => {
       if (object.type === TiledObjectType.START) {
         console.log("Start position ", object.type);

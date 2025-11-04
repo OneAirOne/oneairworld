@@ -1,14 +1,28 @@
-# Client
+# Production
+
+In the root folder
+
+```bash
+# build containers
+docker compose build --no-cache
+
+# run containers
+docker compose up
+```
+
+# Development
+
+## Client
 
 `cd ./client`
 `npm run dev`
 
-# Server
+## Server
 
 `cd ./server`
 `npm start`
 
-### monitor
+# monitor
 
 http://localhost:2567/colyseus/#/
 
