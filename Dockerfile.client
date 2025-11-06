@@ -13,6 +13,7 @@ COPY ./client .
 
 RUN cd /app/client && npm ci
 RUN npm run build
+RUN ls -la /app/client/dist # Add this line for debugging
 
 # Production Stage
 FROM nginx:stable-alpine
