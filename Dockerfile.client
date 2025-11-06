@@ -5,11 +5,13 @@ FROM node:18-alpine AS build
 WORKDIR /app/shared
 COPY ./shared/ ./
 
+RUN cd /app/shared && npm ci
+
 # Client setup
 WORKDIR /app/client
-COPY ./client/package*.json ./
-RUN npm ci
 COPY ./client .
+
+RUN cd /app/client && npm ci
 RUN npm run build
 
 # Production Stage
