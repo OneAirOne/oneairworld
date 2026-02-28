@@ -23,9 +23,8 @@ export class Network {
   sessionId!: string;
 
   constructor() {
-    const endpoint = import.meta.env.PROD
-      ? import.meta.env.VITE_COLYSEUS_URL
-      : `ws://${window.location.hostname}:2567`;
+    // const endpoint = import.meta.env.VITE_COLYSEUS_URL ?? `ws://${window.location.hostname}:2567`;
+    const endpoint = `https://api.erwangilbert.com`;
     this.client = new Client(endpoint);
     this.joinLobbyRoom().then(() => {
       // TODO : store in local store
