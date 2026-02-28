@@ -3,6 +3,9 @@
 ./client/npm-debug.log
 ./client/.env
 
+# Shared
+./shared/node_modules
+
 # Server
 ./server/node_modules
 ./server/npm-debug.log
