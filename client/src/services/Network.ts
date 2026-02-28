@@ -23,10 +23,9 @@ export class Network {
   sessionId!: string;
 
   constructor() {
-    const protocol = window.location.protocol.replace("http", "ws");
     const endpoint = import.meta.env.PROD
-      ? `${protocol}//${window.location.hostname}:2567` // Configure if not used in container environment
-      : `${protocol}//${window.location.hostname}:2567`;
+      ? import.meta.env.VITE_COLYSEUS_URL
+      : `ws://${window.location.hostname}:2567`;
     this.client = new Client(endpoint);
     this.joinLobbyRoom().then(() => {
       // TODO : store in local store
