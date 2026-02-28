@@ -4,12 +4,12 @@ FROM node:18-alpine AS build
 # Shared folder setup
 WORKDIR /app/shared
 COPY ./shared ./
-RUN npm i
+RUN npm ci
 
 # Client setup
 WORKDIR /app/client
 COPY ./client ./
-RUN npm i
+RUN npm ci
 
 RUN npx tsc --noEmit
 RUN npx vite build
