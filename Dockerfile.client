@@ -4,20 +4,21 @@ FROM node:18-alpine AS build
 # Shared folder setup
 WORKDIR /app/shared
 COPY ./shared/package*.json ./
-
-RUN cd /app/shared && npm ci
+RUN npm ci
+COPY ./shared ./
 
 # Client setup
 WORKDIR /app/client
-COPY ./client/package*.json .
+COPY ./client/package*.json ./
+RUN npm ci
+COPY ./client ./
 
-RUN cd /app/client && npm ci
-RUN npm run build
+RUN npx tsc --noEmit
+RUN npx vite build
 
 # Production Stage
 FROM nginx:stable-alpine
 
-# Serve static files from build
 COPY --from=build /app/client/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
