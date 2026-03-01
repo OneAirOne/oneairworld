@@ -1,5 +1,3 @@
-import { Schema } from "@colyseus/schema";
-
 export enum Characters {
   ONEAIR = "oneair",
   LINK = "link",
@@ -34,7 +32,7 @@ export enum DIRECTION {
   RIGHT = "RIGHT",
 }
 
-export interface IPlayer extends Schema {
+export interface IPlayer {
   name: string;
   x: number;
   y: number;
@@ -52,7 +50,7 @@ export interface IPlayer extends Schema {
   decreaseLife: () => void;
 }
 
-export interface IEnemy extends Schema {
+export interface IEnemy {
   id: string;
   x: number;
   y: number;
