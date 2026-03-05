@@ -5,7 +5,7 @@ import { Network } from "services/Network";
 import ComponentService from "services/Component.service";
 
 // Characters
-import { createAnim, anims, Player } from "characters";
+import { createAnim, anims, Player, Enemy } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
@@ -19,19 +19,22 @@ import {
 } from "components/phaser";
 
 // Shared
-import type { IPlayer } from "../../../shared/types";
+import type { IPlayer, IEnemy } from "../../../shared/types";
+import { Anim } from "../../../shared/types";
 import {
   GAME_SCENE_LAYERS,
   TiledLayer,
   TiledObjectType,
 } from "../../../shared/map.config";
-import { SHARED_CONFIG } from "../../../shared/shared.config";
+import { SHARED_CONFIG, COMBAT_CONFIG, ENEMY_CONFIG } from "../../../shared/shared.config";
 
 export class GameScene extends Phaser.Scene {
   private network!: Network;
   private players = new Map<string, Player>();
   private myPlayer!: Player;
   private components!: ComponentService;
+  private enemyDebugGraphics!: Phaser.GameObjects.Graphics;
+  private enemies = new Map<string, Enemy>();
 
   sceneMap!: Phaser.Tilemaps.Tilemap;
   lastServerX: number = 0;
@@ -183,6 +186,9 @@ export class GameScene extends Phaser.Scene {
     createAnim(anims.animOneAir, 10, this);
     createAnim(anims.animFluppy, 10, this);
 
+    // Debug graphics for enemies
+    this.enemyDebugGraphics = this.add.graphics().setDepth(CLIENT_CONFIG.DEBUG_LAYER);
+
     // Register network event listener
     this.registerNetworkListeners();
   }
@@ -194,6 +200,84 @@ export class GameScene extends Phaser.Scene {
     this.network.onPlayerJoin(this.handleJoinPLayer, this);
     this.network.onPlayerUpdated(this.handleProcessServerUpdates, this);
     this.network.onPlayerLeft(this.handleLeftPlayer, this);
+    this.network.onEnemyJoin(this.handleEnemyJoin, this);
+    this.network.onEnemyUpdated(this.handleEnemyUpdated, this);
+    this.network.onEnemyLeft(this.handleEnemyLeft, this);
+  }
+
+  handleEnemyJoin(enemy: IEnemy, id: string) {
+    console.log(`[Scene] enemy joined id=${id} x=${enemy.x} y=${enemy.y}`);
+
+    const newEnemy = new Enemy(this, enemy.x, enemy.y, enemy.texture, id);
+    this.enemies.set(id, newEnemy);
+  }
+
+  handleEnemyUpdated(field: string, value: number | string, id: string) {
+    const enemy = this.enemies.get(id);
+    if (!enemy) return;
+    enemy.update(field, value);
+  }
+
+  handleEnemyLeft(id: string) {
+    console.log(`[Scene] enemy left id=${id}`);
+    const enemy = this.enemies.get(id);
+    if (enemy) enemy.destroy();
+    this.enemies.delete(id);
+  }
+
+  private updateEnemies() {
+    this.enemies.forEach((enemy) => {
+      const serverX = enemy.getData(SERVER_DATA.X);
+      const serverY = enemy.getData(SERVER_DATA.Y);
+      const serverAnim = enemy.getData(SERVER_DATA.ANIM);
+
+      if (serverX) enemy.lerpPositionX(serverX);
+      if (serverY) enemy.lerpPositionY(serverY);
+      if (serverAnim) enemy.updateAnim(serverAnim);
+    });
+  }
+
+  private drawEnemyDebug() {
+    this.enemyDebugGraphics.clear();
+
+    // Enemy hurtbox — blue, centered on body
+    const hs = COMBAT_CONFIG.HURT_BOX_SIZE / 2;
+    this.enemies.forEach((enemy) => {
+      this.enemyDebugGraphics.lineStyle(1, 0x4444ff, 1);
+      this.enemyDebugGraphics.strokeRect(
+        enemy.x - hs, enemy.y - hs,
+        COMBAT_CONFIG.HURT_BOX_SIZE, COMBAT_CONFIG.HURT_BOX_SIZE
+      );
+
+      // Aggro radius — yellow circle
+      this.enemyDebugGraphics.lineStyle(1, 0xffee00, 0.4);
+      this.enemyDebugGraphics.strokeCircle(enemy.x, enemy.y, ENEMY_CONFIG.AGGRO_RADIUS);
+    });
+
+    // Player hitbox — red, only visible when attacking
+    if (this.myPlayer && this.myPlayer.getData(SERVER_DATA.IS_ATTACKING)) {
+      const offset = COMBAT_CONFIG.HIT_BOX_OFFSET;
+      const hbs = COMBAT_CONFIG.HIT_BOX_SIZE / 2;
+      let hx = this.myPlayer.x;
+      let hy = this.myPlayer.y;
+
+      switch (this.myPlayer.lastAnim) {
+        case Anim.UP: case Anim.IDDLE_UP: case Anim.ATTACK_UP:
+          hy -= offset; break;
+        case Anim.DOWN: case Anim.IDDLE_DOWN: case Anim.ATTACK_DOWN:
+          hy += offset; break;
+        case Anim.LEFT: case Anim.IDDLE_LEFT: case Anim.ATTACK_LEFT:
+          hx -= offset; break;
+        case Anim.RIGHT: case Anim.IDDLE_RIGHT: case Anim.ATTACK_RIGHT:
+          hx += offset; break;
+      }
+
+      this.enemyDebugGraphics.lineStyle(1, 0xff2222, 1);
+      this.enemyDebugGraphics.strokeRect(
+        hx - hbs, hy - hbs,
+        COMBAT_CONFIG.HIT_BOX_SIZE, COMBAT_CONFIG.HIT_BOX_SIZE
+      );
+    }
   }
 
   /**
@@ -351,6 +435,14 @@ export class GameScene extends Phaser.Scene {
 
     // LERP OTHER PLAYERS
     this.updateMyPlayers();
+
+    // UPDATE ENEMIES
+    this.updateEnemies();
+
+    // DEBUG: draw enemy bounding boxes
+    if (CLIENT_CONFIG.DEBUG) {
+      this.drawEnemyDebug();
+    }
   }
 
   /**

@@ -176,6 +176,9 @@ export class Player extends Phaser.GameObjects.Sprite {
           this.setData(SERVER_DATA.IS_COLLIDED, value);
         }
         break;
+      case SERVER_DATA.IS_ATTACKING:
+        this.setData(SERVER_DATA.IS_ATTACKING, value);
+        break;
     }
   }
 }

@@ -8,3 +8,18 @@ export const SHARED_CONFIG = {
   CAMERA_MAX_WIDTH: 1000,
   CAMERA_MAX_HEIGHT: 700,
 };
+
+export const COMBAT_CONFIG = {
+  // Player attack hitbox (sensor in front of player when attacking)
+  HIT_BOX_SIZE: 12,
+  HIT_BOX_OFFSET: 15,
+  // Enemy damage-receiving hurtbox (centered on body)
+  HURT_BOX_SIZE: 10,
+  // Damage dealt to enemy per hit
+  ENEMY_HIT_DAMAGE: 25,
+};
+
+export const ENEMY_CONFIG = {
+  // Radius (px) within which an enemy detects and follows a player
+  AGGRO_RADIUS: 80,
+};

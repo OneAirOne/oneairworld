@@ -8,4 +8,7 @@ export enum PhaserEvent {
   PLAYER_UPDATED = "player-updated",
   PLAYER_LEFT = "player-left",
   PLAYER_DISCONNECTED = "player-disconnected",
+  ENEMY_JOINED = "enemy-joined",
+  ENEMY_UPDATED = "enemy-updated",
+  ENEMY_LEFT = "enemy-left",
 }

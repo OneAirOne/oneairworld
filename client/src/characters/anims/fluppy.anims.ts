@@ -33,37 +33,37 @@ export const animFluppy: Record<string, Anim> = {
     suffix: ".png",
     key: "fluppyLeft",
   },
-  STATIC_UP: {
+  IDLE_UP: {
     start: 1,
     end: 1,
     zeroPad: 4,
     prefix: "fluppy/walk/up_static/",
     suffix: ".png",
-    key: "fluppyStaticUp",
+    key: "fluppyIdleUp",
   },
-  STATIC_RIGHT: {
+  IDLE_RIGHT: {
     start: 1,
     end: 1,
     zeroPad: 4,
     prefix: "fluppy/walk/right_static/",
     suffix: ".png",
-    key: "fluppyStaticRight",
+    key: "fluppyIdleRight",
   },
-  STATIC_DOWN: {
+  IDLE_DOWN: {
     start: 1,
     end: 14,
     zeroPad: 4,
     prefix: "fluppy/walk/down_static/",
     suffix: ".png",
-    key: "fluppyStaticDown",
+    key: "fluppyIdleDown",
   },
-  STATIC_LEFT: {
+  IDLE_LEFT: {
     start: 1,
     end: 1,
     zeroPad: 4,
     prefix: "fluppy/walk/left_static/",
     suffix: ".png",
-    key: "fluppyStaticLeft",
+    key: "fluppyIdleLeft",
   },
   ATTACK_UP: {
     start: 1,

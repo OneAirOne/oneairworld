@@ -2,7 +2,7 @@ import { Schema, type } from "@colyseus/schema";
 
 import { SHARED_CONFIG } from "../../../../shared/shared.config";
 
-import { Characters, DIRECTION, type IPlayer } from "../../../../shared/types";
+import { Characters, DIRECTION } from "../../../../shared/types";
 
 import { ANIM_START } from "../../constants";
 import { SERVER_CONFIG } from "../../server.config";
@@ -10,7 +10,7 @@ import { getTiledInfos } from "../../engine/bodies";
 
 const { start } = getTiledInfos();
 
-export class Player extends Schema implements IPlayer {
+export class Player extends Schema {
   @type("string") name = "";
   @type("number") x = start.x;
   @type("number") y = start.y;

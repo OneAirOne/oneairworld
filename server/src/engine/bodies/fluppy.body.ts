@@ -5,80 +5,83 @@ import { Enemy } from "./enemy.body";
 import { COLLISION_CATEGORY } from "../engine.config";
 
 import { DIRECTION } from "../../../../shared/types";
+import { COMBAT_CONFIG } from "../../../../shared/shared.config";
 
 const HIT_BOX_CONFIG = {
   isSensor: true,
   collisionFilter: {
     category: COLLISION_CATEGORY.HIT_BOX,
-    mask: COLLISION_CATEGORY.ENEMY,
+    mask: COLLISION_CATEGORY.HURT_BOX,
   },
 };
 
-const HIT_BOX_OFFSET = 15;
+const HURT_BOX_CONFIG = {
+  isSensor: true,
+  collisionFilter: {
+    category: COLLISION_CATEGORY.HURT_BOX,
+    mask: COLLISION_CATEGORY.HIT_BOX,
+  },
+};
 
 export class Fluppy extends Enemy {
   protected _world: Matter.World;
   private _hitBox: Matter.Body;
-  id: string;
+  private _hurtBox: Matter.Body;
 
   constructor(
     id: string,
     world: Matter.World,
     engine: Matter.Engine,
-    enemyState: EnemyState
+    enemyState: EnemyState,
+    position?: { x: number; y: number }
   ) {
-    super(id, world, engine, enemyState);
+    super(id, world, engine, enemyState, position);
 
-    this._hitBox = Matter.Body.create({
-      position: { x: this._body.position.x, y: this._body.position.y },
-      vertices: [
-        { x: this._body.vertices[0].x, y: this._body.vertices[0].y },
-        { x: this._body.vertices[1].x, y: this._body.vertices[1].y },
-        { x: this._body.vertices[2].x, y: this._body.vertices[2].y },
-        { x: this._body.vertices[3].x, y: this._body.vertices[3].y },
-      ],
-      label: id,
-      ...HIT_BOX_CONFIG,
-    });
+    // Attack hitbox (for future enemy→player damage)
+    this._hitBox = Matter.Bodies.rectangle(
+      this._body.position.x,
+      this._body.position.y,
+      COMBAT_CONFIG.HIT_BOX_SIZE,
+      COMBAT_CONFIG.HIT_BOX_SIZE,
+      { label: id, ...HIT_BOX_CONFIG }
+    );
 
-    Matter.Composite.add(world, [this._hitBox]);
+    // Hurtbox — damage-receiving zone centered on body
+    this._hurtBox = Matter.Bodies.rectangle(
+      this._body.position.x,
+      this._body.position.y,
+      COMBAT_CONFIG.HURT_BOX_SIZE,
+      COMBAT_CONFIG.HURT_BOX_SIZE,
+      { label: id, ...HURT_BOX_CONFIG }
+    );
+
+    Matter.Composite.add(world, [this._hitBox, this._hurtBox]);
 
     /**
-     * Move the hitbox according to the direction
+     * Keep hitbox and hurtbox synced with body position
      */
     Matter.Events.on(engine, "afterUpdate", () => {
+      const x = this._body.position.x;
+      const y = this._body.position.y;
+      const offset = COMBAT_CONFIG.HIT_BOX_OFFSET;
+
+      // Hurtbox stays centered on body
+      Matter.Body.setPosition(this._hurtBox, { x, y });
+
+      // Hitbox moves in front based on direction
       if (this?._enemyState?.direction === DIRECTION.UP) {
-        Matter.Body.setPosition(this._hitBox, {
-          x: this._body.position.x,
-          y: this._body.position.y - HIT_BOX_OFFSET,
-        });
-      }
-      if (this?._enemyState?.direction === DIRECTION.DOWN) {
-        Matter.Body.setPosition(this._hitBox, {
-          x: this._body.position.x,
-          y: this._body.position.y + HIT_BOX_OFFSET,
-        });
-      }
-      if (this?._enemyState?.direction === DIRECTION.LEFT) {
-        Matter.Body.setPosition(this._hitBox, {
-          x: this._body.position.x - HIT_BOX_OFFSET,
-          y: this._body.position.y,
-        });
-      }
-      if (this?._enemyState?.direction === DIRECTION.RIGHT) {
-        Matter.Body.setPosition(this._hitBox, {
-          x: this._body.position.x + HIT_BOX_OFFSET,
-          y: this._body.position.y,
-        });
+        Matter.Body.setPosition(this._hitBox, { x, y: y - offset });
+      } else if (this?._enemyState?.direction === DIRECTION.DOWN) {
+        Matter.Body.setPosition(this._hitBox, { x, y: y + offset });
+      } else if (this?._enemyState?.direction === DIRECTION.LEFT) {
+        Matter.Body.setPosition(this._hitBox, { x: x - offset, y });
+      } else if (this?._enemyState?.direction === DIRECTION.RIGHT) {
+        Matter.Body.setPosition(this._hitBox, { x: x + offset, y });
       }
     });
   }
 
-  /**
-   * Override of player function
-   * Remove the hitbox
-   */
   removePlayer() {
-    Matter.World.remove(this._world, [this._body, this._hitBox]);
+    Matter.World.remove(this._world, [this._body, this._hitBox, this._hurtBox]);
   }
 }

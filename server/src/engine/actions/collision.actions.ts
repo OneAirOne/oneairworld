@@ -1,5 +1,6 @@
 import { Anim, DIRECTION } from "../../../../shared/types";
 import { GameState } from "../../rooms/schema";
+import { COLLISION_CATEGORY } from "../engine.config";
 
 import { SERVER_CONFIG } from "../../server.config";
 
@@ -35,6 +36,47 @@ function logCollision(
       bodyB.collisionFilter.category
     );
   }
+}
+
+/**
+ * Handle player hitbox hitting enemy hurtbox
+ */
+export function collisionPlayerEnemy(
+  bodyA: Matter.Body,
+  bodyB: Matter.Body,
+  gameState: GameState
+): { enemyId: string; playerId: string } | null {
+  const hitBody =
+    bodyA.collisionFilter.category === COLLISION_CATEGORY.HIT_BOX ? bodyA : bodyB;
+  const hurtBody =
+    bodyA.collisionFilter.category === COLLISION_CATEGORY.HURT_BOX ? bodyA : bodyB;
+
+  const playerState = gameState.players.get(hitBody.label);
+  const enemyState = gameState.enemies.get(hurtBody.label);
+
+  if (!playerState || !enemyState) return null;
+  if (!playerState.isAttacking || enemyState.isDead) return null;
+
+  enemyState.decreaseLife();
+
+  // Knockback: push enemy in the opposite direction of the attack
+  const knockbackDirection: Record<DIRECTION, DIRECTION> = {
+    [DIRECTION.UP]: DIRECTION.DOWN,
+    [DIRECTION.DOWN]: DIRECTION.UP,
+    [DIRECTION.LEFT]: DIRECTION.RIGHT,
+    [DIRECTION.RIGHT]: DIRECTION.LEFT,
+  };
+
+  enemyState.isCollided = true;
+  enemyState.collisionDirection = knockbackDirection[playerState.direction as DIRECTION];
+
+  // Hit animation based on attacker direction (same convention as player-player)
+  if (playerState.direction === DIRECTION.UP) enemyState.anim = Anim.HIT_DOWN;
+  if (playerState.direction === DIRECTION.DOWN) enemyState.anim = Anim.HIT_UP;
+  if (playerState.direction === DIRECTION.LEFT) enemyState.anim = Anim.HIT_RIGHT;
+  if (playerState.direction === DIRECTION.RIGHT) enemyState.anim = Anim.HIT_LEFT;
+
+  return { enemyId: hurtBody.label, playerId: hitBody.label };
 }
 
 /**

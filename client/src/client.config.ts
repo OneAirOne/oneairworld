@@ -33,10 +33,11 @@ export enum SERVER_DATA {
   ANIM = "anim",
   LIFE = "life",
   IS_COLLIDED = "isCollided",
+  IS_ATTACKING = "isAttacking",
 }
 
 const CLIENT_CONFIG = {
-  DEBUG: true,
+  DEBUG: false,
   DEBUG_LAYER: 7,
   MAP: {
     TILE_MAP: {

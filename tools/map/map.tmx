@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="43" nextobjectid="51">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="44" nextobjectid="56">
  <editorsettings>
   <export target="map.json" format="json"/>
  </editorsettings>
@@ -260882,6 +260882,23 @@
  </layer>
  <objectgroup id="35" name="info">
   <object id="48" name="start" x="463" y="336">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="43" name="spawn">
+  <object id="51" name="spawn1" x="638.368" y="393.564">
+   <point/>
+  </object>
+  <object id="52" name="spawn2" x="251.673" y="420.348">
+   <point/>
+  </object>
+  <object id="53" name="spawn3" x="66.9344" y="136.546">
+   <point/>
+  </object>
+  <object id="54" name="spawn4" x="793.842" y="331.995">
+   <point/>
+  </object>
+  <object id="55" name="spawn5" x="966.533" y="207.497">
    <point/>
   </object>
  </objectgroup>

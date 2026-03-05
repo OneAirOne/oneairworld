@@ -9,6 +9,7 @@ import { GameState } from "./schema/GameState";
 import { PlayerUpdateCommand } from "./commands";
 
 import { GameEngine } from "../engine/Game.engine";
+import { SERVER_CONFIG } from "../server.config";
 
 // Shared
 import {
@@ -56,8 +57,10 @@ export class Game extends Room<GameState> {
 
     this.engine = new GameEngine(this.state);
 
-    // Create enemies
-    this.engine.addEnemy(Characters.FLUPPY);
+    // Populate world with initial enemies
+    for (let i = 0; i < SERVER_CONFIG.enemyInitialCount; i++) {
+      this.engine.addEnemy(Characters.FLUPPY);
+    }
 
     // Enqueue player actions
     this.onMessage(Message.UPDATE_PLAYER, (client, data: InputPayload) => {

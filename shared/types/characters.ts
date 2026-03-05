@@ -67,4 +67,4 @@ export interface IEnemy {
 }
 
 export const PLAYER_VELOCITY = 2;
-export const ENEMY_VELOCITY = 2;
+export const ENEMY_VELOCITY = 0.8;

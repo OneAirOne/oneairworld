@@ -1,7 +1,7 @@
 import Matter from "matter-js";
 
 import { GameState } from "../rooms/schema";
-import { processPlayerAction, collisionPlayers } from "./actions";
+import { processPlayerAction, collisionPlayers, collisionPlayerEnemy, processEnemyAI } from "./actions";
 
 import { SwordMan, createMap, Fluppy } from "./bodies";
 import { COLLISION_CATEGORY } from "./engine.config";
@@ -13,7 +13,7 @@ import {
   InputPayload,
   LauchOptions,
 } from "../../../shared/types";
-import { createRectangle } from "./bodies";
+import { createRectangle, getSpawnPoints } from "./bodies";
 import { SHARED_CONFIG } from "../../../shared/shared.config";
 
 /**
@@ -29,6 +29,7 @@ export class GameEngine {
   private maxPlayerSize = 7;
   private players: Record<string, SwordMan> = {};
   private enemies: Record<string, Fluppy> = {};
+  private spawnPoints: { x: number; y: number }[] = getSpawnPoints();
 
   constructor(gameState: GameState) {
     this.engine = Matter.Engine.create();
@@ -38,7 +39,33 @@ export class GameEngine {
     this.setup();
 
     /**
-     * COLLISION ACTIVE LISTENER
+     * COLLISION START — player hitbox hits enemy hurtbox (once per contact)
+     */
+    Matter.Events.on(this.engine, "collisionStart", (event) => {
+      for (const pair of event.pairs) {
+        const { bodyA, bodyB } = pair;
+
+        const isPlayerHittingEnemy =
+          (bodyA.collisionFilter.category === COLLISION_CATEGORY.HIT_BOX &&
+            bodyB.collisionFilter.category === COLLISION_CATEGORY.HURT_BOX) ||
+          (bodyB.collisionFilter.category === COLLISION_CATEGORY.HIT_BOX &&
+            bodyA.collisionFilter.category === COLLISION_CATEGORY.HURT_BOX);
+
+        if (isPlayerHittingEnemy && bodyA.label !== bodyB.label) {
+          const hit = collisionPlayerEnemy(bodyA, bodyB, this.state);
+          if (hit) {
+            const enemy = this.enemies[hit.enemyId];
+            if (enemy) {
+              enemy.targetPlayerId = hit.playerId;
+              enemy.hitAnimTimer = 600;
+            }
+          }
+        }
+      }
+    });
+
+    /**
+     * COLLISION ACTIVE — continuous player-player collisions
      */
     Matter.Events.on(this.engine, "collisionActive", (event) => {
       const pairs = event.pairs;
@@ -56,11 +83,13 @@ export class GameEngine {
           bodyA.collisionFilter.category === COLLISION_CATEGORY.HIT_BOX &&
           bodyB.collisionFilter.category === COLLISION_CATEGORY.HIT_BOX;
 
-        if (
-          bodyA.label !== bodyB.label &&
-          !isWallCollission &&
-          !isHitBoxCollition
-        ) {
+        const isPlayerHittingEnemy =
+          (bodyA.collisionFilter.category === COLLISION_CATEGORY.HIT_BOX &&
+            bodyB.collisionFilter.category === COLLISION_CATEGORY.HURT_BOX) ||
+          (bodyB.collisionFilter.category === COLLISION_CATEGORY.HIT_BOX &&
+            bodyA.collisionFilter.category === COLLISION_CATEGORY.HURT_BOX);
+
+        if (bodyA.label !== bodyB.label && !isWallCollission && !isHitBoxCollition && !isPlayerHittingEnemy) {
           collisionPlayers(bodyA, bodyB, this.state);
         }
       }
@@ -120,11 +149,26 @@ export class GameEngine {
         if (!this.state.players.get(key) || !this.players[key]) {
           continue;
         }
-
         this.state.players.get(key).x = this.players[key].getBody().position.x;
         this.state.players.get(key).y = this.players[key].getBody().position.y;
       }
+
+      for (const key in this.enemies) {
+        if (!this.state.enemies.get(key) || !this.enemies[key]) {
+          continue;
+        }
+        this.state.enemies.get(key).x = this.enemies[key].getBody().position.x;
+        this.state.enemies.get(key).y = this.enemies[key].getBody().position.y;
+      }
     });
+  }
+
+  private getRandomSpawnPosition() {
+    if (this.spawnPoints.length === 0) {
+      console.warn("[GameEngine] No spawn points found in map, spawning at origin");
+      return { x: 0, y: 0 };
+    }
+    return this.spawnPoints[Math.floor(Math.random() * this.spawnPoints.length)];
   }
 
   /**
@@ -170,16 +214,18 @@ export class GameEngine {
    * TODO: use lauchOptions to choose the player
    */
   addEnemy(texture: EnemyTextures) {
-    const enemyState = this.state.createEnemy(texture);
+    const position = this.getRandomSpawnPosition();
+    const enemyState = this.state.createEnemy(texture, position);
 
     const enemy = new Fluppy(
       enemyState.id,
       this.world,
       this.engine,
-      enemyState
+      enemyState,
+      position
     );
 
-    this.enemies[enemy.id] = enemy;
+    this.enemies[enemyState.id] = enemy;
   }
 
   /**
@@ -198,7 +244,46 @@ export class GameEngine {
     }
   }
 
+  /**
+   * Remove enemy bodies and colyseus state
+   */
+  removeEnemy(enemyId: string) {
+    const enemy = this.enemies[enemyId];
+    if (!enemy) return;
+
+    enemy.removePlayer();
+
+    if (this.state.enemies.has(enemyId)) {
+      this.state.enemies.delete(enemyId);
+    }
+
+    delete this.enemies[enemyId];
+  }
+
   update(deltaTime: number): void {
     Matter.Engine.update(this.engine, deltaTime);
+
+    const deadEnemyIds: string[] = [];
+
+    this.state.enemies.forEach((enemyState, id) => {
+      if (enemyState.isDead) {
+        deadEnemyIds.push(id);
+      }
+    });
+
+    for (const id of deadEnemyIds) {
+      this.removeEnemy(id);
+
+      if (Math.random() < SERVER_CONFIG.enemySpawnChance) {
+        this.addEnemy(Characters.FLUPPY);
+      }
+    }
+
+    for (const id in this.enemies) {
+      const enemy = this.enemies[id];
+      const enemyState = this.state.enemies.get(id);
+      if (!enemy || !enemyState || enemyState.isDead) continue;
+      processEnemyAI(enemy, enemyState, deltaTime, this.state);
+    }
   }
 }
