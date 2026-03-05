@@ -274,7 +274,9 @@ export class GameEngine {
     for (const id of deadEnemyIds) {
       this.removeEnemy(id);
 
-      if (Math.random() < SERVER_CONFIG.enemySpawnChance) {
+      // Always spawn at least 1, then chance for more
+      this.addEnemy(Characters.FLUPPY);
+      while (Math.random() < SERVER_CONFIG.enemySpawnChance) {
         this.addEnemy(Characters.FLUPPY);
       }
     }
