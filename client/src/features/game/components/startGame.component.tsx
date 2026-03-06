@@ -1,9 +1,5 @@
 import * as React from "react";
 
-// MUI
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-
 // Components
 import LaunchButton from "./lauchButton";
 
@@ -15,15 +11,13 @@ import { BootScene, SCENES } from "scenes";
 import { Characters } from "../../../../../shared/types";
 
 export function StartGame() {
-  const [isStarted, setIsStarted] = React.useState(false);
+  const [visible, setVisible] = React.useState(true);
   const mail = "gilberterwan@gmail.com";
 
-  const handlLauchGame = React.useCallback(async () => {
+  const handleLaunch = React.useCallback(async () => {
     try {
       const bootScene = phaserGame.scene.keys[SCENES.BOOT] as BootScene;
-
       bootScene.launchGame();
-
       await bootScene.network.joinOrCreatePublic({
         name: "Erwan",
         texture: Characters.ONEAIR,
@@ -31,74 +25,65 @@ export function StartGame() {
     } catch (error) {
       console.error(error);
     }
-    setIsStarted(true);
+    setVisible(false);
   }, []);
 
+  if (!visible) return null;
+
   return (
-    <React.Fragment>
-      {!isStarted && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "hsl(0, 0%, 98%) ",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+    <div className="absolute inset-0 z-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center pointer-events-auto">
+      <div className="max-w-lg w-full px-8">
+
+        {/* Avatar */}
+        <div className="flex justify-center mb-8 animate-float">
+          <img
+            src="assets/avatar.jpg"
+            className="w-24 h-24 rounded-full ring-2 ring-purple-500/30"
+          />
+        </div>
+
+        {/* Text */}
+        <div
+          className="mb-10 opacity-0 animate-fade-in-up"
+          style={{ animationDelay: "0.1s" }}
         >
-          <Box sx={{ maxWidth: "40%" }}>
-            <Box
-              id="wrapper-30"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100vh",
-                outlineOffset: "4px",
-              }}
+          <h1 className="text-4xl font-bold text-white mb-5 tracking-tight">
+            Hi,
+          </h1>
+
+          <p className="text-slate-400 text-base leading-relaxed mb-4">
+            I'm Erwan a software developer from France. I really enjoy working
+            on digital projects, especially immersive experiences like gaming.
+          </p>
+
+          <p className="text-slate-400 text-base leading-relaxed mb-4">
+            Do not hesitate to contact me for any requests or project inquiries
+            at{" "}
+            <a
+              href={`mailto:${mail}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-400 hover:text-pink-400 transition-colors duration-200 underline underline-offset-4"
             >
-              <Box sx={{ marginBottom: 2 }}>
-                <img src="assets/avatar-opacity.gif" />
-              </Box>
+              {mail}
+            </a>
+          </p>
 
-              <Box sx={{ marginBottom: 6 }}>
-                <Typography variant="h3" paragraph>
-                  Hi,
-                </Typography>
-                <Typography variant="h6" paragraph>
-                  I'm Erwan a software developer from France. I really enjoy
-                  working on digital projects, especially immervsive experiences
-                  like gaming.
-                </Typography>
+          <p className="text-slate-400 text-base leading-relaxed">
+            If you want to see what I'm capable of or just kill some aliens,
+            click on the button
+          </p>
+        </div>
 
-                <Typography variant="h6" paragraph>
-                  {`Do not hesitate to contact me for any requests of informations
-                  or project requests at `}
-                  <a
-                    href={`mailto:${mail}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {mail}
-                  </a>
-                </Typography>
+        {/* Button */}
+        <div
+          className="flex justify-center opacity-0 animate-fade-in-up"
+          style={{ animationDelay: "0.3s" }}
+        >
+          <LaunchButton onClick={handleLaunch} />
+        </div>
 
-                <Typography variant="h6">
-                  If you want to see what I'm capable of or just kill some
-                  aliens, click on the button 🤭
-                </Typography>
-              </Box>
-
-              <LaunchButton onClick={handlLauchGame} />
-            </Box>
-          </Box>
-        </Box>
-      )}
-    </React.Fragment>
+      </div>
+    </div>
   );
 }

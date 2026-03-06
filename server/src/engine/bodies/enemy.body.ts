@@ -42,6 +42,9 @@ export class Enemy {
   targetPlayerId: string | null = null;
   hitAnimTimer: number = 0;
   loseAggroTimer: number = 0;
+  attackTimer: number = 0;
+  attackCooldown: number = 0;
+  knockbackTimer: number = 0;
   private _directionTimer: number = 0;
   private _directionInterval: number =
     DIRECTION_INTERVAL_MIN +

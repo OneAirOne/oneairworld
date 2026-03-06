@@ -17,7 +17,6 @@ import {
   IRoomData,
   InputPayload,
   LauchOptions,
-  Characters,
 } from "../../../shared/types";
 
 /**
@@ -58,9 +57,7 @@ export class Game extends Room<GameState> {
     this.engine = new GameEngine(this.state);
 
     // Populate world with initial enemies
-    for (let i = 0; i < SERVER_CONFIG.enemyInitialCount; i++) {
-      this.engine.addEnemy(Characters.FLUPPY);
-    }
+    this.engine.spawnEnemies(SERVER_CONFIG.enemyInitialCount);
 
     // Enqueue player actions
     this.onMessage(Message.UPDATE_PLAYER, (client, data: InputPayload) => {

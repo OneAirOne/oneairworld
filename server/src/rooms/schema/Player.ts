@@ -1,6 +1,6 @@
 import { Schema, type } from "@colyseus/schema";
 
-import { SHARED_CONFIG } from "../../../../shared/shared.config";
+import { COMBAT_CONFIG } from "../../../../shared/shared.config";
 
 import { Characters, DIRECTION } from "../../../../shared/types";
 
@@ -26,8 +26,8 @@ export class Player extends Schema {
 
   inputQueue: any[] = [];
 
-  decreaseLife() {
-    const unit = 5;
+  decreaseLife(damage: number = COMBAT_CONFIG.PLAYER_HIT_DAMAGE) {
+    const unit = damage;
     if (this.life - unit <= 0) {
       if (SERVER_CONFIG.debug) {
         this.life = 100;

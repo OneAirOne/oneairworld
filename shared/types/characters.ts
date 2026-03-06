@@ -47,7 +47,7 @@ export interface IPlayer {
 
   inputQueue: any[];
 
-  decreaseLife: () => void;
+  decreaseLife: (damage?: number) => void;
 }
 
 export interface IEnemy {

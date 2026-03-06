@@ -51,6 +51,10 @@ export class BootScene extends Phaser.Scene {
 
     // Load Tileset
     this.load.image(
+      CLIENT_CONFIG.MAP.TILE_SETS.LOGOS.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.LOGOS.PATH
+    );
+    this.load.image(
       CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME,
       CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.PATH
     );

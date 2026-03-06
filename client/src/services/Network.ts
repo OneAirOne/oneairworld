@@ -39,15 +39,15 @@ export class Network {
     console.log("Joined the lobby room ... store in store");
     this.lobby = await this.client.joinOrCreate(RoomType.LOBBY);
 
-    this.lobby.onMessage("rooms", (rooms) => {
+    this.lobby.onMessage("rooms", (_rooms) => {
       // TODO : store in local store
     });
 
-    this.lobby.onMessage("+", ([roomId, room]) => {
+    this.lobby.onMessage("+", (_update) => {
       // TODO : store in local store
     });
 
-    this.lobby.onMessage("-", (roomId) => {
+    this.lobby.onMessage("-", (_roomId) => {
       // TODO : store in local store
     });
   }
@@ -178,6 +178,10 @@ export class Network {
 
   onEnemyLeft(callback: (id: string) => void, context?: any) {
     phaserEvents.on(Event.ENEMY_LEFT, callback, context);
+  }
+
+  getEnemies(): IGameState["enemies"] | undefined {
+    return this.room?.state.enemies;
   }
 }
 

@@ -1,53 +1,24 @@
-import styled from "@emotion/styled";
-import { Typography } from "@mui/material";
-
-const Pushable = styled("button")({
-  background: "hsl(340, 100%, 32%)",
-  borderRadius: "12px",
-  border: "none",
-  padding: "0",
-  cursor: "pointer",
-  outlineOffset: "4px",
-  "&:hover .front": {
-    transform: "translateY(-6px)",
-  },
-
-  "&:active .front": {
-    transform: "translateY(-2px)",
-  },
-  "&:focus:not(:focus-visible)": {
-    outline: "none",
-  },
-});
-
-const Front = styled("div")({
-  display: "block",
-  padding: "12px 42px",
-  borderRadius: "12px",
-  fontSize: "1.25rem",
-  background: "hsl(345, 100%, 47%)",
-  color: "white",
-  transform: "translateY(-4px)",
-  willChange: "transform",
-  transition: "250ms",
-});
+const SHADOW_COLOR = "hsl(120, 4%, 71%)";
+const FACE_COLOR   = "hsl(345, 100%, 47%)";
 
 interface Props {
   onClick: () => void;
 }
 
 export default function LaunchButton({ onClick }: Props) {
-  async function handleClick() {
-    onClick && onClick();
-  }
-
   return (
-    <Pushable onClick={handleClick}>
-      <Front className="front">
-        <Typography variant="button" fontSize={20}>
-          Go
-        </Typography>
-      </Front>
-    </Pushable>
+    <button
+      onClick={onClick}
+      style={{ background: SHADOW_COLOR }}
+      className="group rounded-xl border-0 p-0 cursor-pointer outline-offset-4"
+    >
+      <span
+        style={{ background: FACE_COLOR }}
+        className="flex items-center gap-3 px-[42px] py-3 rounded-xl text-xl font-semibold text-white -translate-y-1 will-change-transform transition-transform duration-[250ms] group-hover:-translate-y-[6px] group-active:-translate-y-0.5"
+      >
+        <img src="assets/avatar-opacity.gif" className="w-12 h-12 rounded-full" />
+        Go
+      </span>
+    </button>
   );
 }

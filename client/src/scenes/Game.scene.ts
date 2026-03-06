@@ -70,6 +70,10 @@ export class GameScene extends Phaser.Scene {
     });
 
     // Create Tilesets
+    const LOGOS = this.sceneMap.addTilesetImage(
+      CLIENT_CONFIG.MAP.TILE_SETS.LOGOS.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.LOGOS.NAME
+    );
     const MODERN_CITY = this.sceneMap.addTilesetImage(
       CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME,
       CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME
@@ -100,6 +104,7 @@ export class GameScene extends Phaser.Scene {
     );
 
     const tileSets = [
+      LOGOS,
       MODERN_CITY,
       CITY_JAP,
       INTERIOR_JAP,
@@ -191,6 +196,11 @@ export class GameScene extends Phaser.Scene {
 
     // Register network event listener
     this.registerNetworkListeners();
+
+    // Sync enemies already in state (spawned before scene was ready)
+    this.network.getEnemies()?.forEach((enemy: IEnemy, id: string) => {
+      this.handleEnemyJoin(enemy, id);
+    });
   }
 
   /**
@@ -240,9 +250,12 @@ export class GameScene extends Phaser.Scene {
   private drawEnemyDebug() {
     this.enemyDebugGraphics.clear();
 
-    // Enemy hurtbox — blue, centered on body
     const hs = COMBAT_CONFIG.HURT_BOX_SIZE / 2;
+    const hbs = COMBAT_CONFIG.HIT_BOX_SIZE / 2;
+    const offset = COMBAT_CONFIG.HIT_BOX_OFFSET;
+
     this.enemies.forEach((enemy) => {
+      // Hurtbox — blue, centered on body
       this.enemyDebugGraphics.lineStyle(1, 0x4444ff, 1);
       this.enemyDebugGraphics.strokeRect(
         enemy.x - hs, enemy.y - hs,
@@ -252,6 +265,31 @@ export class GameScene extends Phaser.Scene {
       // Aggro radius — yellow circle
       this.enemyDebugGraphics.lineStyle(1, 0xffee00, 0.4);
       this.enemyDebugGraphics.strokeCircle(enemy.x, enemy.y, ENEMY_CONFIG.AGGRO_RADIUS);
+
+      // Attack range — orange circle
+      this.enemyDebugGraphics.lineStyle(1, 0xff8800, 0.8);
+      this.enemyDebugGraphics.strokeCircle(enemy.x, enemy.y, ENEMY_CONFIG.ATTACK_RANGE);
+
+      // Attack hitbox — red, visible only when attacking
+      const currentAnim = enemy.getData(SERVER_DATA.ANIM) as string;
+      const isAttacking =
+        currentAnim === Anim.ATTACK_UP || currentAnim === Anim.ATTACK_DOWN ||
+        currentAnim === Anim.ATTACK_LEFT || currentAnim === Anim.ATTACK_RIGHT;
+
+      if (isAttacking) {
+        let hx = enemy.x;
+        let hy = enemy.y;
+        if (currentAnim === Anim.ATTACK_UP)    hy -= offset;
+        if (currentAnim === Anim.ATTACK_DOWN)  hy += offset;
+        if (currentAnim === Anim.ATTACK_LEFT)  hx -= offset;
+        if (currentAnim === Anim.ATTACK_RIGHT) hx += offset;
+
+        this.enemyDebugGraphics.lineStyle(2, 0xff2222, 1);
+        this.enemyDebugGraphics.strokeRect(
+          hx - hbs, hy - hbs,
+          COMBAT_CONFIG.HIT_BOX_SIZE, COMBAT_CONFIG.HIT_BOX_SIZE
+        );
+      }
     });
 
     // Player hitbox — red, only visible when attacking
@@ -418,7 +456,7 @@ export class GameScene extends Phaser.Scene {
    * Client-side re-renders at every 16.6ms (60fps).
    * Credits: https://learn.colyseus.io/phaser/2-linear-interpolation
    */
-  update(_time: number, delta: number) {
+  update(_time: number, _delta: number) {
     if (!this.myPlayer) return;
 
     // CAMERA

@@ -14,7 +14,8 @@ import {
   LauchOptions,
 } from "../../../shared/types";
 import { createRectangle, getSpawnPoints } from "./bodies";
-import { SHARED_CONFIG } from "../../../shared/shared.config";
+import { SHARED_CONFIG, COMBAT_CONFIG } from "../../../shared/shared.config";
+import { DIRECTION } from "../../../shared/types";
 
 /**
  * All physics are opered on the game engine 2d MatterJs
@@ -58,6 +59,20 @@ export class GameEngine {
             if (enemy) {
               enemy.targetPlayerId = hit.playerId;
               enemy.hitAnimTimer = 600;
+
+              // Knockback: push enemy in the attack direction
+              const playerState = this.state.players.get(hit.playerId);
+              if (playerState) {
+                const v = COMBAT_CONFIG.ENEMY_KNOCKBACK_VELOCITY;
+                const dir = playerState.direction as DIRECTION;
+                const vel =
+                  dir === DIRECTION.UP    ? { x: 0, y: -v } :
+                  dir === DIRECTION.DOWN  ? { x: 0, y:  v } :
+                  dir === DIRECTION.LEFT  ? { x: -v, y: 0 } :
+                                           { x:  v, y: 0 };
+                Matter.Body.setVelocity(enemy.getBody(), vel);
+                enemy.knockbackTimer = COMBAT_CONFIG.ENEMY_KNOCKBACK_DURATION;
+              }
             }
           }
         }
@@ -213,19 +228,22 @@ export class GameEngine {
    * Create a player with the session id
    * TODO: use lauchOptions to choose the player
    */
-  addEnemy(texture: EnemyTextures) {
+  private addEnemy(texture: EnemyTextures) {
     const position = this.getRandomSpawnPosition();
     const enemyState = this.state.createEnemy(texture, position);
-
-    const enemy = new Fluppy(
-      enemyState.id,
-      this.world,
-      this.engine,
-      enemyState,
-      position
-    );
-
+    const enemy = new Fluppy(enemyState.id, this.world, this.engine, enemyState, position);
     this.enemies[enemyState.id] = enemy;
+  }
+
+  spawnEnemies(count: number) {
+    for (let i = 0; i < count; i++) {
+      this.addEnemy(Characters.FLUPPY);
+    }
+  }
+
+  private onEnemyDeath() {
+    const bonus = Math.random() < SERVER_CONFIG.enemySpawnChance ? 1 : 0;
+    this.spawnEnemies(1 + bonus);
   }
 
   /**
@@ -273,12 +291,7 @@ export class GameEngine {
 
     for (const id of deadEnemyIds) {
       this.removeEnemy(id);
-
-      // Always spawn at least 1, then chance for more
-      this.addEnemy(Characters.FLUPPY);
-      while (Math.random() < SERVER_CONFIG.enemySpawnChance) {
-        this.addEnemy(Characters.FLUPPY);
-      }
+      this.onEnemyDeath();
     }
 
     for (const id in this.enemies) {

@@ -45,6 +45,10 @@ const CLIENT_CONFIG = {
       PAHT: `assets/map/map.json`,
     },
     TILE_SETS: {
+      LOGOS: {
+        NAME: "logos",
+        PATH: "assets/map/logos.png",
+      },
       MODERN_CITY: {
         NAME: "city-modern",
         PATH: "assets/map/city-modern.png",

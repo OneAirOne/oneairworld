@@ -20,14 +20,19 @@ function getRandomDirection(): DIRECTION {
 
 function directionToAnim(dir: DIRECTION): Anim {
   switch (dir) {
-    case DIRECTION.UP:
-      return Anim.UP;
-    case DIRECTION.DOWN:
-      return Anim.DOWN;
-    case DIRECTION.LEFT:
-      return Anim.LEFT;
-    case DIRECTION.RIGHT:
-      return Anim.RIGHT;
+    case DIRECTION.UP:    return Anim.UP;
+    case DIRECTION.DOWN:  return Anim.DOWN;
+    case DIRECTION.LEFT:  return Anim.LEFT;
+    case DIRECTION.RIGHT: return Anim.RIGHT;
+  }
+}
+
+function directionToAttackAnim(dir: DIRECTION): Anim {
+  switch (dir) {
+    case DIRECTION.UP:    return Anim.ATTACK_UP;
+    case DIRECTION.DOWN:  return Anim.ATTACK_DOWN;
+    case DIRECTION.LEFT:  return Anim.ATTACK_LEFT;
+    case DIRECTION.RIGHT: return Anim.ATTACK_RIGHT;
   }
 }
 
@@ -50,7 +55,7 @@ export function processEnemyAI(
   deltaTime: number,
   gameState: GameState
 ) {
-  // Don't override direction while hit animation is playing
+  // --- Hit anim timer ---
   const isHitAnim =
     enemyState.anim === Anim.HIT_UP ||
     enemyState.anim === Anim.HIT_DOWN ||
@@ -62,6 +67,30 @@ export function processEnemyAI(
     if (body.hitAnimTimer <= 0) {
       enemyState.anim = directionToAnim(enemyState.direction as DIRECTION);
     }
+  }
+
+  // --- Knockback: freeze AI, let the velocity persist ---
+  if (body.knockbackTimer > 0) {
+    body.knockbackTimer = Math.max(0, body.knockbackTimer - deltaTime);
+    return;
+  }
+
+  // --- Attack cooldown tick ---
+  if (body.attackCooldown > 0) {
+    body.attackCooldown = Math.max(0, body.attackCooldown - deltaTime);
+  }
+
+  // --- Ongoing attack: freeze movement, wait for anim to finish ---
+  if (enemyState.isAttacking) {
+    body.attackTimer -= deltaTime;
+    if (body.attackTimer <= 0) {
+      enemyState.isAttacking = false;
+      if (!isHitAnim) {
+        enemyState.anim = directionToAnim(enemyState.direction as DIRECTION);
+      }
+    }
+    Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
+    return;
   }
 
   // --- Proximity detection: aggro nearest player in range ---
@@ -114,18 +143,28 @@ export function processEnemyAI(
 
   if (!isHitAnim) {
     if (body.targetPlayerId) {
-      // Follow target
       const target = gameState.players.get(body.targetPlayerId);
       if (target) {
         const dx = target.x - body.getBody().position.x;
         const dy = target.y - body.getBody().position.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
         const dir =
           Math.abs(dx) > Math.abs(dy)
             ? dx > 0 ? DIRECTION.RIGHT : DIRECTION.LEFT
             : dy > 0 ? DIRECTION.DOWN : DIRECTION.UP;
 
         enemyState.direction = dir;
-        enemyState.anim = directionToAnim(dir);
+
+        // --- Attack if in range and cooldown ready ---
+        if (dist <= ENEMY_CONFIG.ATTACK_RANGE && body.attackCooldown <= 0) {
+          enemyState.isAttacking = true;
+          enemyState.anim = directionToAttackAnim(dir);
+          body.attackTimer = ENEMY_CONFIG.ATTACK_DURATION;
+          body.attackCooldown = ENEMY_CONFIG.ATTACK_COOLDOWN;
+          target.decreaseLife();
+        } else {
+          enemyState.anim = directionToAnim(dir);
+        }
       }
     } else {
       // Random wandering
