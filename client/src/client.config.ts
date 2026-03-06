@@ -83,6 +83,11 @@ const CLIENT_CONFIG = {
     NAME: "characters",
     SPRITE_SHEET_ATLAS_PATH: `assets/characters/characters.json`,
     SPRITE_SHEET_TEXTURE_PATH: `assets/characters/characters.png`,
+    SLIME: {
+      NAME: "slime",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/slime.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/slime.png`,
+    }
   },
   ITEMS: {
     HEART: {

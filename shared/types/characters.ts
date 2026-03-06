@@ -2,9 +2,10 @@ export enum Characters {
   ONEAIR = "oneair",
   LINK = "link",
   FLUPPY = "fluppy",
+  SLIME = "slime",
 }
 
-export type EnemyTextures = Characters.FLUPPY;
+export type EnemyTextures = Characters.FLUPPY | Characters.SLIME;
 
 export enum Anim {
   ATTACK_LEFT = "LeftAttack",

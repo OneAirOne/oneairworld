@@ -188,8 +188,9 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Create animations
-    createAnim(anims.animOneAir, 10, this);
-    createAnim(anims.animFluppy, 10, this);
+    createAnim(anims.animOneAir, 10, this, CLIENT_CONFIG.CHARACTERS.NAME);
+    createAnim(anims.animFluppy, 10, this, CLIENT_CONFIG.CHARACTERS.NAME);
+    createAnim(anims.animSlime, 10, this, CLIENT_CONFIG.CHARACTERS.SLIME.NAME);
 
     // Debug graphics for enemies
     this.enemyDebugGraphics = this.add.graphics().setDepth(CLIENT_CONFIG.DEBUG_LAYER);

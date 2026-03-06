@@ -20,7 +20,7 @@ export class Enemy extends Schema {
   @type("number") y = start.y;
 
   @type("string") anim = ANIM_START;
-  @type("string") texture = Characters.FLUPPY;
+  @type("string") texture = Characters.SLIME;
   @type("string") direction = DIRECTION.DOWN;
   @type("boolean") isAttacking = false;
   @type("number") life = 100;

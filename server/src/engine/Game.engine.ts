@@ -237,7 +237,7 @@ export class GameEngine {
 
   spawnEnemies(count: number) {
     for (let i = 0; i < count; i++) {
-      this.addEnemy(Characters.FLUPPY);
+      this.addEnemy(Characters.SLIME);
     }
   }
 

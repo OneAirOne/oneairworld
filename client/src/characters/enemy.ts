@@ -50,7 +50,11 @@ export class Enemy extends Phaser.GameObjects.Sprite {
 
   updateAnim(value: Anim) {
     if (!this._canUpdateAnim) return;
-    this.play(`${this._enemyTexture}${value}`, true);
+    const key = `${this._enemyTexture}${value}`;
+    console.log(`[Enemy] Updating animation: ${key}`);
+    
+    if (!this.scene.anims.exists(key)) return;
+    this.play(key, true);
   }
 
   update(field: string, value: number | string): void {

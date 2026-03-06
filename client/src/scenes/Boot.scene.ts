@@ -96,6 +96,12 @@ export class BootScene extends Phaser.Scene {
       CLIENT_CONFIG.CHARACTERS.SPRITE_SHEET_ATLAS_PATH
     );
 
+    this.load.atlas(
+      CLIENT_CONFIG.CHARACTERS.SLIME.NAME,
+      CLIENT_CONFIG.CHARACTERS.SLIME.SPRITE_SHEET_TEXTURE_PATH,
+      CLIENT_CONFIG.CHARACTERS.SLIME.SPRITE_SHEET_ATLAS_PATH
+    );
+
     this.load.on("complete", () => {
       this.preloadComplete = true;
       this.launchBackground();
