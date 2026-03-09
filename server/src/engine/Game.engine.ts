@@ -13,7 +13,7 @@ import {
   InputPayload,
   LauchOptions,
 } from "../../../shared/types";
-import { createRectangle, getSpawnPoints } from "./bodies";
+import { createRectangle, getSpawnPoints, getTiledInfos } from "./bodies";
 import { SHARED_CONFIG, COMBAT_CONFIG } from "../../../shared/shared.config";
 import { DIRECTION } from "../../../shared/types";
 
@@ -31,6 +31,7 @@ export class GameEngine {
   private players: Record<string, SwordMan> = {};
   private enemies: Record<string, Fluppy> = {};
   private spawnPoints: { x: number; y: number }[] = getSpawnPoints();
+  private playerStart: { x: number; y: number } = getTiledInfos()?.start ?? { x: 0, y: 0 };
 
   constructor(gameState: GameState) {
     this.engine = Matter.Engine.create();
@@ -43,6 +44,7 @@ export class GameEngine {
      * COLLISION START — player hitbox hits enemy hurtbox (once per contact)
      */
     Matter.Events.on(this.engine, "collisionStart", (event) => {
+      // Pass 1: player→enemy hits (apply cancels + knockback first)
       for (const pair of event.pairs) {
         const { bodyA, bodyB } = pair;
 
@@ -56,11 +58,19 @@ export class GameEngine {
           const hit = collisionPlayerEnemy(bodyA, bodyB, this.state);
           if (hit) {
             const enemy = this.enemies[hit.enemyId];
-            if (enemy) {
+            const enemyState = this.state.enemies.get(hit.enemyId);
+            if (enemy && enemyState) {
               enemy.targetPlayerId = hit.playerId;
               enemy.hitAnimTimer = 600;
 
-              // Knockback: push enemy in the attack direction
+              // Cancel ongoing attack — mark damage as dealt to block same-tick enemy→player hit
+              if (enemyState.isAttacking && !enemy.attackDamageDealt) {
+                enemyState.isAttacking = false;
+                enemy.attackTimer = 0;
+                enemy.attackDamageDealt = true;
+              }
+
+              // Knockback
               const playerState = this.state.players.get(hit.playerId);
               if (playerState) {
                 const v = COMBAT_CONFIG.ENEMY_KNOCKBACK_VELOCITY;
@@ -74,6 +84,28 @@ export class GameEngine {
                 enemy.knockbackTimer = COMBAT_CONFIG.ENEMY_KNOCKBACK_DURATION;
               }
             }
+          }
+        }
+      }
+
+      // Pass 2: enemy→player hits (cancels from pass 1 are already applied)
+      for (const pair of event.pairs) {
+        const { bodyA, bodyB } = pair;
+
+        const isEnemyHittingPlayer =
+          (bodyA.collisionFilter.category === COLLISION_CATEGORY.ENEMY_HIT_BOX &&
+            bodyB.collisionFilter.category === COLLISION_CATEGORY.PLAYER_HURT_BOX) ||
+          (bodyB.collisionFilter.category === COLLISION_CATEGORY.ENEMY_HIT_BOX &&
+            bodyA.collisionFilter.category === COLLISION_CATEGORY.PLAYER_HURT_BOX);
+
+        if (isEnemyHittingPlayer && bodyA.label !== bodyB.label) {
+          const enemyBody = bodyA.collisionFilter.category === COLLISION_CATEGORY.ENEMY_HIT_BOX ? bodyA : bodyB;
+          const playerBody = bodyA.collisionFilter.category === COLLISION_CATEGORY.PLAYER_HURT_BOX ? bodyA : bodyB;
+          const enemy = this.enemies[enemyBody.label];
+          const playerState = this.state.players.get(playerBody.label);
+          if (enemy && playerState && !enemy.attackDamageDealt) {
+            playerState.decreaseLife();
+            enemy.attackDamageDealt = true;
           }
         }
       }
@@ -242,8 +274,7 @@ export class GameEngine {
   }
 
   private onEnemyDeath() {
-    const bonus = Math.random() < SERVER_CONFIG.enemySpawnChance ? 1 : 0;
-    this.spawnEnemies(1 + bonus);
+    this.spawnEnemies(1);
   }
 
   /**
@@ -281,11 +312,44 @@ export class GameEngine {
   update(deltaTime: number): void {
     Matter.Engine.update(this.engine, deltaTime);
 
+    // Player respawn at initial start position
+    this.state.players.forEach((playerState, id) => {
+      if (!playerState.isDead) return;
+      const playerBody = this.players[id];
+      if (playerBody) Matter.Body.setPosition(playerBody.getBody(), this.playerStart);
+      playerState.x = this.playerStart.x;
+      playerState.y = this.playerStart.y;
+      playerState.life = 100;
+      playerState.isDead = false;
+    });
+
+    // Enemy death — delay removal to let death anim play
+    const DEATH_ANIM_DURATION = 700;
     const deadEnemyIds: string[] = [];
 
     this.state.enemies.forEach((enemyState, id) => {
-      if (enemyState.isDead) {
-        deadEnemyIds.push(id);
+      if (!enemyState.isDead) return;
+      const body = this.enemies[id];
+      if (!body) return;
+      if (body.deathAnimTimer < 0) {
+        // First death tick: fling in current direction then let it coast
+        const DEATH_FLING = 1.5;
+        const dir = enemyState.direction as DIRECTION;
+        const vel =
+          dir === DIRECTION.UP    ? { x: 0, y: -DEATH_FLING } :
+          dir === DIRECTION.DOWN  ? { x: 0, y:  DEATH_FLING } :
+          dir === DIRECTION.LEFT  ? { x: -DEATH_FLING, y: 0 } :
+                                    { x:  DEATH_FLING, y: 0 };
+        Matter.Body.setVelocity(body.getBody(), vel);
+        body.deathAnimTimer = DEATH_ANIM_DURATION;
+      } else {
+        // Decelerate naturally
+        const v = body.getBody().velocity;
+        Matter.Body.setVelocity(body.getBody(), { x: v.x * 0.88, y: v.y * 0.88 });
+        body.deathAnimTimer -= deltaTime;
+        if (body.deathAnimTimer <= 0) {
+          deadEnemyIds.push(id);
+        }
       }
     });
 

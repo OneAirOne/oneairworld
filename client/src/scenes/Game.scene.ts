@@ -192,6 +192,69 @@ export class GameScene extends Phaser.Scene {
     createAnim(anims.animFluppy, 10, this, CLIENT_CONFIG.CHARACTERS.NAME);
     createAnim(anims.animSlime, 10, this, CLIENT_CONFIG.CHARACTERS.SLIME.NAME);
 
+    // Wizard idle animation (looping)
+    const wizardAnim = anims.animWizard.IDLE;
+    this.anims.create({
+      key: wizardAnim.key,
+      frames: this.anims.generateFrameNames(CLIENT_CONFIG.CHARACTERS.WIZARD.NAME, {
+        start: wizardAnim.start,
+        end: wizardAnim.end,
+        zeroPad: wizardAnim.zeroPad,
+        prefix: wizardAnim.prefix,
+        suffix: wizardAnim.suffix,
+      }),
+      frameRate: 6,
+      repeat: -1,
+    });
+
+    // Dino idle animation (looping)
+    const dinoAnim = anims.animDino.IDLE;
+    this.anims.create({
+      key: dinoAnim.key,
+      frames: this.anims.generateFrameNames(CLIENT_CONFIG.CHARACTERS.DINO.NAME, {
+        start: dinoAnim.start,
+        end: dinoAnim.end,
+        zeroPad: dinoAnim.zeroPad,
+        prefix: dinoAnim.prefix,
+        suffix: dinoAnim.suffix,
+      }),
+      frameRate: 6,
+      repeat: -1,
+    });
+
+    // Robot idle animation (looping)
+    const robotAnim = anims.animRobot.IDLE;
+    this.anims.create({
+      key: robotAnim.key,
+      frames: this.anims.generateFrameNames(CLIENT_CONFIG.CHARACTERS.ROBOT.NAME, {
+        start: robotAnim.start,
+        end: robotAnim.end,
+        zeroPad: robotAnim.zeroPad,
+        prefix: robotAnim.prefix,
+        suffix: robotAnim.suffix,
+      }),
+      frameRate: 6,
+      repeat: -1,
+    });
+
+    // Spawn wizard NPC at its Tiled point, robot just beside it
+    // @ts-ignore
+    this.sceneMap.findObject("wizard", (obj) => {
+      if (obj.name === "wizard") {
+        const wizard = this.add.sprite(obj.x, obj.y, CLIENT_CONFIG.CHARACTERS.WIZARD.NAME);
+        wizard.setDepth(1);
+        wizard.play(wizardAnim.key);
+
+        const robot = this.add.sprite(obj.x + 20, obj.y, CLIENT_CONFIG.CHARACTERS.ROBOT.NAME);
+        robot.setDepth(1);
+        robot.play(robotAnim.key);
+
+        const dino = this.add.sprite(obj.x + 40, obj.y, CLIENT_CONFIG.CHARACTERS.DINO.NAME);
+        dino.setDepth(1);
+        dino.play(dinoAnim.key);
+      }
+    });
+
     // Debug graphics for enemies
     this.enemyDebugGraphics = this.add.graphics().setDepth(CLIENT_CONFIG.DEBUG_LAYER);
 
@@ -238,6 +301,8 @@ export class GameScene extends Phaser.Scene {
 
   private updateEnemies() {
     this.enemies.forEach((enemy) => {
+      if (enemy.isDead) return;
+
       const serverX = enemy.getData(SERVER_DATA.X);
       const serverY = enemy.getData(SERVER_DATA.Y);
       const serverAnim = enemy.getData(SERVER_DATA.ANIM);
@@ -251,54 +316,48 @@ export class GameScene extends Phaser.Scene {
   private drawEnemyDebug() {
     this.enemyDebugGraphics.clear();
 
-    const hs = COMBAT_CONFIG.HURT_BOX_SIZE / 2;
-    const hbs = COMBAT_CONFIG.HIT_BOX_SIZE / 2;
-    const offset = COMBAT_CONFIG.HIT_BOX_OFFSET;
+    const hurtHalf = COMBAT_CONFIG.HURT_BOX_SIZE / 2;
+    const hitHalf  = COMBAT_CONFIG.HIT_BOX_SIZE / 2;
+    const offset   = COMBAT_CONFIG.HIT_BOX_OFFSET;
 
     this.enemies.forEach((enemy) => {
-      // Hurtbox — blue, centered on body
-      this.enemyDebugGraphics.lineStyle(1, 0x4444ff, 1);
+      const ex = enemy.x;
+      const ey = enemy.y;
+
+      // Aggro radius — yellow
+      this.enemyDebugGraphics.lineStyle(1, 0xffee00, 0.3);
+      this.enemyDebugGraphics.strokeCircle(ex, ey, ENEMY_CONFIG.AGGRO_RADIUS);
+
+      // Attack trigger range — orange (distance at which enemy deals damage)
+      this.enemyDebugGraphics.lineStyle(1, 0xff8800, 0.8);
+      this.enemyDebugGraphics.strokeCircle(ex, ey, ENEMY_CONFIG.ATTACK_RANGE);
+
+      // Enemy HURT_BOX — blue (where player hits land)
+      this.enemyDebugGraphics.lineStyle(2, 0x4488ff, 1);
       this.enemyDebugGraphics.strokeRect(
-        enemy.x - hs, enemy.y - hs,
+        ex - hurtHalf, ey - hurtHalf,
         COMBAT_CONFIG.HURT_BOX_SIZE, COMBAT_CONFIG.HURT_BOX_SIZE
       );
 
-      // Aggro radius — yellow circle
-      this.enemyDebugGraphics.lineStyle(1, 0xffee00, 0.4);
-      this.enemyDebugGraphics.strokeCircle(enemy.x, enemy.y, ENEMY_CONFIG.AGGRO_RADIUS);
-
-      // Attack range — orange circle
-      this.enemyDebugGraphics.lineStyle(1, 0xff8800, 0.8);
-      this.enemyDebugGraphics.strokeCircle(enemy.x, enemy.y, ENEMY_CONFIG.ATTACK_RANGE);
-
-      // Attack hitbox — red, visible only when attacking
+      // Enemy HIT_BOX — red, follows direction (slime jumps toward player)
       const currentAnim = enemy.getData(SERVER_DATA.ANIM) as string;
       const isAttacking =
         currentAnim === Anim.ATTACK_UP || currentAnim === Anim.ATTACK_DOWN ||
         currentAnim === Anim.ATTACK_LEFT || currentAnim === Anim.ATTACK_RIGHT;
 
-      if (isAttacking) {
-        let hx = enemy.x;
-        let hy = enemy.y;
-        if (currentAnim === Anim.ATTACK_UP)    hy -= offset;
-        if (currentAnim === Anim.ATTACK_DOWN)  hy += offset;
-        if (currentAnim === Anim.ATTACK_LEFT)  hx -= offset;
-        if (currentAnim === Anim.ATTACK_RIGHT) hx += offset;
-
-        this.enemyDebugGraphics.lineStyle(2, 0xff2222, 1);
-        this.enemyDebugGraphics.strokeRect(
-          hx - hbs, hy - hbs,
-          COMBAT_CONFIG.HIT_BOX_SIZE, COMBAT_CONFIG.HIT_BOX_SIZE
-        );
-      }
+      // Hitbox centered on enemy
+      this.enemyDebugGraphics.lineStyle(2, 0xff2222, isAttacking ? 1 : 0.3);
+      this.enemyDebugGraphics.strokeRect(
+        ex - hitHalf, ey - hitHalf,
+        COMBAT_CONFIG.HIT_BOX_SIZE, COMBAT_CONFIG.HIT_BOX_SIZE
+      );
     });
 
-    // Player hitbox — red, only visible when attacking
-    if (this.myPlayer && this.myPlayer.getData(SERVER_DATA.IS_ATTACKING)) {
-      const offset = COMBAT_CONFIG.HIT_BOX_OFFSET;
-      const hbs = COMBAT_CONFIG.HIT_BOX_SIZE / 2;
+    // Player HIT_BOX — green when attacking
+    if (this.myPlayer) {
       let hx = this.myPlayer.x;
       let hy = this.myPlayer.y;
+      const isAttacking = this.myPlayer.getData(SERVER_DATA.IS_ATTACKING);
 
       switch (this.myPlayer.lastAnim) {
         case Anim.UP: case Anim.IDDLE_UP: case Anim.ATTACK_UP:
@@ -311,9 +370,17 @@ export class GameScene extends Phaser.Scene {
           hx += offset; break;
       }
 
-      this.enemyDebugGraphics.lineStyle(1, 0xff2222, 1);
+      // Player HIT_BOX — green (attack zone)
+      this.enemyDebugGraphics.lineStyle(2, 0x00ff44, isAttacking ? 1 : 0.2);
       this.enemyDebugGraphics.strokeRect(
-        hx - hbs, hy - hbs,
+        hx - hitHalf, hy - hitHalf,
+        COMBAT_CONFIG.HIT_BOX_SIZE, COMBAT_CONFIG.HIT_BOX_SIZE
+      );
+
+      // Player HURT_BOX — cyan (damage-receiving zone, always centered)
+      this.enemyDebugGraphics.lineStyle(2, 0x00ffff, 1);
+      this.enemyDebugGraphics.strokeRect(
+        this.myPlayer.x - hitHalf, this.myPlayer.y - hitHalf,
         COMBAT_CONFIG.HIT_BOX_SIZE, COMBAT_CONFIG.HIT_BOX_SIZE
       );
     }

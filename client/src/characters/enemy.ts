@@ -11,6 +11,7 @@ const BLOCKING_ANIMS = [...HIT_ANIMS, ...ATTACK_ANIMS];
 export class Enemy extends Phaser.GameObjects.Sprite {
   private _enemyTexture: string;
   private _canUpdateAnim: boolean = true;
+  private _isDead: boolean = false;
   id: string;
 
   constructor(
@@ -51,13 +52,23 @@ export class Enemy extends Phaser.GameObjects.Sprite {
   updateAnim(value: Anim) {
     if (!this._canUpdateAnim) return;
     const key = `${this._enemyTexture}${value}`;
-    console.log(`[Enemy] Updating animation: ${key}`);
-    
     if (!this.scene.anims.exists(key)) return;
     this.play(key, true);
   }
 
-  update(field: string, value: number | string): void {
+  playDeathAnim() {
+    const key = `${this._enemyTexture}${Anim.DEAD}`;
+    if (!this.scene.anims.exists(key)) return;
+    this._isDead = true;
+    this._canUpdateAnim = false;
+    this.play(key, false);
+  }
+
+  get isDead() {
+    return this._isDead;
+  }
+
+  update(field: string, value: number | string | boolean): void {
     switch (field) {
       case SERVER_DATA.X:
         if (typeof value === "number") this.setData(SERVER_DATA.X, value);
@@ -67,6 +78,9 @@ export class Enemy extends Phaser.GameObjects.Sprite {
         break;
       case SERVER_DATA.ANIM:
         if (typeof value === "string") this.setData(SERVER_DATA.ANIM, value);
+        break;
+      case SERVER_DATA.IS_DEAD:
+        if (value === true) this.playDeathAnim();
         break;
     }
   }

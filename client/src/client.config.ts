@@ -34,6 +34,7 @@ export enum SERVER_DATA {
   LIFE = "life",
   IS_COLLIDED = "isCollided",
   IS_ATTACKING = "isAttacking",
+  IS_DEAD = "isDead",
 }
 
 const CLIENT_CONFIG = {
@@ -87,7 +88,22 @@ const CLIENT_CONFIG = {
       NAME: "slime",
       SPRITE_SHEET_ATLAS_PATH: `assets/characters/slime.json`,
       SPRITE_SHEET_TEXTURE_PATH: `assets/characters/slime.png`,
-    }
+    },
+    WIZARD: {
+      NAME: "wizard",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/wizard.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/wizard.png`,
+    },
+    ROBOT: {
+      NAME: "robot",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/robot.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/robot.png`,
+    },
+    DINO: {
+      NAME: "dino",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/dino.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/dino.png`,
+    },
   },
   ITEMS: {
     HEART: {

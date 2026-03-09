@@ -113,4 +113,12 @@ export const animSlime: Record<string, Anim> = {
     suffix: ".png",
     key: "slimeLeftHit",
   },
+  DEAD: {
+    start: 1,
+    end: 5,
+    zeroPad: 3,
+    prefix: "slime/dead",
+    suffix: ".png",
+    key: "slimeDead",
+  },
 };

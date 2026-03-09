@@ -24,6 +24,7 @@ export enum Anim {
   HIT_DOWN = "DownHit",
   HIT_LEFT = "LeftHit",
   HIT_RIGHT = "RightHit",
+  DEAD = "Dead",
 }
 
 export enum DIRECTION {

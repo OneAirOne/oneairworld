@@ -105,7 +105,49 @@ export class Player extends Phaser.GameObjects.Sprite {
   }
 
   updateLife(newLife: number) {
+    if (newLife < this.life) {
+      this._playHitAnim();
+      this._flashOnHit();
+      this._shakeCamera();
+    }
     this.life = newLife;
+  }
+
+  private _playHitAnim() {
+    const directionToHit: Partial<Record<Anim, Anim>> = {
+      [Anim.UP]: Anim.HIT_UP, [Anim.IDDLE_UP]: Anim.HIT_UP, [Anim.ATTACK_UP]: Anim.HIT_UP,
+      [Anim.DOWN]: Anim.HIT_DOWN, [Anim.IDDLE_DOWN]: Anim.HIT_DOWN, [Anim.ATTACK_DOWN]: Anim.HIT_DOWN,
+      [Anim.LEFT]: Anim.HIT_LEFT, [Anim.IDDLE_LEFT]: Anim.HIT_LEFT, [Anim.ATTACK_LEFT]: Anim.HIT_LEFT,
+      [Anim.RIGHT]: Anim.HIT_RIGHT, [Anim.IDDLE_RIGHT]: Anim.HIT_RIGHT, [Anim.ATTACK_RIGHT]: Anim.HIT_RIGHT,
+    };
+    const hitAnim = directionToHit[this.lastAnim] ?? Anim.HIT_DOWN;
+    this._canUpdateAnim = false;
+    this.play(`${this._playerTexture}${hitAnim}`, true);
+  }
+
+  private _flashOnHit() {
+    let flashes = 0;
+    const maxFlashes = 5;
+    const timer = this.scene.time.addEvent({
+      delay: 60,
+      repeat: maxFlashes * 2 - 1,
+      callback: () => {
+        flashes++;
+        if (flashes % 2 === 1) {
+          this.setTint(0xffffff);
+        } else {
+          this.clearTint();
+        }
+        if (flashes >= maxFlashes * 2) {
+          this.clearTint();
+          timer.remove();
+        }
+      },
+    });
+  }
+
+  private _shakeCamera() {
+    this.scene.cameras.main.shake(150, 0.0008);
   }
 
   updateIsCollided(isCollided: boolean) {

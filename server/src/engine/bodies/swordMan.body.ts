@@ -18,6 +18,7 @@ const HIT_BOX_CONFIG = {
 export class SwordMan extends Player {
   protected _world: Matter.World;
   private _hitBox: Matter.Body;
+  private _hurtBox: Matter.Body;
   id: string;
 
   constructor(
@@ -28,7 +29,6 @@ export class SwordMan extends Player {
   ) {
     super(id, world, engine, playerState);
 
-    const s = COMBAT_CONFIG.HIT_BOX_SIZE / 2;
     this._hitBox = Matter.Bodies.rectangle(
       this._body.position.x,
       this._body.position.y,
@@ -37,7 +37,23 @@ export class SwordMan extends Player {
       { label: id, ...HIT_BOX_CONFIG }
     );
 
-    Matter.Composite.add(world, [this._hitBox]);
+    // Player hurtbox — always active, receives enemy hit
+    this._hurtBox = Matter.Bodies.rectangle(
+      this._body.position.x,
+      this._body.position.y,
+      COMBAT_CONFIG.HIT_BOX_SIZE,
+      COMBAT_CONFIG.HIT_BOX_SIZE,
+      {
+        label: id,
+        isSensor: true,
+        collisionFilter: {
+          category: COLLISION_CATEGORY.PLAYER_HURT_BOX,
+          mask: COLLISION_CATEGORY.ENEMY_HIT_BOX,
+        },
+      }
+    );
+
+    Matter.Composite.add(world, [this._hitBox, this._hurtBox]);
 
     const ACTIVE_MASK = COLLISION_CATEGORY.PLAYER | COLLISION_CATEGORY.HURT_BOX;
 
@@ -52,6 +68,9 @@ export class SwordMan extends Player {
       const offset = COMBAT_CONFIG.HIT_BOX_OFFSET;
       const x = this._body.position.x;
       const y = this._body.position.y;
+
+      // Keep hurtbox centered on player at all times
+      Matter.Body.setPosition(this._hurtBox, { x, y });
 
       if (this?._playerState?.direction === DIRECTION.UP) {
         Matter.Body.setPosition(this._hitBox, { x, y: y - offset });
@@ -70,6 +89,6 @@ export class SwordMan extends Player {
    * Remove the hitbox
    */
   removePlayer() {
-    Matter.World.remove(this._world, [this._body, this._hitBox]);
+    Matter.World.remove(this._world, [this._body, this._hitBox, this._hurtBox]);
   }
 }

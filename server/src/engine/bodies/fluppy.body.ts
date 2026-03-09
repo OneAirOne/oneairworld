@@ -4,16 +4,7 @@ import { Enemy as EnemyState } from "../../rooms/schema/Enemy";
 import { Enemy } from "./enemy.body";
 import { COLLISION_CATEGORY } from "../engine.config";
 
-import { DIRECTION } from "../../../../shared/types";
 import { COMBAT_CONFIG } from "../../../../shared/shared.config";
-
-const HIT_BOX_CONFIG = {
-  isSensor: true,
-  collisionFilter: {
-    category: COLLISION_CATEGORY.HIT_BOX,
-    mask: COLLISION_CATEGORY.HURT_BOX,
-  },
-};
 
 const HURT_BOX_CONFIG = {
   isSensor: true,
@@ -37,16 +28,20 @@ export class Fluppy extends Enemy {
   ) {
     super(id, world, engine, enemyState, position);
 
-    // Attack hitbox (for future enemy→player damage)
+    // Enemy attack hitbox — active only when isAttacking
     this._hitBox = Matter.Bodies.rectangle(
       this._body.position.x,
       this._body.position.y,
       COMBAT_CONFIG.HIT_BOX_SIZE,
       COMBAT_CONFIG.HIT_BOX_SIZE,
-      { label: id, ...HIT_BOX_CONFIG }
+      {
+        label: id,
+        isSensor: true,
+        collisionFilter: { category: COLLISION_CATEGORY.ENEMY_HIT_BOX, mask: 0 },
+      }
     );
 
-    // Hurtbox — damage-receiving zone centered on body
+    // Enemy hurtbox — always active, receives player hit
     this._hurtBox = Matter.Bodies.rectangle(
       this._body.position.x,
       this._body.position.y,
@@ -57,27 +52,17 @@ export class Fluppy extends Enemy {
 
     Matter.Composite.add(world, [this._hitBox, this._hurtBox]);
 
-    /**
-     * Keep hitbox and hurtbox synced with body position
-     */
     Matter.Events.on(engine, "afterUpdate", () => {
       const x = this._body.position.x;
       const y = this._body.position.y;
-      const offset = COMBAT_CONFIG.HIT_BOX_OFFSET;
 
-      // Hurtbox stays centered on body
       Matter.Body.setPosition(this._hurtBox, { x, y });
+      Matter.Body.setPosition(this._hitBox, { x, y });
 
-      // Hitbox moves in front based on direction
-      if (this?._enemyState?.direction === DIRECTION.UP) {
-        Matter.Body.setPosition(this._hitBox, { x, y: y - offset });
-      } else if (this?._enemyState?.direction === DIRECTION.DOWN) {
-        Matter.Body.setPosition(this._hitBox, { x, y: y + offset });
-      } else if (this?._enemyState?.direction === DIRECTION.LEFT) {
-        Matter.Body.setPosition(this._hitBox, { x: x - offset, y });
-      } else if (this?._enemyState?.direction === DIRECTION.RIGHT) {
-        Matter.Body.setPosition(this._hitBox, { x: x + offset, y });
-      }
+      // Hitbox active only during attack
+      this._hitBox.collisionFilter.mask = this._enemyState?.isAttacking
+        ? COLLISION_CATEGORY.PLAYER_HURT_BOX
+        : 0;
     });
   }
 

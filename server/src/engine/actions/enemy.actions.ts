@@ -80,16 +80,25 @@ export function processEnemyAI(
     body.attackCooldown = Math.max(0, body.attackCooldown - deltaTime);
   }
 
-  // --- Ongoing attack: freeze movement, wait for anim to finish ---
+  // --- Ongoing attack: lunge toward player at start, then freeze ---
   if (enemyState.isAttacking) {
     body.attackTimer -= deltaTime;
     if (body.attackTimer <= 0) {
       enemyState.isAttacking = false;
+      body.attackDamageDealt = false;
       if (!isHitAnim) {
         enemyState.anim = directionToAnim(enemyState.direction as DIRECTION);
       }
+    } else if (body.attackTimer > ENEMY_CONFIG.ATTACK_DURATION * 0.6) {
+      // First 40%: diagonal lunge toward stored player position
+      Matter.Body.setVelocity(body.getBody(), {
+        x: body.attackLungeVx,
+        y: body.attackLungeVy,
+      });
+    } else {
+      // Remaining 60%: freeze
+      Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
     }
-    Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
     return;
   }
 
@@ -161,7 +170,11 @@ export function processEnemyAI(
           enemyState.anim = directionToAttackAnim(dir);
           body.attackTimer = ENEMY_CONFIG.ATTACK_DURATION;
           body.attackCooldown = ENEMY_CONFIG.ATTACK_COOLDOWN;
-          target.decreaseLife();
+          body.attackDamageDealt = false;
+          // Store exact normalized vector toward player for diagonal lunge
+          const len = dist || 1;
+          body.attackLungeVx = (dx / len) * 1.5;
+          body.attackLungeVy = (dy / len) * 1.5;
         } else {
           enemyState.anim = directionToAnim(dir);
         }
