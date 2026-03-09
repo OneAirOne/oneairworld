@@ -110,6 +110,7 @@ export function processEnemyAI(
     let closestId: string | null = null;
 
     gameState.players.forEach((player, id) => {
+      if (player.isSpeaking) return;
       const dx = player.x - ex;
       const dy = player.y - ey;
       const dist = Math.sqrt(dx * dx + dy * dy);
@@ -128,7 +129,7 @@ export function processEnemyAI(
   // --- Leash check: lose aggro when player stays out of range ---
   if (body.targetPlayerId) {
     const target = gameState.players.get(body.targetPlayerId);
-    if (!target) {
+    if (!target || target.isSpeaking) {
       body.targetPlayerId = null;
       body.loseAggroTimer = 0;
     } else {

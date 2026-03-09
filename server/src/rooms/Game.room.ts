@@ -67,6 +67,14 @@ export class Game extends Room<GameState> {
       });
     });
 
+    // Toggle speaking state
+    this.onMessage(Message.UPDATE_PLAYER_SPEAKING, (client, data: { isSpeaking: boolean }) => {
+      const player = this.state.players.get(client.sessionId);
+      if (!player) return;
+      player.isSpeaking = data.isSpeaking;
+      this.engine.setPlayerSpeaking(client.sessionId, data.isSpeaking);
+    });
+
     // Run update loop at 60 fps
     this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }

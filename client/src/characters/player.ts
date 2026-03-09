@@ -4,6 +4,7 @@ import { SERVER_DATA } from "client.config";
 
 import { Anim, InputPayload } from "../../../shared/types";
 import { anims } from "characters";
+import { getBubblePosition, createSpeakingBubble } from "../scenes/game.helpers";
 
 /* -------------------------------- Constant -------------------------------- */
 
@@ -29,6 +30,9 @@ export class Player extends Phaser.GameObjects.Sprite {
   lastAnim: Anim = Anim.IDDLE_DOWN;
   life: number = 100;
   isCollided: boolean = false;
+  private _speakingBubble: Phaser.GameObjects.Text | null = null;
+  private _bubbleOffsetX = 10;
+  private _bubbleOffsetY = 18;
 
   constructor(
     scene: Phaser.Scene,
@@ -154,6 +158,25 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.isCollided = isCollided;
   }
 
+  showSpeakingBubble() {
+    if (!this._speakingBubble) {
+      this._speakingBubble = createSpeakingBubble(this.scene, this, this._bubbleOffsetX, this._bubbleOffsetY);
+      this.scene.events.on(Phaser.Scenes.Events.POST_UPDATE, this._updateBubblePos, this);
+    }
+    this._speakingBubble.setVisible(true);
+  }
+
+  hideSpeakingBubble() {
+    this._speakingBubble?.setVisible(false);
+  }
+
+  private _updateBubblePos() {
+    if (this._speakingBubble?.visible) {
+      const pos = getBubblePosition(this, this._bubbleOffsetX, this._bubbleOffsetY);
+      this._speakingBubble.setPosition(pos.x, pos.y);
+    }
+  }
+
   /**
    * Fonction called by the update loop of the scene
    * to update the position X
@@ -220,6 +243,13 @@ export class Player extends Phaser.GameObjects.Sprite {
         break;
       case SERVER_DATA.IS_ATTACKING:
         this.setData(SERVER_DATA.IS_ATTACKING, value);
+        break;
+      case SERVER_DATA.IS_SPEAKING:
+        if (value) {
+          this.showSpeakingBubble();
+        } else {
+          this.hideSpeakingBubble();
+        }
         break;
     }
   }

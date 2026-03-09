@@ -21,6 +21,7 @@ export class Player extends Schema {
   @type("boolean") isAttacking = false;
   @type("number") life = 100;
   @type("boolean") isDead = false;
+  @type("boolean") isSpeaking = false;
   @type("boolean") isCollided = false;
   @type("string") collisionDirection = DIRECTION.DOWN;
 

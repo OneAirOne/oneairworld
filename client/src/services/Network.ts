@@ -145,6 +145,13 @@ export class Network {
   }
 
   /**
+   * Notify server that local player is speaking (or stopped)
+   */
+  setSpeaking(isSpeaking: boolean) {
+    this.room?.send(Message.UPDATE_PLAYER_SPEAKING, { isSpeaking });
+  }
+
+  /**
    * Register event listener and call back function when a player updated
    */
   onPlayerUpdated(

@@ -44,6 +44,7 @@ export interface IPlayer {
   isAttacking: boolean;
   life: number;
   isDead: boolean;
+  isSpeaking: boolean;
   isCollided: boolean;
   collisionDirection: DIRECTION;
 

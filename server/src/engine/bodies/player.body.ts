@@ -14,7 +14,7 @@ export interface BodyConfig {
   collisionFilter: Matter.ICollisionFilter;
 }
 
-const PLAYER_CONFIG = {
+export const PLAYER_CONFIG = {
   collisionFilter: {
     category: COLLISION_CATEGORY.PLAYER,
   },

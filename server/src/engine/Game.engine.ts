@@ -3,7 +3,7 @@ import Matter from "matter-js";
 import { GameState } from "../rooms/schema";
 import { processPlayerAction, collisionPlayers, collisionPlayerEnemy, processEnemyAI } from "./actions";
 
-import { SwordMan, createMap, Fluppy } from "./bodies";
+import { SwordMan, createMap, Fluppy, PLAYER_CONFIG } from "./bodies";
 import { COLLISION_CATEGORY } from "./engine.config";
 import { SERVER_CONFIG } from "../server.config";
 
@@ -103,7 +103,7 @@ export class GameEngine {
           const playerBody = bodyA.collisionFilter.category === COLLISION_CATEGORY.PLAYER_HURT_BOX ? bodyA : bodyB;
           const enemy = this.enemies[enemyBody.label];
           const playerState = this.state.players.get(playerBody.label);
-          if (enemy && playerState && !enemy.attackDamageDealt) {
+          if (enemy && playerState && !enemy.attackDamageDealt && !playerState.isSpeaking) {
             playerState.decreaseLife();
             enemy.attackDamageDealt = true;
           }
@@ -265,6 +265,18 @@ export class GameEngine {
     const enemyState = this.state.createEnemy(texture, position);
     const enemy = new Fluppy(enemyState.id, this.world, this.engine, enemyState, position);
     this.enemies[enemyState.id] = enemy;
+  }
+
+  setPlayerSpeaking(sessionId: string, isSpeaking: boolean) {
+    const player = this.players[sessionId];
+    if (!player) return;
+    const body = player.getBody();
+    Matter.Body.setStatic(body, isSpeaking);
+    if (!isSpeaking) {
+      // Restore dynamic properties lost when going static
+      Matter.Body.setMass(body, PLAYER_CONFIG.mass);
+      Matter.Body.setVelocity(body, { x: 0, y: 0 });
+    }
   }
 
   spawnEnemies(count: number) {

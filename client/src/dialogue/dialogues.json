@@ -1,0 +1,30 @@
+{
+  "robot": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Hello compagnon, tu viens pour parler du jeune développeur Erwan ?",
+        "choices": [
+          { "label": "Oui", "next": "linkedin_question" },
+          { "label": "Non", "next": "no" }
+        ]
+      },
+      "linkedin_question": {
+        "text": "Erwan est un développeur passionné et curieux ! Veux-tu visiter son LinkedIn ?",
+        "choices": [
+          { "label": "Oui", "next": "linkedin_open" },
+          { "label": "Non", "next": "no" }
+        ]
+      },
+      "linkedin_open": {
+        "text": "Super ! Bonne visite :)",
+        "action": "open_linkedin",
+        "choices": []
+      },
+      "no": {
+        "text": "Ah ok... et bien débarrasse moi de tous ces slimes s'il te plaît :)",
+        "choices": []
+      }
+    }
+  }
+}

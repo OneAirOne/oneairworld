@@ -9,6 +9,7 @@ import { createAnim, anims, Player, Enemy } from "characters";
 
 // Others
 import { SCENES } from "./scene.config";
+import { createSpeakingBubble } from "./game.helpers";
 import CLIENT_CONFIG, { SERVER_DATA } from "client.config";
 
 // Components
@@ -17,6 +18,10 @@ import {
   DebugPlayer,
   UiBarComponent,
 } from "components/phaser";
+
+// Dialogue
+import { DialogueManager } from "../dialogue/DialogueManager";
+import { phaserEvents, PhaserEvent } from "../events/eventManager";
 
 // Shared
 import type { IPlayer, IEnemy } from "../../../shared/types";
@@ -28,6 +33,8 @@ import {
 } from "../../../shared/map.config";
 import { SHARED_CONFIG, COMBAT_CONFIG, ENEMY_CONFIG } from "../../../shared/shared.config";
 
+const ROBOT_INTERACTION_RADIUS = 50;
+
 export class GameScene extends Phaser.Scene {
   private network!: Network;
   private players = new Map<string, Player>();
@@ -35,6 +42,9 @@ export class GameScene extends Phaser.Scene {
   private components!: ComponentService;
   private enemyDebugGraphics!: Phaser.GameObjects.Graphics;
   private enemies = new Map<string, Enemy>();
+  private robotSprite: Phaser.GameObjects.Sprite | null = null;
+  private robotBubble: Phaser.GameObjects.Text | null = null;
+  private dialogueManager = new DialogueManager();
 
   sceneMap!: Phaser.Tilemaps.Tilemap;
   lastServerX: number = 0;
@@ -237,22 +247,61 @@ export class GameScene extends Phaser.Scene {
       repeat: -1,
     });
 
-    // Spawn wizard NPC at its Tiled point, robot just beside it
+    // Spawn wizard + dino at pnj1, robot at pnj2
     // @ts-ignore
-    this.sceneMap.findObject("wizard", (obj) => {
-      if (obj.name === "wizard") {
-        const wizard = this.add.sprite(obj.x, obj.y, CLIENT_CONFIG.CHARACTERS.WIZARD.NAME);
+    this.sceneMap.findObject("info", (obj) => {
+      const tiledObj = obj as unknown as { x: number; y: number; name: string };
+      if (tiledObj.name === "pnj1") {
+        const wizard = this.add.sprite(tiledObj.x, tiledObj.y, CLIENT_CONFIG.CHARACTERS.WIZARD.NAME);
         wizard.setDepth(1);
         wizard.play(wizardAnim.key);
 
-        const robot = this.add.sprite(obj.x + 20, obj.y, CLIENT_CONFIG.CHARACTERS.ROBOT.NAME);
-        robot.setDepth(1);
-        robot.play(robotAnim.key);
-
-        const dino = this.add.sprite(obj.x + 40, obj.y, CLIENT_CONFIG.CHARACTERS.DINO.NAME);
+        const dino = this.add.sprite(tiledObj.x + 20, tiledObj.y, CLIENT_CONFIG.CHARACTERS.DINO.NAME);
         dino.setDepth(1);
         dino.play(dinoAnim.key);
       }
+      if (tiledObj.name === "pnj2") {
+        const robot = this.add.sprite(tiledObj.x, tiledObj.y, CLIENT_CONFIG.CHARACTERS.ROBOT.NAME);
+        robot.setDepth(1);
+        robot.play(robotAnim.key);
+        this.robotSprite = robot;
+
+        this.robotBubble = createSpeakingBubble(this, robot, 10, 14);
+      }
+    });
+
+    // Dialogue keyboard controls + speaking state sync
+    this.input.keyboard!.on("keydown-ENTER", () => {
+      if (this.dialogueManager.isOpen()) {
+        this.dialogueManager.confirm();
+      } else if (this.dialogueManager.isInZone()) {
+        this.dialogueManager.open();
+      }
+    });
+
+    this.input.keyboard!.on("keydown-UP", () => {
+      if (this.dialogueManager.isOpen()) this.dialogueManager.navigateUp();
+    });
+    this.input.keyboard!.on("keydown-DOWN", () => {
+      if (this.dialogueManager.isOpen()) this.dialogueManager.navigateDown();
+    });
+    this.input.keyboard!.on("keydown-ESC", () => {
+      if (this.dialogueManager.isOpen()) this.dialogueManager.close();
+    });
+    phaserEvents.on(PhaserEvent.DIALOGUE_ACTION, (action: string) => {
+      if (action === "open_linkedin") {
+        window.open("https://fr.linkedin.com/in/erwan-gilbert-b184241b", "_blank");
+      }
+    });
+
+    phaserEvents.on(PhaserEvent.DIALOGUE_OPEN, () => {
+      this.network.setSpeaking(true);
+      this.myPlayer?.showSpeakingBubble();
+    });
+
+    phaserEvents.on(PhaserEvent.DIALOGUE_CLOSE, () => {
+      this.network.setSpeaking(false);
+      this.myPlayer?.hideSpeakingBubble();
     });
 
     // Debug graphics for enemies
@@ -530,8 +579,10 @@ export class GameScene extends Phaser.Scene {
     // CAMERA
     this.setupCamera();
 
-    // INPUTS
-    const inputs = this.myPlayer.handleInput();
+    // INPUTS — blocked while dialogue is open
+    const inputs = this.dialogueManager.isOpen()
+      ? { left: false, right: false, up: false, down: false, space: false }
+      : this.myPlayer.handleInput();
 
     // SEND INPUT TO BACKEND
     this.network.updatePlayer(inputs);
@@ -544,6 +595,21 @@ export class GameScene extends Phaser.Scene {
 
     // UPDATE ENEMIES
     this.updateEnemies();
+
+    // Robot interaction zone
+    if (this.robotSprite && this.robotBubble) {
+      const dist = Phaser.Math.Distance.Between(
+        this.myPlayer.x, this.myPlayer.y,
+        this.robotSprite.x, this.robotSprite.y
+      );
+      const inZone = dist <= ROBOT_INTERACTION_RADIUS;
+      this.robotBubble.setVisible(inZone);
+      if (inZone) {
+        this.dialogueManager.enterZone("robot");
+      } else {
+        this.dialogueManager.leaveZone();
+      }
+    }
 
     // DEBUG: draw enemy bounding boxes
     if (CLIENT_CONFIG.DEBUG) {
