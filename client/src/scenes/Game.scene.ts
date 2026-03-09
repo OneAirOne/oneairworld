@@ -302,7 +302,14 @@ export class GameScene extends Phaser.Scene {
 
     phaserEvents.on(PhaserEvent.DIALOGUE_ACTION, (action: string) => {
       if (action === "open_linkedin") {
-        window.open("https://fr.linkedin.com/in/erwan-gilbert-b184241b", "_blank");
+        const url = "https://fr.linkedin.com/in/erwan-gilbert-b184241b";
+        // window.open is blocked on mobile (user-activation lost in Phaser's rAF loop)
+        // so we fall back to same-tab navigation on touch devices
+        if (this.sys.game.device.input.touch) {
+          window.location.href = url;
+        } else {
+          window.open(url, "_blank", "noopener,noreferrer");
+        }
       }
     });
 
