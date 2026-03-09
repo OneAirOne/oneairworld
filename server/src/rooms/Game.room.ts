@@ -9,6 +9,7 @@ import { GameState } from "./schema/GameState";
 import { PlayerUpdateCommand } from "./commands";
 
 import { GameEngine } from "../engine/Game.engine";
+import { SERVER_CONFIG } from "../server.config";
 
 // Shared
 import {
@@ -16,7 +17,6 @@ import {
   IRoomData,
   InputPayload,
   LauchOptions,
-  Characters,
 } from "../../../shared/types";
 
 /**
@@ -56,8 +56,8 @@ export class Game extends Room<GameState> {
 
     this.engine = new GameEngine(this.state);
 
-    // Create enemies
-    this.engine.addEnemy(Characters.FLUPPY);
+    // Populate world with initial enemies
+    this.engine.spawnEnemies(SERVER_CONFIG.enemyInitialCount);
 
     // Enqueue player actions
     this.onMessage(Message.UPDATE_PLAYER, (client, data: InputPayload) => {
@@ -65,6 +65,14 @@ export class Game extends Room<GameState> {
         client,
         data,
       });
+    });
+
+    // Toggle speaking state
+    this.onMessage(Message.UPDATE_PLAYER_SPEAKING, (client, data: { isSpeaking: boolean }) => {
+      const player = this.state.players.get(client.sessionId);
+      if (!player) return;
+      player.isSpeaking = data.isSpeaking;
+      this.engine.setPlayerSpeaking(client.sessionId, data.isSpeaking);
     });
 
     // Run update loop at 60 fps

@@ -17,7 +17,7 @@ const MAP_CONFIG = {
   isStatic: true,
   collisionFilter: {
     category: COLLISION_CATEGORY.WALL,
-    mask: COLLISION_CATEGORY.PLAYER,
+    mask: COLLISION_CATEGORY.PLAYER | COLLISION_CATEGORY.ENEMY,
   },
 };
 
@@ -122,6 +122,32 @@ export function createMap(world: Matter.World) {
       console.log("Create layer wall");
     }
   });
+}
+
+/**
+ * Get all spawn points from the "spawn" layer in Tiled
+ */
+export function getSpawnPoints(): { x: number; y: number }[] {
+  let map: any;
+
+  try {
+    const tilemapFile = `${__dirname}/${MAP_NAME}.json`;
+    map = JSON.parse(fs.readFileSync(tilemapFile, "utf8"));
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+
+  const spawnLayer = map.layers.find(
+    (layer: TiledData) => layer.name === TiledLayer.SPAWN
+  );
+
+  if (!spawnLayer || !spawnLayer.objects) return [];
+
+  return spawnLayer.objects.map((obj: TiledObject) => ({
+    x: obj.x,
+    y: obj.y,
+  }));
 }
 
 interface ObjectInfo {

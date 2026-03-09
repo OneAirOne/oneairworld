@@ -1,1 +1,1 @@
-export const ANIM_START = "IdleDown";
+export const ANIM_START = "Down";

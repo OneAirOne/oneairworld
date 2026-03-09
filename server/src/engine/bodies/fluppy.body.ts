@@ -4,81 +4,69 @@ import { Enemy as EnemyState } from "../../rooms/schema/Enemy";
 import { Enemy } from "./enemy.body";
 import { COLLISION_CATEGORY } from "../engine.config";
 
-import { DIRECTION } from "../../../../shared/types";
+import { COMBAT_CONFIG } from "../../../../shared/shared.config";
 
-const HIT_BOX_CONFIG = {
+const HURT_BOX_CONFIG = {
   isSensor: true,
   collisionFilter: {
-    category: COLLISION_CATEGORY.HIT_BOX,
-    mask: COLLISION_CATEGORY.ENEMY,
+    category: COLLISION_CATEGORY.HURT_BOX,
+    mask: COLLISION_CATEGORY.HIT_BOX,
   },
 };
-
-const HIT_BOX_OFFSET = 15;
 
 export class Fluppy extends Enemy {
   protected _world: Matter.World;
   private _hitBox: Matter.Body;
-  id: string;
+  private _hurtBox: Matter.Body;
 
   constructor(
     id: string,
     world: Matter.World,
     engine: Matter.Engine,
-    enemyState: EnemyState
+    enemyState: EnemyState,
+    position?: { x: number; y: number }
   ) {
-    super(id, world, engine, enemyState);
+    super(id, world, engine, enemyState, position);
 
-    this._hitBox = Matter.Body.create({
-      position: { x: this._body.position.x, y: this._body.position.y },
-      vertices: [
-        { x: this._body.vertices[0].x, y: this._body.vertices[0].y },
-        { x: this._body.vertices[1].x, y: this._body.vertices[1].y },
-        { x: this._body.vertices[2].x, y: this._body.vertices[2].y },
-        { x: this._body.vertices[3].x, y: this._body.vertices[3].y },
-      ],
-      label: id,
-      ...HIT_BOX_CONFIG,
-    });
+    // Enemy attack hitbox — active only when isAttacking
+    this._hitBox = Matter.Bodies.rectangle(
+      this._body.position.x,
+      this._body.position.y,
+      COMBAT_CONFIG.HIT_BOX_SIZE,
+      COMBAT_CONFIG.HIT_BOX_SIZE,
+      {
+        label: id,
+        isSensor: true,
+        collisionFilter: { category: COLLISION_CATEGORY.ENEMY_HIT_BOX, mask: 0 },
+      }
+    );
 
-    Matter.Composite.add(world, [this._hitBox]);
+    // Enemy hurtbox — always active, receives player hit
+    this._hurtBox = Matter.Bodies.rectangle(
+      this._body.position.x,
+      this._body.position.y,
+      COMBAT_CONFIG.HURT_BOX_SIZE,
+      COMBAT_CONFIG.HURT_BOX_SIZE,
+      { label: id, ...HURT_BOX_CONFIG }
+    );
 
-    /**
-     * Move the hitbox according to the direction
-     */
+    Matter.Composite.add(world, [this._hitBox, this._hurtBox]);
+
     Matter.Events.on(engine, "afterUpdate", () => {
-      if (this?._enemyState?.direction === DIRECTION.UP) {
-        Matter.Body.setPosition(this._hitBox, {
-          x: this._body.position.x,
-          y: this._body.position.y - HIT_BOX_OFFSET,
-        });
-      }
-      if (this?._enemyState?.direction === DIRECTION.DOWN) {
-        Matter.Body.setPosition(this._hitBox, {
-          x: this._body.position.x,
-          y: this._body.position.y + HIT_BOX_OFFSET,
-        });
-      }
-      if (this?._enemyState?.direction === DIRECTION.LEFT) {
-        Matter.Body.setPosition(this._hitBox, {
-          x: this._body.position.x - HIT_BOX_OFFSET,
-          y: this._body.position.y,
-        });
-      }
-      if (this?._enemyState?.direction === DIRECTION.RIGHT) {
-        Matter.Body.setPosition(this._hitBox, {
-          x: this._body.position.x + HIT_BOX_OFFSET,
-          y: this._body.position.y,
-        });
-      }
+      const x = this._body.position.x;
+      const y = this._body.position.y;
+
+      Matter.Body.setPosition(this._hurtBox, { x, y });
+      Matter.Body.setPosition(this._hitBox, { x, y });
+
+      // Hitbox active only during attack
+      this._hitBox.collisionFilter.mask = this._enemyState?.isAttacking
+        ? COLLISION_CATEGORY.PLAYER_HURT_BOX
+        : 0;
     });
   }
 
-  /**
-   * Override of player function
-   * Remove the hitbox
-   */
   removePlayer() {
-    Matter.World.remove(this._world, [this._body, this._hitBox]);
+    Matter.World.remove(this._world, [this._body, this._hitBox, this._hurtBox]);
   }
 }

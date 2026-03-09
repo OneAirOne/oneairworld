@@ -33,10 +33,13 @@ export enum SERVER_DATA {
   ANIM = "anim",
   LIFE = "life",
   IS_COLLIDED = "isCollided",
+  IS_ATTACKING = "isAttacking",
+  IS_DEAD = "isDead",
+  IS_SPEAKING = "isSpeaking",
 }
 
 const CLIENT_CONFIG = {
-  DEBUG: true,
+  DEBUG: false,
   DEBUG_LAYER: 7,
   MAP: {
     TILE_MAP: {
@@ -44,6 +47,10 @@ const CLIENT_CONFIG = {
       PAHT: `assets/map/map.json`,
     },
     TILE_SETS: {
+      LOGOS: {
+        NAME: "logos",
+        PATH: "assets/map/logos.png",
+      },
       MODERN_CITY: {
         NAME: "city-modern",
         PATH: "assets/map/city-modern.png",
@@ -78,6 +85,26 @@ const CLIENT_CONFIG = {
     NAME: "characters",
     SPRITE_SHEET_ATLAS_PATH: `assets/characters/characters.json`,
     SPRITE_SHEET_TEXTURE_PATH: `assets/characters/characters.png`,
+    SLIME: {
+      NAME: "slime",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/slime.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/slime.png`,
+    },
+    WIZARD: {
+      NAME: "wizard",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/wizard.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/wizard.png`,
+    },
+    ROBOT: {
+      NAME: "robot",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/robot.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/robot.png`,
+    },
+    DINO: {
+      NAME: "dino",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/dino.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/dino.png`,
+    },
   },
   ITEMS: {
     HEART: {

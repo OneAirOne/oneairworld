@@ -8,4 +8,20 @@ export enum PhaserEvent {
   PLAYER_UPDATED = "player-updated",
   PLAYER_LEFT = "player-left",
   PLAYER_DISCONNECTED = "player-disconnected",
+  ENEMY_JOINED = "enemy-joined",
+  ENEMY_UPDATED = "enemy-updated",
+  ENEMY_LEFT = "enemy-left",
+  // Dialogue
+  DIALOGUE_ZONE_ENTER = "dialogue-zone-enter",
+  DIALOGUE_ZONE_LEAVE = "dialogue-zone-leave",
+  DIALOGUE_OPEN = "dialogue-open",
+  DIALOGUE_UPDATE = "dialogue-update",
+  DIALOGUE_NAVIGATE = "dialogue-navigate",
+  DIALOGUE_ACTION = "dialogue-action",
+  DIALOGUE_CLOSE = "dialogue-close",
+  // Mobile touch actions (mirror keyboard shortcuts)
+  MOBILE_INTERACT = "mobile-interact",
+  MOBILE_NAV_UP = "mobile-nav-up",
+  MOBILE_NAV_DOWN = "mobile-nav-down",
+  MOBILE_CLOSE = "mobile-close",
 }

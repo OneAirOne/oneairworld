@@ -11,12 +11,13 @@ import CLIENT_CONFIG from "client.config";
 export function createAnim(
   animConfig: Record<string, Anim>,
   frameRate: number,
-  scene: Phaser.Scene
+  scene: Phaser.Scene,
+  spriteSheetName: string = CLIENT_CONFIG.CHARACTERS.NAME
 ) {
   for (let key of Object.keys(animConfig)) {
     const anim = animConfig[key];
 
-    let frames = scene.anims.generateFrameNames(CLIENT_CONFIG.CHARACTERS.NAME, {
+    let frames = scene.anims.generateFrameNames(spriteSheetName, {
       start: anim.start,
       end: anim.end,
       zeroPad: anim.zeroPad,

@@ -1,12 +1,11 @@
 import { Schema, type } from "@colyseus/schema";
 
-import { SHARED_CONFIG } from "../../../../shared/shared.config";
+import { COMBAT_CONFIG } from "../../../../shared/shared.config";
 
 import {
   Characters,
   DIRECTION,
   EnemyTextures,
-  type IEnemy,
 } from "../../../../shared/types";
 
 import { ANIM_START } from "../../constants";
@@ -15,13 +14,13 @@ import { getTiledInfos } from "../../engine/bodies";
 
 const { start } = getTiledInfos();
 
-export class Enemy extends Schema implements IEnemy {
+export class Enemy extends Schema {
   @type("string") id = "";
   @type("number") x = start.x;
   @type("number") y = start.y;
 
   @type("string") anim = ANIM_START;
-  @type("string") texture = Characters.FLUPPY;
+  @type("string") texture = Characters.SLIME;
   @type("string") direction = DIRECTION.DOWN;
   @type("boolean") isAttacking = false;
   @type("number") life = 100;
@@ -30,7 +29,7 @@ export class Enemy extends Schema implements IEnemy {
   @type("string") collisionDirection = DIRECTION.DOWN;
 
   decreaseLife() {
-    const unit = 5;
+    const unit = COMBAT_CONFIG.ENEMY_HIT_DAMAGE;
     if (this.life - unit <= 0) {
       if (SERVER_CONFIG.debug) {
         this.life = 100;

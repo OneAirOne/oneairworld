@@ -1,12 +1,11 @@
-import { Schema } from "@colyseus/schema";
-
 export enum Characters {
   ONEAIR = "oneair",
   LINK = "link",
   FLUPPY = "fluppy",
+  SLIME = "slime",
 }
 
-export type EnemyTextures = Characters.FLUPPY;
+export type EnemyTextures = Characters.FLUPPY | Characters.SLIME;
 
 export enum Anim {
   ATTACK_LEFT = "LeftAttack",
@@ -25,6 +24,7 @@ export enum Anim {
   HIT_DOWN = "DownHit",
   HIT_LEFT = "LeftHit",
   HIT_RIGHT = "RightHit",
+  DEAD = "Dead",
 }
 
 export enum DIRECTION {
@@ -34,7 +34,7 @@ export enum DIRECTION {
   RIGHT = "RIGHT",
 }
 
-export interface IPlayer extends Schema {
+export interface IPlayer {
   name: string;
   x: number;
   y: number;
@@ -44,15 +44,16 @@ export interface IPlayer extends Schema {
   isAttacking: boolean;
   life: number;
   isDead: boolean;
+  isSpeaking: boolean;
   isCollided: boolean;
   collisionDirection: DIRECTION;
 
   inputQueue: any[];
 
-  decreaseLife: () => void;
+  decreaseLife: (damage?: number) => void;
 }
 
-export interface IEnemy extends Schema {
+export interface IEnemy {
   id: string;
   x: number;
   y: number;
@@ -69,4 +70,4 @@ export interface IEnemy extends Schema {
 }
 
 export const PLAYER_VELOCITY = 2;
-export const ENEMY_VELOCITY = 2;
+export const ENEMY_VELOCITY = 0.8;

@@ -1,5 +1,6 @@
 export enum TiledLayer {
   INFO = "info",
+  SPAWN = "spawn",
   ABOVE = "above",
   COLLIDE_ABOVE_PLAYER = "collide_above_player",
   COLLIDE_UNDER_PLAYER = "collide_under_player",

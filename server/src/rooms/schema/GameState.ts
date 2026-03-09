@@ -6,14 +6,13 @@ import { SHARED_CONFIG } from "../../../../shared/shared.config";
 import {
   Characters,
   type EnemyTextures,
-  type IGameState,
   type LauchOptions,
 } from "../../../../shared/types";
 
 import { Player } from "./Player";
 import { Enemy } from "./Enemy";
 
-export class GameState extends Schema implements IGameState {
+export class GameState extends Schema {
   @type("number") worldWidth = SHARED_CONFIG.WORLD_WIDTH;
   @type("number") worldHeight = SHARED_CONFIG.WORLD_HEIGHT;
 
@@ -29,10 +28,12 @@ export class GameState extends Schema implements IGameState {
     return newPlayer;
   }
 
-  createEnemy(texture: EnemyTextures) {
+  createEnemy(texture: EnemyTextures, position: { x: number; y: number }) {
     const newEnemy = new Enemy();
     newEnemy.id = uuidv4();
-    newEnemy.texture = newEnemy.texture = texture;
+    newEnemy.texture = texture;
+    newEnemy.x = position.x;
+    newEnemy.y = position.y;
     this.enemies.set(newEnemy.id, newEnemy);
 
     return newEnemy;

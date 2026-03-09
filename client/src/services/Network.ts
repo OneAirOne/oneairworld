@@ -10,6 +10,7 @@ import { phaserEvents, Event } from "events";
 import {
   IGameState,
   IPlayer,
+  IEnemy,
   Message,
   InputPayload,
   LauchOptions,
@@ -38,15 +39,15 @@ export class Network {
     console.log("Joined the lobby room ... store in store");
     this.lobby = await this.client.joinOrCreate(RoomType.LOBBY);
 
-    this.lobby.onMessage("rooms", (rooms) => {
+    this.lobby.onMessage("rooms", (_rooms) => {
       // TODO : store in local store
     });
 
-    this.lobby.onMessage("+", ([roomId, room]) => {
+    this.lobby.onMessage("+", (_update) => {
       // TODO : store in local store
     });
 
-    this.lobby.onMessage("-", (roomId) => {
+    this.lobby.onMessage("-", (_roomId) => {
       // TODO : store in local store
     });
   }
@@ -78,7 +79,7 @@ export class Network {
       phaserEvents.emit(Event.PLAYER_JOINED, player, sessionId);
 
       // Track changes on every child object inside the players MapSchema
-      player.onChange = (changes: DataChange<any>[]) => {
+      (player as any).onChange = (changes: DataChange<any>[]) => {
         changes.forEach((change) => {
           const { field, value } = change;
           // if (field !== "tick") {
@@ -98,6 +99,26 @@ export class Network {
 
       phaserEvents.emit(Event.PLAYER_LEFT, key);
       // TODO : remove player from the store + display message
+    };
+
+    /**
+     * Debug: track enemy state
+     */
+    this.room.state.enemies.onAdd = (enemy: IEnemy, id: string) => {
+      console.log(`[Enemy] added id=${id} x=${enemy.x} y=${enemy.y} texture=${enemy.texture}`);
+
+      phaserEvents.emit(Event.ENEMY_JOINED, enemy, id);
+
+      (enemy as any).onChange = (changes: DataChange<any>[]) => {
+        changes.forEach(({ field, value }) => {
+          phaserEvents.emit(Event.ENEMY_UPDATED, field, value, id);
+        });
+      };
+    };
+
+    this.room.state.enemies.onRemove = (_enemy: IEnemy, id: string) => {
+      console.log(`[Enemy] removed id=${id}`);
+      phaserEvents.emit(Event.ENEMY_LEFT, id);
     };
 
     /**
@@ -124,6 +145,13 @@ export class Network {
   }
 
   /**
+   * Notify server that local player is speaking (or stopped)
+   */
+  setSpeaking(isSpeaking: boolean) {
+    this.room?.send(Message.UPDATE_PLAYER_SPEAKING, { isSpeaking });
+  }
+
+  /**
    * Register event listener and call back function when a player updated
    */
   onPlayerUpdated(
@@ -142,6 +170,25 @@ export class Network {
 
   onPlayerLeft(callback: (sessionId: string) => void, context?: any) {
     phaserEvents.on(Event.PLAYER_LEFT, callback, context);
+  }
+
+  onEnemyJoin(callback: (enemy: IEnemy, id: string) => void, context?: any) {
+    phaserEvents.on(Event.ENEMY_JOINED, callback, context);
+  }
+
+  onEnemyUpdated(
+    callback: (field: string, value: number | string, id: string) => void,
+    context?: any
+  ) {
+    phaserEvents.on(Event.ENEMY_UPDATED, callback, context);
+  }
+
+  onEnemyLeft(callback: (id: string) => void, context?: any) {
+    phaserEvents.on(Event.ENEMY_LEFT, callback, context);
+  }
+
+  getEnemies(): IGameState["enemies"] | undefined {
+    return this.room?.state.enemies;
   }
 }
 

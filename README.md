@@ -48,6 +48,12 @@ After working on `.tmx` files inside `tools/map`:
 
 - Restart the server
 
+### Add PNJ
+
+- Create Tileset with free texture packer in `tools/characters`
+- Copy the .png and .json to `client/public/assets/characters`
+- Create an anim file in `client/src/characters/anims/xxxxx.anims.ts`
+
 #### Credit
 
 https://darties.fr/creer-une-carte-sur-tiled-et-lintegrer-en-phaser-3/
