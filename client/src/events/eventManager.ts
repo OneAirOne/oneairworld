@@ -19,4 +19,9 @@ export enum PhaserEvent {
   DIALOGUE_NAVIGATE = "dialogue-navigate",
   DIALOGUE_ACTION = "dialogue-action",
   DIALOGUE_CLOSE = "dialogue-close",
+  // Mobile touch actions (mirror keyboard shortcuts)
+  MOBILE_INTERACT = "mobile-interact",
+  MOBILE_NAV_UP = "mobile-nav-up",
+  MOBILE_NAV_DOWN = "mobile-nav-down",
+  MOBILE_CLOSE = "mobile-close",
 }

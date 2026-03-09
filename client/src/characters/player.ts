@@ -5,6 +5,7 @@ import { SERVER_DATA } from "client.config";
 import { Anim, InputPayload } from "../../../shared/types";
 import { anims } from "characters";
 import { getBubblePosition, createSpeakingBubble } from "../scenes/game.helpers";
+import { mobileInput } from "../input/mobileInput";
 
 /* -------------------------------- Constant -------------------------------- */
 
@@ -99,11 +100,11 @@ export class Player extends Phaser.GameObjects.Sprite {
    * Synx player input payload with phaser cursors
    */
   handleInput(): InputPayload {
-    this._inputPayload.left = this._cursors.left.isDown;
-    this._inputPayload.right = this._cursors.right.isDown;
-    this._inputPayload.up = this._cursors.up.isDown;
-    this._inputPayload.down = this._cursors.down.isDown;
-    this._inputPayload.space = this._cursors.space.isDown;
+    this._inputPayload.left  = this._cursors.left.isDown  || mobileInput.left;
+    this._inputPayload.right = this._cursors.right.isDown || mobileInput.right;
+    this._inputPayload.up    = this._cursors.up.isDown    || mobileInput.up;
+    this._inputPayload.down  = this._cursors.down.isDown  || mobileInput.down;
+    this._inputPayload.space = this._cursors.space.isDown || mobileInput.space;
 
     return this._inputPayload;
   }

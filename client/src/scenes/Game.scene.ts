@@ -288,6 +288,18 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard!.on("keydown-ESC", () => {
       if (this.dialogueManager.isOpen()) this.dialogueManager.close();
     });
+    // Mobile dialogue controls (mirror keyboard shortcuts)
+    phaserEvents.on(PhaserEvent.MOBILE_INTERACT, () => {
+      if (this.dialogueManager.isOpen()) {
+        this.dialogueManager.confirm();
+      } else if (this.dialogueManager.isInZone()) {
+        this.dialogueManager.open();
+      }
+    });
+    phaserEvents.on(PhaserEvent.MOBILE_NAV_UP,  () => { if (this.dialogueManager.isOpen()) this.dialogueManager.navigateUp(); });
+    phaserEvents.on(PhaserEvent.MOBILE_NAV_DOWN, () => { if (this.dialogueManager.isOpen()) this.dialogueManager.navigateDown(); });
+    phaserEvents.on(PhaserEvent.MOBILE_CLOSE,   () => { if (this.dialogueManager.isOpen()) this.dialogueManager.close(); });
+
     phaserEvents.on(PhaserEvent.DIALOGUE_ACTION, (action: string) => {
       if (action === "open_linkedin") {
         window.open("https://fr.linkedin.com/in/erwan-gilbert-b184241b", "_blank");
