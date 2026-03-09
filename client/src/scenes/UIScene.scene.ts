@@ -48,6 +48,7 @@ export class UIScene extends Phaser.Scene {
   private _dialogueOpen = false;
   private _inZone = false;
   private _hasChoices = false;
+  private _pendingUrl: string | null = null;
 
   constructor() {
     super(SCENES.UI);
@@ -142,11 +143,19 @@ export class UIScene extends Phaser.Scene {
     const onClose = () => {
       this._dialogueOpen = false;
       this._hasChoices = false;
+      this._pendingUrl = null;
       this.dialogueBg.setVisible(false);
       this.dialogueText.setVisible(false);
       this.dialogueHint.setVisible(false);
       this._clearChoices();
       this._syncMobileButtons();
+    };
+
+    const ACTION_URLS: Record<string, string> = {
+      open_linkedin: "https://fr.linkedin.com/in/erwan-gilbert-b184241b",
+    };
+    const onAction = (action: string) => {
+      this._pendingUrl = ACTION_URLS[action] ?? null;
     };
 
     const onZoneEnter = () => {
@@ -171,6 +180,7 @@ export class UIScene extends Phaser.Scene {
     phaserEvents.on(PhaserEvent.DIALOGUE_UPDATE, renderDialogue);
     phaserEvents.on(PhaserEvent.DIALOGUE_NAVIGATE, onNavigate);
     phaserEvents.on(PhaserEvent.DIALOGUE_CLOSE, onClose);
+    phaserEvents.on(PhaserEvent.DIALOGUE_ACTION, onAction);
 
     this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
       phaserEvents.off(PhaserEvent.DIALOGUE_ZONE_ENTER, onZoneEnter);
@@ -179,6 +189,7 @@ export class UIScene extends Phaser.Scene {
       phaserEvents.off(PhaserEvent.DIALOGUE_UPDATE, renderDialogue);
       phaserEvents.off(PhaserEvent.DIALOGUE_NAVIGATE, onNavigate);
       phaserEvents.off(PhaserEvent.DIALOGUE_CLOSE, onClose);
+      phaserEvents.off(PhaserEvent.DIALOGUE_ACTION, onAction);
     });
   }
 
@@ -228,6 +239,24 @@ export class UIScene extends Phaser.Scene {
     this._setupButtonInput(this._btnCycle,   () => phaserEvents.emit(PhaserEvent.MOBILE_NAV_DOWN));
     this._setupButtonInput(this._btnConfirm, () => phaserEvents.emit(PhaserEvent.MOBILE_INTERACT));
     this._setupButtonInput(this._btnClose,   () => phaserEvents.emit(PhaserEvent.MOBILE_CLOSE));
+
+    // Native touchend listener to open URLs — window.open() requires a trusted
+    // user-gesture call stack; Phaser's rAF loop breaks that on mobile browsers.
+    const canvas = this.sys.game.canvas;
+    canvas.addEventListener("touchend", (e: TouchEvent) => {
+      if (!this._pendingUrl) return;
+      const touch = e.changedTouches[0];
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const cx = (touch.clientX - rect.left) * scaleX;
+      const cy = (touch.clientY - rect.top) * scaleY;
+      const dx = cx - this._btnConfirm.x;
+      const dy = cy - this._btnConfirm.y;
+      if (Math.sqrt(dx * dx + dy * dy) <= btnR) {
+        window.open(this._pendingUrl, "_blank", "noopener,noreferrer");
+      }
+    }, { passive: true });
   }
 
   /** Creates a circular button Container with background + label. */
