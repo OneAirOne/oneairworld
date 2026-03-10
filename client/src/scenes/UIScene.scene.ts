@@ -353,10 +353,14 @@ export class UIScene extends Phaser.Scene {
     this._joyThumb.setPosition(thumbX, thumbY);
 
     const deadzone = JOY_BASE_RADIUS * 0.25;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
     mobileInput.left  = dx < -deadzone;
     mobileInput.right = dx >  deadzone;
-    mobileInput.up    = dy < -deadzone;
-    mobileInput.down  = dy >  deadzone;
+    // Up/down only activate when the vertical component is significant
+    // relative to the horizontal one, to avoid sticking when sliding left/right.
+    mobileInput.up    = dy < -deadzone && absDy > absDx * 0.4;
+    mobileInput.down  = dy >  deadzone && absDy > absDx * 0.4;
   }
 
   private _resetJoystick() {
