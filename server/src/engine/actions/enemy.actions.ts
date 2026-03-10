@@ -80,23 +80,31 @@ export function processEnemyAI(
     body.attackCooldown = Math.max(0, body.attackCooldown - deltaTime);
   }
 
-  // --- Ongoing attack: lunge toward player at start, then freeze ---
+  // --- Ongoing attack: ease-in jump to landing point, then freeze ---
   if (enemyState.isAttacking) {
     body.attackTimer -= deltaTime;
     if (body.attackTimer <= 0) {
       enemyState.isAttacking = false;
       body.attackDamageDealt = false;
+      Matter.Body.setPosition(body.getBody(), { x: body.attackTargetX, y: body.attackTargetY });
+      Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
       if (!isHitAnim) {
         enemyState.anim = directionToAnim(enemyState.direction as DIRECTION);
       }
     } else if (body.attackTimer > ENEMY_CONFIG.ATTACK_DURATION * 0.6) {
-      // First 40%: diagonal lunge toward stored player position
-      Matter.Body.setVelocity(body.getBody(), {
-        x: body.attackLungeVx,
-        y: body.attackLungeVy,
+      // First 40%: ease-in interpolation from origin to landing point (t²)
+      const lunge_duration = ENEMY_CONFIG.ATTACK_DURATION * 0.4;
+      const elapsed = ENEMY_CONFIG.ATTACK_DURATION - body.attackTimer;
+      const t = Math.min(elapsed / lunge_duration, 1);
+      const eased = t * t; // quadratic ease-in: slow takeoff → accelerates
+      Matter.Body.setPosition(body.getBody(), {
+        x: body.attackOriginX + (body.attackTargetX - body.attackOriginX) * eased,
+        y: body.attackOriginY + (body.attackTargetY - body.attackOriginY) * eased,
       });
+      Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
     } else {
-      // Remaining 60%: freeze
+      // Remaining 60%: freeze at landing point
+      Matter.Body.setPosition(body.getBody(), { x: body.attackTargetX, y: body.attackTargetY });
       Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
     }
     return;
@@ -172,10 +180,13 @@ export function processEnemyAI(
           body.attackTimer = ENEMY_CONFIG.ATTACK_DURATION;
           body.attackCooldown = ENEMY_CONFIG.ATTACK_COOLDOWN;
           body.attackDamageDealt = false;
-          // Store exact normalized vector toward player for diagonal lunge
-          const len = dist || 1;
-          body.attackLungeVx = (dx / len) * 1.5;
-          body.attackLungeVy = (dy / len) * 1.5;
+          // Commit origin + landing point — fixed even if the player moves.
+          body.attackOriginX = body.getBody().position.x;
+          body.attackOriginY = body.getBody().position.y;
+          body.attackTargetX = target.x;
+          body.attackTargetY = target.y;
+          Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
+          return;
         } else {
           enemyState.anim = directionToAnim(dir);
         }
