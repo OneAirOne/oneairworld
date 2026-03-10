@@ -139,7 +139,7 @@ export class Player extends Phaser.GameObjects.Sprite {
       callback: () => {
         flashes++;
         if (flashes % 2 === 1) {
-          this.setTint(0xffffff);
+          this.setTintFill(0xffffff);
         } else {
           this.clearTint();
         }
