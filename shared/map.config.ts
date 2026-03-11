@@ -46,7 +46,7 @@ export const GAME_SCENE_LAYERS: LayerConfig[] = [
   },
   {
     name: TiledLayer.ABOVE,
-    depth: 2,
+    depth: 3,
   },
 ];
 

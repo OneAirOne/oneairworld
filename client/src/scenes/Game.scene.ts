@@ -31,7 +31,7 @@ import {
   TiledLayer,
   TiledObjectType,
 } from "../../../shared/map.config";
-import { SHARED_CONFIG, COMBAT_CONFIG, ENEMY_CONFIG } from "../../../shared/shared.config";
+import { SHARED_CONFIG, ENEMY_CONFIG, getCharCombatConfig, PNJ_LIST } from "../../../shared/shared.config";
 
 const ROBOT_INTERACTION_RADIUS = 50;
 
@@ -199,6 +199,7 @@ export class GameScene extends Phaser.Scene {
 
     // Create animations
     createAnim(anims.animOneAir, 10, this, CLIENT_CONFIG.CHARACTERS.NAME);
+    createAnim(anims.animTimothee, 10, this, CLIENT_CONFIG.CHARACTERS.TIMOTHEE.NAME);
     createAnim(anims.animFluppy, 10, this, CLIENT_CONFIG.CHARACTERS.NAME);
     createAnim(anims.animSlime, 10, this, CLIENT_CONFIG.CHARACTERS.SLIME.NAME);
 
@@ -232,6 +233,21 @@ export class GameScene extends Phaser.Scene {
       repeat: -1,
     });
 
+    // Ghost idle animation (looping)
+    const ghostAnim = anims.animGhost.IDLE;
+    this.anims.create({
+      key: ghostAnim.key,
+      frames: this.anims.generateFrameNames(CLIENT_CONFIG.CHARACTERS.GHOST.NAME, {
+        start: ghostAnim.start,
+        end: ghostAnim.end,
+        zeroPad: ghostAnim.zeroPad,
+        prefix: ghostAnim.prefix,
+        suffix: ghostAnim.suffix,
+      }),
+      frameRate: 6,
+      repeat: -1,
+    });
+
     // Robot idle animation (looping)
     const robotAnim = anims.animRobot.IDLE;
     this.anims.create({
@@ -247,26 +263,26 @@ export class GameScene extends Phaser.Scene {
       repeat: -1,
     });
 
-    // Spawn wizard + dino at pnj1, robot at pnj2
+    // ── Resolve PNJ anim keys (client-side only) ──────────────────────────────
+    const PNJ_ANIM_KEYS: Record<string, string> = {
+      [CLIENT_CONFIG.CHARACTERS.GHOST.NAME]:  ghostAnim.key,
+      [CLIENT_CONFIG.CHARACTERS.WIZARD.NAME]: wizardAnim.key,
+      [CLIENT_CONFIG.CHARACTERS.DINO.NAME]:   dinoAnim.key,
+      [CLIENT_CONFIG.CHARACTERS.ROBOT.NAME]:  robotAnim.key,
+    };
+
     // @ts-ignore
     this.sceneMap.findObject("info", (obj) => {
       const tiledObj = obj as unknown as { x: number; y: number; name: string };
-      if (tiledObj.name === "pnj1") {
-        const wizard = this.add.sprite(tiledObj.x, tiledObj.y, CLIENT_CONFIG.CHARACTERS.WIZARD.NAME);
-        wizard.setDepth(1);
-        wizard.play(wizardAnim.key);
-
-        const dino = this.add.sprite(tiledObj.x + 20, tiledObj.y, CLIENT_CONFIG.CHARACTERS.DINO.NAME);
-        dino.setDepth(1);
-        dino.play(dinoAnim.key);
-      }
-      if (tiledObj.name === "pnj2") {
-        const robot = this.add.sprite(tiledObj.x, tiledObj.y, CLIENT_CONFIG.CHARACTERS.ROBOT.NAME);
-        robot.setDepth(1);
-        robot.play(robotAnim.key);
-        this.robotSprite = robot;
-
-        this.robotBubble = createSpeakingBubble(this, robot, 10, 14);
+      for (const pnj of PNJ_LIST) {
+        if (tiledObj.name !== pnj.spawnPoint || !pnj.visible) continue;
+        const sprite = this.add.sprite(tiledObj.x + pnj.offsetX, tiledObj.y + pnj.offsetY, pnj.texture);
+        sprite.setDepth(1);
+        sprite.play(PNJ_ANIM_KEYS[pnj.texture]);
+        if (pnj.isRobot) {
+          this.robotSprite = sprite;
+          this.robotBubble = createSpeakingBubble(this, sprite, 10, 14);
+        }
       }
     });
 
@@ -382,9 +398,10 @@ export class GameScene extends Phaser.Scene {
   private drawEnemyDebug() {
     this.enemyDebugGraphics.clear();
 
-    const hurtHalf = COMBAT_CONFIG.HURT_BOX_SIZE / 2;
-    const hitHalf  = COMBAT_CONFIG.HIT_BOX_SIZE / 2;
-    const offset   = COMBAT_CONFIG.HIT_BOX_OFFSET;
+    const enemyCc  = getCharCombatConfig("oneair"); // enemies always use default
+    const hurtHalf = enemyCc.hurtBoxW / 2;
+    const hitHalf  = enemyCc.hitBoxSize / 2;
+    const offset   = enemyCc.hitBoxOffset;
 
     this.enemies.forEach((enemy) => {
       const ex = enemy.x;
@@ -402,7 +419,7 @@ export class GameScene extends Phaser.Scene {
       this.enemyDebugGraphics.lineStyle(2, 0x4488ff, 1);
       this.enemyDebugGraphics.strokeRect(
         ex - hurtHalf, ey - hurtHalf,
-        COMBAT_CONFIG.HURT_BOX_SIZE, COMBAT_CONFIG.HURT_BOX_SIZE
+        enemyCc.hurtBoxW, enemyCc.hurtBoxW
       );
 
       // Enemy HIT_BOX — red, follows direction (slime jumps toward player)
@@ -415,39 +432,45 @@ export class GameScene extends Phaser.Scene {
       this.enemyDebugGraphics.lineStyle(2, 0xff2222, isAttacking ? 1 : 0.3);
       this.enemyDebugGraphics.strokeRect(
         ex - hitHalf, ey - hitHalf,
-        COMBAT_CONFIG.HIT_BOX_SIZE, COMBAT_CONFIG.HIT_BOX_SIZE
+        enemyCc.hitBoxSize, enemyCc.hitBoxSize
       );
     });
 
     // Player HIT_BOX — green when attacking
     if (this.myPlayer) {
+      const pCc        = getCharCombatConfig(CLIENT_CONFIG.ACTIVE_PLAYER);
+      const pHitHalf   = pCc.hitBoxSize / 2;
+      const pHurtHalfW = pCc.hurtBoxW / 2;
+      const pHurtHalfH = pCc.hurtBoxH / 2;
+
       let hx = this.myPlayer.x;
       let hy = this.myPlayer.y;
       const isAttacking = this.myPlayer.getData(SERVER_DATA.IS_ATTACKING);
 
       switch (this.myPlayer.lastAnim) {
         case Anim.UP: case Anim.IDDLE_UP: case Anim.ATTACK_UP:
-          hy -= offset; break;
+          hy -= pCc.hitBoxOffsetUp; break;
         case Anim.DOWN: case Anim.IDDLE_DOWN: case Anim.ATTACK_DOWN:
-          hy += offset; break;
+          hy += pCc.hitBoxOffsetDown; break;
         case Anim.LEFT: case Anim.IDDLE_LEFT: case Anim.ATTACK_LEFT:
-          hx -= offset; break;
+          hx -= pCc.hitBoxOffsetLeft; hy += pCc.hitBoxOffsetLRY; break;
         case Anim.RIGHT: case Anim.IDDLE_RIGHT: case Anim.ATTACK_RIGHT:
-          hx += offset; break;
+          hx += pCc.hitBoxOffsetRight; hy += pCc.hitBoxOffsetLRY; break;
       }
 
       // Player HIT_BOX — green (attack zone)
       this.enemyDebugGraphics.lineStyle(2, 0x00ff44, isAttacking ? 1 : 0.2);
       this.enemyDebugGraphics.strokeRect(
-        hx - hitHalf, hy - hitHalf,
-        COMBAT_CONFIG.HIT_BOX_SIZE, COMBAT_CONFIG.HIT_BOX_SIZE
+        hx - pHitHalf, hy - pHitHalf,
+        pCc.hitBoxSize, pCc.hitBoxSize
       );
 
-      // Player HURT_BOX — cyan (damage-receiving zone, always centered)
+      // Player HURT_BOX — cyan
       this.enemyDebugGraphics.lineStyle(2, 0x00ffff, 1);
       this.enemyDebugGraphics.strokeRect(
-        this.myPlayer.x - hitHalf, this.myPlayer.y - hitHalf,
-        COMBAT_CONFIG.HIT_BOX_SIZE, COMBAT_CONFIG.HIT_BOX_SIZE
+        this.myPlayer.x - pHurtHalfW,
+        this.myPlayer.y + pCc.hurtBoxOffsetY - pHurtHalfH,
+        pCc.hurtBoxW, pCc.hurtBoxH
       );
     }
   }

@@ -1009,14 +1009,14 @@
                 {
                  "height":0,
                  "id":48,
-                 "name":"pnj2",
+                 "name":"pnj3",
                  "point":true,
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":801.297872340426,
-                 "y":272.170212765957
+                 "x":760.872468085106,
+                 "y":258.694822695036
                 }, 
                 {
                  "height":0,
@@ -1027,8 +1027,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":463.120567375887,
-                 "y":319.858156028369
+                 "x":463.121,
+                 "y":319.858
                 }, 
                 {
                  "height":0,
@@ -1039,8 +1039,80 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":494.056737588652,
-                 "y":319.858156028369
+                 "x":499.021539007092,
+                 "y":307.801262411348
+                }, 
+                {
+                 "height":0,
+                 "id":62,
+                 "name":"pnj2",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":634.042553191489,
+                 "y":243.971631205674
+                }, 
+                {
+                 "height":0,
+                 "id":63,
+                 "name":"pnj4",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":534.042553191489,
+                 "y":478.723404255319
+                }, 
+                {
+                 "height":0,
+                 "id":64,
+                 "name":"pnj5",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":980.851063829787,
+                 "y":136.170212765957
+                }, 
+                {
+                 "height":0,
+                 "id":65,
+                 "name":"pnj6",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":853.191489361702,
+                 "y":553.191489361702
+                }, 
+                {
+                 "height":0,
+                 "id":66,
+                 "name":"pnj7",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":139.716312056738,
+                 "y":332.624113475177
+                }, 
+                {
+                 "height":0,
+                 "id":67,
+                 "name":"pnj8",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":143.262411347518,
+                 "y":76.595744680851
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1120,7 +1192,7 @@
          "y":0
         }],
  "nextlayerid":45,
- "nextobjectid":62,
+ "nextobjectid":68,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

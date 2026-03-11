@@ -2,6 +2,7 @@
 import PhaserAnimatedTiles from "phaser-animated-tiles/src/plugin/main";
 
 import { BootScene, BackgroundScene, GameScene, UIScene } from "scenes";
+import { Characters } from "../../shared/types";
 
 export const PHASER_CONFIG: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -39,6 +40,11 @@ export enum SERVER_DATA {
 }
 
 const CLIENT_CONFIG = {
+  // ── Switch player character here ─────────────────────────────────────────
+  // Characters.ONEAIR  → hit anims ✓  dead anim ✗
+  // Characters.TIMOTHEE → hit anims ✗  dead anim ✓
+  ACTIVE_PLAYER: Characters.ONEAIR,
+  // ─────────────────────────────────────────────────────────────────────────
   DEBUG: false,
   DEBUG_LAYER: 7,
   MAP: {
@@ -104,6 +110,16 @@ const CLIENT_CONFIG = {
       NAME: "dino",
       SPRITE_SHEET_ATLAS_PATH: `assets/characters/dino.json`,
       SPRITE_SHEET_TEXTURE_PATH: `assets/characters/dino.png`,
+    },
+    TIMOTHEE: {
+      NAME: "timothee",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/timothee.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/timothee.png`,
+    },
+    GHOST: {
+      NAME: "ghost",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/ghost.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/ghost.png`,
     },
   },
   ITEMS: {

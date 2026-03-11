@@ -3,7 +3,7 @@ import Matter from "matter-js";
 import { Player as PlayerState } from "../../rooms/schema/Player";
 import { COLLISION_CATEGORY } from "../engine.config";
 
-import { SHARED_CONFIG } from "../../../../shared/shared.config";
+import { SHARED_CONFIG, getCharCombatConfig } from "../../../../shared/shared.config";
 import { DIRECTION } from "../../../../shared/types";
 import { getTiledInfos } from "./map/map.body";
 
@@ -48,11 +48,12 @@ export class Player {
     this._world = world;
     this._playerState = playerState;
 
+    const charConfig = getCharCombatConfig(playerState.texture);
     this._body = Matter.Bodies.rectangle(
       start.x,
       start.y,
-      SHARED_CONFIG.SPRITE_SIZE,
-      SHARED_CONFIG.SPRITE_SIZE,
+      charConfig.bodyW,
+      charConfig.bodyH,
       {
         label: id,
         ...PLAYER_CONFIG,

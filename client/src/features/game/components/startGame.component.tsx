@@ -8,7 +8,7 @@ import phaserGame from "Game";
 import { BootScene, SCENES } from "scenes";
 
 // Shared
-import { Characters } from "../../../../../shared/types";
+import CLIENT_CONFIG from "client.config";
 
 export function StartGame() {
   const [visible, setVisible] = React.useState(true);
@@ -20,7 +20,7 @@ export function StartGame() {
       bootScene.launchGame();
       await bootScene.network.joinOrCreatePublic({
         name: "Erwan",
-        texture: Characters.ONEAIR,
+        texture: CLIENT_CONFIG.ACTIVE_PLAYER,
       });
     } catch (error) {
       console.error(error);

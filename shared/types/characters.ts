@@ -1,5 +1,6 @@
 export enum Characters {
   ONEAIR = "oneair",
+  TIMOTHEE = "timothee",
   LINK = "link",
   FLUPPY = "fluppy",
   SLIME = "slime",

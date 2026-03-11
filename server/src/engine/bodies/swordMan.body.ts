@@ -5,7 +5,7 @@ import { Player } from "./player.body";
 import { COLLISION_CATEGORY } from "../engine.config";
 
 import { DIRECTION } from "../../../../shared/types";
-import { COMBAT_CONFIG } from "../../../../shared/shared.config";
+import { getCharCombatConfig } from "../../../../shared/shared.config";
 
 const HIT_BOX_CONFIG = {
   isSensor: true,
@@ -29,11 +29,13 @@ export class SwordMan extends Player {
   ) {
     super(id, world, engine, playerState);
 
+    const cc = getCharCombatConfig(playerState.texture);
+
     this._hitBox = Matter.Bodies.rectangle(
       this._body.position.x,
       this._body.position.y,
-      COMBAT_CONFIG.HIT_BOX_SIZE,
-      COMBAT_CONFIG.HIT_BOX_SIZE,
+      cc.hitBoxSize,
+      cc.hitBoxSize,
       { label: id, ...HIT_BOX_CONFIG }
     );
 
@@ -41,8 +43,8 @@ export class SwordMan extends Player {
     this._hurtBox = Matter.Bodies.rectangle(
       this._body.position.x,
       this._body.position.y,
-      COMBAT_CONFIG.HIT_BOX_SIZE,
-      COMBAT_CONFIG.HIT_BOX_SIZE,
+      cc.hurtBoxW,
+      cc.hurtBoxH,
       {
         label: id,
         isSensor: true,
@@ -65,21 +67,20 @@ export class SwordMan extends Player {
       const isAttacking = this?._playerState?.isAttacking ?? false;
       this._hitBox.collisionFilter.mask = isAttacking ? ACTIVE_MASK : 0;
 
-      const offset = COMBAT_CONFIG.HIT_BOX_OFFSET;
       const x = this._body.position.x;
       const y = this._body.position.y;
 
-      // Keep hurtbox centered on player at all times
-      Matter.Body.setPosition(this._hurtBox, { x, y });
+      // Keep hurtbox on player, shifted toward feet by hurtBoxOffsetY
+      Matter.Body.setPosition(this._hurtBox, { x, y: y + cc.hurtBoxOffsetY });
 
       if (this?._playerState?.direction === DIRECTION.UP) {
-        Matter.Body.setPosition(this._hitBox, { x, y: y - offset });
+        Matter.Body.setPosition(this._hitBox, { x, y: y - cc.hitBoxOffsetUp });
       } else if (this?._playerState?.direction === DIRECTION.DOWN) {
-        Matter.Body.setPosition(this._hitBox, { x, y: y + offset });
+        Matter.Body.setPosition(this._hitBox, { x, y: y + cc.hitBoxOffsetDown });
       } else if (this?._playerState?.direction === DIRECTION.LEFT) {
-        Matter.Body.setPosition(this._hitBox, { x: x - offset, y });
+        Matter.Body.setPosition(this._hitBox, { x: x - cc.hitBoxOffsetLeft, y: y + cc.hitBoxOffsetLRY });
       } else if (this?._playerState?.direction === DIRECTION.RIGHT) {
-        Matter.Body.setPosition(this._hitBox, { x: x + offset, y });
+        Matter.Body.setPosition(this._hitBox, { x: x + cc.hitBoxOffsetRight, y: y + cc.hitBoxOffsetLRY });
       }
     });
   }
