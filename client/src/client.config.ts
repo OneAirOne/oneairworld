@@ -121,6 +121,11 @@ const CLIENT_CONFIG = {
       SPRITE_SHEET_ATLAS_PATH: `assets/characters/ghost.json`,
       SPRITE_SHEET_TEXTURE_PATH: `assets/characters/ghost.png`,
     },
+    WENDY: {
+      NAME: "wendy",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/wendy.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/wendy.png`,
+    },
   },
   ITEMS: {
     HEART: {

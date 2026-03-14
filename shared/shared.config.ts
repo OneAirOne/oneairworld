@@ -87,9 +87,10 @@ export interface PnjConfig {
 }
 
 export const PNJ_LIST: PnjConfig[] = [
-  { texture: "ghost",  spawnPoint: "pnj5", offsetX: -20, offsetY: 0, visible: true  },
+  { texture: "ghost",  spawnPoint: "pnj1", offsetX:  40, offsetY: 0, visible: true  },
   { texture: "wizard", spawnPoint: "pnj9", offsetX:   0, offsetY: 0, visible: false },
   { texture: "dino",   spawnPoint: "pnj1", offsetX:  0, offsetY: 0, visible: true  },
+  { texture: "wendy",  spawnPoint: "pnj1", offsetX: 20, offsetY: 0, visible: true  },
   { texture: "robot",  spawnPoint: "pnj2", offsetX:   0, offsetY: 0, visible: true, isRobot: true },
 ];
 

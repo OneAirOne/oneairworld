@@ -6,3 +6,4 @@ export { animWizard } from "./wizard.anims";
 export { animWizard as animRobot } from "./robot.anims";
 export { animWizard as animDino } from "./dino.anims";
 export { animWizard as animGhost } from "./ghost.anims";
+export { animWendy } from "./wendy.anims";

@@ -233,6 +233,21 @@ export class GameScene extends Phaser.Scene {
       repeat: -1,
     });
 
+    // Wendy idle animation (looping)
+    const wendyAnim = anims.animWendy.IDLE;
+    this.anims.create({
+      key: wendyAnim.key,
+      frames: this.anims.generateFrameNames(CLIENT_CONFIG.CHARACTERS.WENDY.NAME, {
+        start: wendyAnim.start,
+        end: wendyAnim.end,
+        zeroPad: wendyAnim.zeroPad,
+        prefix: wendyAnim.prefix,
+        suffix: wendyAnim.suffix,
+      }),
+      frameRate: 6,
+      repeat: -1,
+    });
+
     // Ghost idle animation (looping)
     const ghostAnim = anims.animGhost.IDLE;
     this.anims.create({
@@ -269,6 +284,7 @@ export class GameScene extends Phaser.Scene {
       [CLIENT_CONFIG.CHARACTERS.WIZARD.NAME]: wizardAnim.key,
       [CLIENT_CONFIG.CHARACTERS.DINO.NAME]:   dinoAnim.key,
       [CLIENT_CONFIG.CHARACTERS.ROBOT.NAME]:  robotAnim.key,
+      [CLIENT_CONFIG.CHARACTERS.WENDY.NAME]:  wendyAnim.key,
     };
 
     // @ts-ignore
@@ -401,7 +417,6 @@ export class GameScene extends Phaser.Scene {
     const enemyCc  = getCharCombatConfig("oneair"); // enemies always use default
     const hurtHalf = enemyCc.hurtBoxW / 2;
     const hitHalf  = enemyCc.hitBoxSize / 2;
-    const offset   = enemyCc.hitBoxOffset;
 
     this.enemies.forEach((enemy) => {
       const ex = enemy.x;
