@@ -33,7 +33,7 @@ export function CharacterSelectModal({ onSelect }: Props) {
                   : "border-slate-600 hover:border-slate-400",
               ].join(" ")}
             >
-              <img src={c.gif} className="w-20 h-20 rounded-full object-cover" />
+              <img src={c.gif} className="w-12 h-12 rounded-full object-cover" />
               <span className="text-white font-semibold text-sm">{c.name}</span>
             </button>
           ))}
