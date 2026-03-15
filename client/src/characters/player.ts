@@ -54,6 +54,10 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.id = id;
     this._playerTexture = texture;
 
+    if (texture === Characters.ONEAIR) {
+      this.setScale(1.1);
+    }
+
     if (this.scene) {
       this._cursors = this.scene!.input!.keyboard!.createCursorKeys();
     } else {

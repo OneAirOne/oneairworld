@@ -138,6 +138,12 @@ export class BootScene extends Phaser.Scene {
       CLIENT_CONFIG.CHARACTERS.WENDY.SPRITE_SHEET_ATLAS_PATH
     );
 
+    this.load.atlas(
+      CLIENT_CONFIG.CHARACTERS.JOHN.NAME,
+      CLIENT_CONFIG.CHARACTERS.JOHN.SPRITE_SHEET_TEXTURE_PATH,
+      CLIENT_CONFIG.CHARACTERS.JOHN.SPRITE_SHEET_ATLAS_PATH
+    );
+
     this.load.on("complete", () => {
       this.preloadComplete = true;
       this.launchBackground();

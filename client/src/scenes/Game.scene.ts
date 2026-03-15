@@ -233,6 +233,21 @@ export class GameScene extends Phaser.Scene {
       repeat: -1,
     });
 
+    // John idle animation (looping)
+    const johnAnim = anims.animJohn.IDLE;
+    this.anims.create({
+      key: johnAnim.key,
+      frames: this.anims.generateFrameNames(CLIENT_CONFIG.CHARACTERS.JOHN.NAME, {
+        start: johnAnim.start,
+        end: johnAnim.end,
+        zeroPad: johnAnim.zeroPad,
+        prefix: johnAnim.prefix,
+        suffix: johnAnim.suffix,
+      }),
+      frameRate: 6,
+      repeat: -1,
+    });
+
     // Wendy idle animation (looping)
     const wendyAnim = anims.animWendy.IDLE;
     this.anims.create({
@@ -285,6 +300,7 @@ export class GameScene extends Phaser.Scene {
       [CLIENT_CONFIG.CHARACTERS.DINO.NAME]:   dinoAnim.key,
       [CLIENT_CONFIG.CHARACTERS.ROBOT.NAME]:  robotAnim.key,
       [CLIENT_CONFIG.CHARACTERS.WENDY.NAME]:  wendyAnim.key,
+      [CLIENT_CONFIG.CHARACTERS.JOHN.NAME]:   johnAnim.key,
     };
 
     // @ts-ignore
