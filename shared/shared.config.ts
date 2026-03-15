@@ -95,6 +95,15 @@ export const PNJ_LIST: PnjConfig[] = [
   { texture: "robot",  spawnPoint: "pnj2", offsetX:   0, offsetY: 0, visible: true, isRobot: true },
 ];
 
+export const ARROW_CONFIG = {
+  SPEED: 5,                  // px per physics tick (at 60 fps)
+  MAX_DISTANCE: 400,         // px before arrow despawns
+  FIRE_COOLDOWN: 600,        // ms between shots
+  SIZE: 6,                   // hitbox size in px
+  KNOCKBACK_VELOCITY: 2.5,   // stronger than sword (0.5)
+  KNOCKBACK_DURATION: 350,   // ms
+};
+
 export const ENEMY_CONFIG = {
   // Radius (px) within which an enemy detects and follows a player
   AGGRO_RADIUS: 60,

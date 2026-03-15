@@ -10,7 +10,7 @@ const HURT_BOX_CONFIG = {
   isSensor: true,
   collisionFilter: {
     category: COLLISION_CATEGORY.HURT_BOX,
-    mask: COLLISION_CATEGORY.HIT_BOX,
+    mask: COLLISION_CATEGORY.HIT_BOX | COLLISION_CATEGORY.ARROW_HIT_BOX,
   },
 };
 

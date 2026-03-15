@@ -3,6 +3,13 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      colors: {
+        brand: {
+          DEFAULT: "#f0003c", // hsl(345, 100%, 47%) — rouge face
+          shadow:  "#b2b8b2", // hsl(120, 4%, 71%)   — gris shadow
+          muted:   "#c44466", // rouge désaturé disabled
+        },
+      },
       fontFamily: {
         sans: ["Inter", "system-ui", "Helvetica", "Arial", "sans-serif"],
       },

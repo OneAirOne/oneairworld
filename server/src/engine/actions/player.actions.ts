@@ -2,10 +2,12 @@ import Matter from "matter-js";
 
 import {
   Anim,
+  Characters,
   DIRECTION,
   InputPayload,
   PLAYER_VELOCITY,
 } from "../../../../shared/types";
+import { ARROW_CONFIG } from "../../../../shared/shared.config";
 import { Player } from "../../rooms/schema";
 import { SwordMan } from "../bodies";
 
@@ -145,20 +147,22 @@ export function processPlayerAction(
   if (input.space) {
     vx = 0;
     vy = 0;
-    player.isAttacking = true;
 
-    if (isLeft(player.anim as Anim)) {
-      updateAnim(Anim.ATTACK_LEFT);
+    if (player.texture === Characters.LINK) {
+      // Archer: fire an arrow (edge-triggered with cooldown, no sword hitbox)
+      if (body.arrowCooldown <= 0) {
+        body.arrowRequested = true;
+        body.arrowCooldown = ARROW_CONFIG.FIRE_COOLDOWN;
+      }
+      player.isAttacking = false;
+    } else {
+      player.isAttacking = true;
     }
-    if (isRight(player.anim as Anim)) {
-      updateAnim(Anim.ATTACK_RIGHT);
-    }
-    if (isUp(player.anim as Anim)) {
-      updateAnim(Anim.ATTACK_UP);
-    }
-    if (isDown(player.anim as Anim)) {
-      updateAnim(Anim.ATTACK_DOWN);
-    }
+
+    if (isLeft(player.anim as Anim)) updateAnim(Anim.ATTACK_LEFT);
+    if (isRight(player.anim as Anim)) updateAnim(Anim.ATTACK_RIGHT);
+    if (isUp(player.anim as Anim)) updateAnim(Anim.ATTACK_UP);
+    if (isDown(player.anim as Anim)) updateAnim(Anim.ATTACK_DOWN);
   } else {
     player.isAttacking = false;
   }

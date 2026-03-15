@@ -43,7 +43,8 @@ const CLIENT_CONFIG = {
   // ── Switch player character here ─────────────────────────────────────────
   // Characters.ONEAIR  → hit anims ✓  dead anim ✗
   // Characters.TIMOTHEE → hit anims ✗  dead anim ✓
-  ACTIVE_PLAYER: Characters.ONEAIR,
+  // Characters.LINK    → archer, fires arrows instead of sword
+  ACTIVE_PLAYER: Characters.LINK,
   // ─────────────────────────────────────────────────────────────────────────
   DEBUG: false,
   DEBUG_LAYER: 7,

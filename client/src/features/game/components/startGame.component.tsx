@@ -2,25 +2,32 @@ import * as React from "react";
 
 // Components
 import LaunchButton from "./lauchButton";
+import { CharacterSelectModal } from "./CharacterSelectModal";
 
 // Others
 import phaserGame from "Game";
 import { BootScene, SCENES } from "scenes";
 
 // Shared
-import CLIENT_CONFIG from "client.config";
+import { Characters } from "../../../../../shared/types";
 
 export function StartGame() {
   const [visible, setVisible] = React.useState(true);
+  const [showModal, setShowModal] = React.useState(false);
   const mail = "gilberterwan@gmail.com";
 
-  const handleLaunch = React.useCallback(async () => {
+  const handleLaunch = React.useCallback(() => {
+    setShowModal(true);
+  }, []);
+
+  const handleCharacterSelect = React.useCallback(async (character: Characters) => {
+    setShowModal(false);
     try {
       const bootScene = phaserGame.scene.keys[SCENES.BOOT] as BootScene;
       bootScene.launchGame();
       await bootScene.network.joinOrCreatePublic({
         name: "Erwan",
-        texture: CLIENT_CONFIG.ACTIVE_PLAYER,
+        texture: character,
       });
     } catch (error) {
       console.error(error);
@@ -38,7 +45,7 @@ export function StartGame() {
         <div className="flex justify-center mb-8 animate-float">
           <img
             src="assets/avatar.jpg"
-            className="w-24 h-24 rounded-full ring-2 ring-purple-500/30"
+            className="w-24 h-24 rounded-full ring-2 ring-brand/30"
           />
         </div>
 
@@ -63,7 +70,7 @@ export function StartGame() {
               href={`mailto:${mail}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-purple-400 hover:text-pink-400 transition-colors duration-200 underline underline-offset-4"
+              className="text-brand hover:text-brand/70 transition-colors duration-200 underline underline-offset-4"
             >
               {mail}
             </a>
@@ -84,6 +91,8 @@ export function StartGame() {
         </div>
 
       </div>
+
+      {showModal && <CharacterSelectModal onSelect={handleCharacterSelect} />}
     </div>
   );
 }

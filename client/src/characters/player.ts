@@ -5,6 +5,7 @@ import { SERVER_DATA } from "client.config";
 import { Anim, Characters, InputPayload } from "../../../shared/types";
 import { animOneAir } from "./anims/oneair.anims";
 import { animTimothee } from "./anims/timothee.anims";
+import { animLink } from "./anims/link.anims";
 import { getBubblePosition, createSpeakingBubble } from "../scenes/game.helpers";
 import { mobileInput } from "../input/mobileInput";
 
@@ -15,7 +16,9 @@ const ANIM_SUFFIX_ATTACK = "Attack";
 const ANIM_SUFFIX_HIT = "Hit";
 
 function getAnimConfig(texture: string) {
-  return texture === Characters.TIMOTHEE ? animTimothee : animOneAir;
+  if (texture === Characters.TIMOTHEE) return animTimothee;
+  if (texture === Characters.LINK)     return animLink;
+  return animOneAir;
 }
 
 /* ---------------------------------- Class --------------------------------- */
@@ -54,7 +57,7 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.id = id;
     this._playerTexture = texture;
 
-    if (texture === Characters.ONEAIR) {
+    if (texture === Characters.ONEAIR || texture === Characters.LINK) {
       this.setScale(1.1);
     }
 

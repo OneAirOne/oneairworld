@@ -11,6 +11,9 @@ export enum PhaserEvent {
   ENEMY_JOINED = "enemy-joined",
   ENEMY_UPDATED = "enemy-updated",
   ENEMY_LEFT = "enemy-left",
+  ARROW_JOINED = "arrow-joined",// TODO: merge with PLAYER_JOINED?
+  ARROW_UPDATED = "arrow-updated",
+  ARROW_LEFT = "arrow-left",
   // Dialogue
   DIALOGUE_ZONE_ENTER = "dialogue-zone-enter",
   DIALOGUE_ZONE_LEAVE = "dialogue-zone-leave",
@@ -19,6 +22,8 @@ export enum PhaserEvent {
   DIALOGUE_NAVIGATE = "dialogue-navigate",
   DIALOGUE_ACTION = "dialogue-action",
   DIALOGUE_CLOSE = "dialogue-close",
+  // Interior transitions
+  ENTER_INTERIOR = "enter-interior",
   // Mobile touch actions (mirror keyboard shortcuts)
   MOBILE_INTERACT = "mobile-interact",
   MOBILE_NAV_UP = "mobile-nav-up",

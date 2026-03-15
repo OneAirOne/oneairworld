@@ -6,6 +6,7 @@ import ComponentService from "services/Component.service";
 
 // Characters
 import { createAnim, anims, Player, Enemy } from "characters";
+import { Arrow, ARROW_ANIM_KEYS } from "../characters/Arrow";
 
 // Others
 import { SCENES } from "./scene.config";
@@ -24,7 +25,7 @@ import { DialogueManager } from "../dialogue/DialogueManager";
 import { phaserEvents, PhaserEvent } from "../events/eventManager";
 
 // Shared
-import type { IPlayer, IEnemy } from "../../../shared/types";
+import type { IPlayer, IEnemy, IArrow } from "../../../shared/types";
 import { Anim } from "../../../shared/types";
 import {
   GAME_SCENE_LAYERS,
@@ -42,6 +43,7 @@ export class GameScene extends Phaser.Scene {
   private components!: ComponentService;
   private enemyDebugGraphics!: Phaser.GameObjects.Graphics;
   private enemies = new Map<string, Enemy>();
+  private arrows = new Map<string, Arrow>();
   private robotSprite: Phaser.GameObjects.Sprite | null = null;
   private robotBubble: Phaser.GameObjects.Text | null = null;
   private dialogueManager = new DialogueManager();
@@ -198,8 +200,22 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Create animations
-    createAnim(anims.animOneAir, 10, this, CLIENT_CONFIG.CHARACTERS.NAME);
+    createAnim(anims.animOneAir,  10, this, CLIENT_CONFIG.CHARACTERS.NAME);
     createAnim(anims.animTimothee, 10, this, CLIENT_CONFIG.CHARACTERS.TIMOTHEE.NAME);
+    createAnim(anims.animLink,    10, this, CLIENT_CONFIG.CHARACTERS.NAME);
+
+    // Arrow anims (1 frame per direction)
+    for (const [dir, key] of Object.entries(ARROW_ANIM_KEYS)) {
+      this.anims.create({
+        key,
+        frames: this.anims.generateFrameNames(CLIENT_CONFIG.CHARACTERS.NAME, {
+          prefix: `link/arrow/${dir.toLowerCase()}/`,
+          start: 1, end: 1, zeroPad: 4, suffix: ".png",
+        }),
+        frameRate: 1,
+        repeat: -1,
+      });
+    }
     createAnim(anims.animFluppy, 10, this, CLIENT_CONFIG.CHARACTERS.NAME);
     createAnim(anims.animSlime, 10, this, CLIENT_CONFIG.CHARACTERS.SLIME.NAME);
 
@@ -391,6 +407,9 @@ export class GameScene extends Phaser.Scene {
     this.network.onEnemyJoin(this.handleEnemyJoin, this);
     this.network.onEnemyUpdated(this.handleEnemyUpdated, this);
     this.network.onEnemyLeft(this.handleEnemyLeft, this);
+    this.network.onArrowJoin(this.handleArrowJoin, this);
+    this.network.onArrowUpdated(this.handleArrowUpdated, this);
+    this.network.onArrowLeft(this.handleArrowLeft, this);
   }
 
   handleEnemyJoin(enemy: IEnemy, id: string) {
@@ -411,6 +430,24 @@ export class GameScene extends Phaser.Scene {
     const enemy = this.enemies.get(id);
     if (enemy) enemy.destroy();
     this.enemies.delete(id);
+  }
+
+  handleArrowJoin(arrow: IArrow, id: string) {
+    const sprite = new Arrow(this, arrow.x, arrow.y, arrow.direction);
+    this.arrows.set(id, sprite);
+  }
+
+  handleArrowUpdated(field: string, value: number | string, id: string) {
+    const arrow = this.arrows.get(id);
+    if (!arrow) return;
+    if (field === "x") arrow.x = value as number;
+    if (field === "y") arrow.y = value as number;
+  }
+
+  handleArrowLeft(id: string) {
+    const arrow = this.arrows.get(id);
+    if (arrow) arrow.destroy();
+    this.arrows.delete(id);
   }
 
   private updateEnemies() {

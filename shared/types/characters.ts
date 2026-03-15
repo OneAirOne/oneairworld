@@ -70,5 +70,13 @@ export interface IEnemy {
   decreaseLife: () => void;
 }
 
+export interface IArrow {
+  id: string;
+  x: number;
+  y: number;
+  direction: string;
+  ownerId: string;
+}
+
 export const PLAYER_VELOCITY = 2;
 export const ENEMY_VELOCITY = 0.8;

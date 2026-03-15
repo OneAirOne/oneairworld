@@ -3,7 +3,7 @@ import Matter from "matter-js";
 import { GameState } from "../rooms/schema";
 import { processPlayerAction, collisionPlayers, collisionPlayerEnemy, processEnemyAI } from "./actions";
 
-import { SwordMan, createMap, Fluppy, PLAYER_CONFIG } from "./bodies";
+import { SwordMan, createMap, Fluppy, PLAYER_CONFIG, ArrowBody } from "./bodies";
 import { COLLISION_CATEGORY } from "./engine.config";
 import { SERVER_CONFIG } from "../server.config";
 
@@ -14,7 +14,7 @@ import {
   LauchOptions,
 } from "../../../shared/types";
 import { createRectangle, getSpawnPoints, getTiledInfos } from "./bodies";
-import { SHARED_CONFIG, COMBAT_CONFIG } from "../../../shared/shared.config";
+import { SHARED_CONFIG, COMBAT_CONFIG, ARROW_CONFIG } from "../../../shared/shared.config";
 import { DIRECTION } from "../../../shared/types";
 
 /**
@@ -30,6 +30,9 @@ export class GameEngine {
   private maxPlayerSize = 7;
   private players: Record<string, SwordMan> = {};
   private enemies: Record<string, Fluppy> = {};
+  private arrows: Record<string, ArrowBody> = {};
+  private _arrowsToRemove: string[] = [];
+  private _logTimer: number = 0;
   private spawnPoints: { x: number; y: number }[] = getSpawnPoints();
   private playerStart: { x: number; y: number } = getTiledInfos()?.start ?? { x: 0, y: 0 };
 
@@ -84,6 +87,80 @@ export class GameEngine {
                 enemy.knockbackTimer = COMBAT_CONFIG.ENEMY_KNOCKBACK_DURATION;
               }
             }
+          }
+        }
+      }
+
+      // Pass 1b: arrow→enemy hits
+      for (const pair of event.pairs) {
+        const { bodyA, bodyB } = pair;
+        const isArrowHittingEnemy =
+          (bodyA.collisionFilter.category === COLLISION_CATEGORY.ARROW_HIT_BOX &&
+            bodyB.collisionFilter.category === COLLISION_CATEGORY.HURT_BOX) ||
+          (bodyB.collisionFilter.category === COLLISION_CATEGORY.ARROW_HIT_BOX &&
+            bodyA.collisionFilter.category === COLLISION_CATEGORY.HURT_BOX);
+
+        if (isArrowHittingEnemy && bodyA.label !== bodyB.label) {
+          const arrowBody  = bodyA.collisionFilter.category === COLLISION_CATEGORY.ARROW_HIT_BOX ? bodyA : bodyB;
+          const hurtBody   = bodyA.collisionFilter.category === COLLISION_CATEGORY.HURT_BOX      ? bodyA : bodyB;
+          const arrow      = this.arrows[arrowBody.label];
+          const enemyState = this.state.enemies.get(hurtBody.label);
+          const enemy      = this.enemies[hurtBody.label];
+
+          if (arrow && enemy && enemyState && !enemyState.isDead) {
+            enemyState.decreaseLife(COMBAT_CONFIG.ENEMY_HIT_DAMAGE);
+            enemy.hitAnimTimer = 600;
+            this._arrowsToRemove.push(arrow.id);
+
+            // Knockback in the arrow's travel direction
+            const v = ARROW_CONFIG.KNOCKBACK_VELOCITY;
+            const dir = arrow.direction;
+            const vel =
+              dir === DIRECTION.UP    ? { x: 0, y: -v } :
+              dir === DIRECTION.DOWN  ? { x: 0, y:  v } :
+              dir === DIRECTION.LEFT  ? { x: -v, y: 0 } :
+                                        { x:  v, y: 0 };
+            Matter.Body.setVelocity(enemy.getBody(), vel);
+            enemy.knockbackTimer = ARROW_CONFIG.KNOCKBACK_DURATION;
+          }
+        }
+      }
+
+      // Pass 1c: arrow→wall — stop the arrow
+      for (const pair of event.pairs) {
+        const { bodyA, bodyB } = pair;
+        const isArrowHittingWall =
+          (bodyA.collisionFilter.category === COLLISION_CATEGORY.ARROW_HIT_BOX &&
+            bodyB.collisionFilter.category === COLLISION_CATEGORY.WALL) ||
+          (bodyB.collisionFilter.category === COLLISION_CATEGORY.ARROW_HIT_BOX &&
+            bodyA.collisionFilter.category === COLLISION_CATEGORY.WALL);
+
+        if (isArrowHittingWall) {
+          const arrowBody = bodyA.collisionFilter.category === COLLISION_CATEGORY.ARROW_HIT_BOX ? bodyA : bodyB;
+          const arrow = this.arrows[arrowBody.label];
+          if (arrow) this._arrowsToRemove.push(arrow.id);
+        }
+      }
+
+      // Pass 1d: arrow→player — damage + stop the arrow
+      for (const pair of event.pairs) {
+        const { bodyA, bodyB } = pair;
+        const isArrowHittingPlayer =
+          (bodyA.collisionFilter.category === COLLISION_CATEGORY.ARROW_HIT_BOX &&
+            bodyB.collisionFilter.category === COLLISION_CATEGORY.PLAYER_HURT_BOX) ||
+          (bodyB.collisionFilter.category === COLLISION_CATEGORY.ARROW_HIT_BOX &&
+            bodyA.collisionFilter.category === COLLISION_CATEGORY.PLAYER_HURT_BOX);
+
+        if (isArrowHittingPlayer && bodyA.label !== bodyB.label) {
+          const arrowBody  = bodyA.collisionFilter.category === COLLISION_CATEGORY.ARROW_HIT_BOX ? bodyA : bodyB;
+          const playerBody = bodyA.collisionFilter.category === COLLISION_CATEGORY.PLAYER_HURT_BOX ? bodyA : bodyB;
+          const arrow       = this.arrows[arrowBody.label];
+          const playerState = this.state.players.get(playerBody.label);
+
+          // Don't hit the archer who fired the arrow
+          if (arrow && playerState && !playerState.isDead && playerBody.label !== arrow.ownerId) {
+            if (!playerState.isSpeaking) playerState.decreaseLife();
+            this._arrowsToRemove.push(arrow.id);
           }
         }
       }
@@ -207,6 +284,13 @@ export class GameEngine {
         this.state.enemies.get(key).x = this.enemies[key].getBody().position.x;
         this.state.enemies.get(key).y = this.enemies[key].getBody().position.y;
       }
+
+      for (const key in this.arrows) {
+        const arrowState = this.state.arrows.get(key);
+        if (!arrowState || !this.arrows[key]) continue;
+        arrowState.x = this.arrows[key].getBody().position.x;
+        arrowState.y = this.arrows[key].getBody().position.y;
+      }
     });
   }
 
@@ -233,6 +317,22 @@ export class GameEngine {
       input,
       (anim) => (playerState.anim = anim)
     );
+
+    // Link archer: spawn arrow if requested
+    if (player.arrowRequested) {
+      player.arrowRequested = false;
+      const arrowId = `arrow_${sessionId}_${Date.now()}`;
+      const arrowBody = new ArrowBody(
+        arrowId,
+        sessionId,
+        this.world,
+        playerState.x,
+        playerState.y,
+        playerState.direction as any
+      );
+      this.arrows[arrowId] = arrowBody;
+      this.state.createArrow(arrowId, playerState.x, playerState.y, playerState.direction, sessionId);
+    }
   }
 
   /**
@@ -299,6 +399,7 @@ export class GameEngine {
     if (this.state.players.has(sessionId)) {
       this.state.players.delete(sessionId);
     }
+    delete this.players[sessionId];
     if (SERVER_CONFIG.debug) {
       const numberOfBodies = this.world.bodies.length;
       console.log(`[on left] Number of bodies in the world: ${numberOfBodies}`);
@@ -323,6 +424,16 @@ export class GameEngine {
 
   update(deltaTime: number): void {
     Matter.Engine.update(this.engine, deltaTime);
+
+    // Log entity counts every 5 seconds
+    this._logTimer += deltaTime;
+    if (this._logTimer >= 5000) {
+      this._logTimer = 0;
+      const playerCount = Object.keys(this.players).length;
+      const enemyCount  = Object.keys(this.enemies).length;
+      const arrowCount  = Object.keys(this.arrows).length;
+      console.log(`[Engine] players=${playerCount} enemies=${enemyCount} arrows=${arrowCount}`);
+    }
 
     // Player respawn at initial start position
     this.state.players.forEach((playerState, id) => {
@@ -368,6 +479,27 @@ export class GameEngine {
     for (const id of deadEnemyIds) {
       this.removeEnemy(id);
       this.onEnemyDeath();
+    }
+
+    // Decrement archer cooldowns
+    for (const id in this.players) {
+      const p = this.players[id];
+      if (p.arrowCooldown > 0) p.arrowCooldown -= deltaTime;
+    }
+
+    // Tick arrows — collect expired ones
+    for (const id in this.arrows) {
+      const expired = this.arrows[id].tick(deltaTime);
+      if (expired) this._arrowsToRemove.push(id);
+    }
+
+    // Remove arrows (from collision or max distance)
+    const toRemove = [...new Set(this._arrowsToRemove)];
+    this._arrowsToRemove = [];
+    for (const id of toRemove) {
+      this.arrows[id]?.remove();
+      delete this.arrows[id];
+      if (this.state.arrows.has(id)) this.state.arrows.delete(id);
     }
 
     for (const id in this.enemies) {

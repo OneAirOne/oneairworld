@@ -4,7 +4,7 @@ import { Player as PlayerState } from "../../rooms/schema/Player";
 import { Player } from "./player.body";
 import { COLLISION_CATEGORY } from "../engine.config";
 
-import { DIRECTION } from "../../../../shared/types";
+import { Characters, DIRECTION } from "../../../../shared/types";
 import { getCharCombatConfig } from "../../../../shared/shared.config";
 
 const HIT_BOX_CONFIG = {
@@ -20,6 +20,10 @@ export class SwordMan extends Player {
   private _hitBox: Matter.Body;
   private _hurtBox: Matter.Body;
   id: string;
+
+  // Archer (Link) arrow firing
+  arrowRequested: boolean = false;
+  arrowCooldown: number = 0;
 
   constructor(
     id: string,
@@ -50,7 +54,7 @@ export class SwordMan extends Player {
         isSensor: true,
         collisionFilter: {
           category: COLLISION_CATEGORY.PLAYER_HURT_BOX,
-          mask: COLLISION_CATEGORY.ENEMY_HIT_BOX,
+          mask: COLLISION_CATEGORY.ENEMY_HIT_BOX | COLLISION_CATEGORY.ARROW_HIT_BOX,
         },
       }
     );
@@ -65,7 +69,8 @@ export class SwordMan extends Player {
      */
     Matter.Events.on(engine, "afterUpdate", () => {
       const isAttacking = this?._playerState?.isAttacking ?? false;
-      this._hitBox.collisionFilter.mask = isAttacking ? ACTIVE_MASK : 0;
+      const isArcher = this?._playerState?.texture === Characters.LINK;
+      this._hitBox.collisionFilter.mask = (isAttacking && !isArcher) ? ACTIVE_MASK : 0;
 
       const x = this._body.position.x;
       const y = this._body.position.y;
