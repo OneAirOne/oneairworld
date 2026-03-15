@@ -1,7 +1,7 @@
 import Matter from "matter-js";
 
 import { Player as PlayerState } from "../../rooms/schema/Player";
-import { Player } from "./player.body";
+import { Player, PLAYER_CONFIG } from "./player.body";
 import { COLLISION_CATEGORY } from "../engine.config";
 
 import { Characters, DIRECTION } from "../../../../shared/types";
@@ -15,6 +15,7 @@ const HIT_BOX_CONFIG = {
   },
 };
 
+// TODO: create a base class for melee characters that handles the hitbox logic, and have SwordMan extend it. Archer (Link) will be a separate class that extends Player directly and has its own arrow logic, since the hitbox logic is different (active during arrow flight, not player attack)  
 export class SwordMan extends Player {
   protected _world: Matter.World;
   private _hitBox: Matter.Body;
@@ -88,6 +89,20 @@ export class SwordMan extends Player {
         Matter.Body.setPosition(this._hitBox, { x: x + cc.hitBoxOffsetRight, y: y + cc.hitBoxOffsetLRY });
       }
     });
+  }
+
+  /** Remove all bodies from the world without destroying them */
+  detachFromWorld() {
+    Matter.World.remove(this._world, [this._body, this._hitBox, this._hurtBox]);
+  }
+
+  /** Re-add all bodies to the world at a given position */
+  attachToWorld(x: number, y: number) {
+    Matter.Body.setPosition(this._body, { x, y });
+    Matter.Body.setVelocity(this._body, { x: 0, y: 0 });
+    Matter.Body.setStatic(this._body, false);
+    Matter.Body.setMass(this._body, PLAYER_CONFIG.mass);
+    Matter.World.add(this._world, [this._body, this._hitBox, this._hurtBox]);
   }
 
   /**

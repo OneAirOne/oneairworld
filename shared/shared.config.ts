@@ -83,16 +83,18 @@ export interface PnjConfig {
   offsetX: number;
   offsetY: number;
   visible: boolean;
-  isRobot?: boolean;
+  atlasKey?: string;
+  /** If set, player can interact with this PNJ (dialogue key in dialogues.json) */
+  dialogueId?: string;
 }
 
 export const PNJ_LIST: PnjConfig[] = [
-  { texture: "ghost",  spawnPoint: "pnj1", offsetX:  40, offsetY: 0, visible: true  },
+  { texture: "ghost",  spawnPoint: "pnj1", offsetX:  40, offsetY: 0, visible: true,  dialogueId: "ghost"  },
   { texture: "wizard", spawnPoint: "pnj9", offsetX:   0, offsetY: 0, visible: false },
-  { texture: "dino",   spawnPoint: "pnj1", offsetX:  0, offsetY: 0, visible: true  },
-  { texture: "wendy",  spawnPoint: "pnj1", offsetX: 20, offsetY: 0, visible: true  },
-  { texture: "john",   spawnPoint: "pnj1", offsetX: 55, offsetY: 0, visible: true  },
-  { texture: "robot",  spawnPoint: "pnj2", offsetX:   0, offsetY: 0, visible: true, isRobot: true },
+  { texture: "dino",   spawnPoint: "pnj1", offsetX:   0, offsetY: 0, visible: true  },
+  { texture: "wendy",  spawnPoint: "pnj1", offsetX:  20, offsetY: 0, visible: true  },
+  { texture: "john",   spawnPoint: "pnj1", offsetX:  55, offsetY: 0, visible: true  },
+  { texture: "robot",  spawnPoint: "pnj2", offsetX:   0, offsetY: 0, visible: true,  dialogueId: "robot"  },
 ];
 
 export const ARROW_CONFIG = {

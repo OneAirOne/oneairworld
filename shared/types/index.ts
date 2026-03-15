@@ -4,3 +4,4 @@ export * from "./room";
 export * from "./message";
 export * from "./inputPayload";
 export * from "./options";
+export * from "./zone";

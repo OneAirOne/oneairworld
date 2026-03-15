@@ -12,6 +12,7 @@ import {
   EnemyTextures,
   InputPayload,
   LauchOptions,
+  Zone,
 } from "../../../shared/types";
 import { createRectangle, getSpawnPoints, getTiledInfos } from "./bodies";
 import { SHARED_CONFIG, COMBAT_CONFIG, ARROW_CONFIG } from "../../../shared/shared.config";
@@ -33,6 +34,7 @@ export class GameEngine {
   private arrows: Record<string, ArrowBody> = {};
   private _arrowsToRemove: string[] = [];
   private _logTimer: number = 0;
+  private _savedRoadPositions: Record<string, { x: number; y: number }> = {};
   private spawnPoints: { x: number; y: number }[] = getSpawnPoints();
   private playerStart: { x: number; y: number } = getTiledInfos()?.start ?? { x: 0, y: 0 };
 
@@ -311,6 +313,9 @@ export class GameEngine {
 
     if (!player || !playerState) return;
 
+    // Skip physics processing for players not on the road
+    if (playerState.zone !== Zone.ROAD) return;
+
     processPlayerAction(
       player,
       playerState,
@@ -367,6 +372,27 @@ export class GameEngine {
     this.enemies[enemyState.id] = enemy;
   }
 
+  setPlayerZone(sessionId: string, zone: string) {
+    const player = this.players[sessionId];
+    const playerState = this.state.players.get(sessionId);
+    if (!player || !playerState) return;
+
+    const inRoad = zone === Zone.ROAD;
+
+    if (!inRoad) {
+      // Save current road position before detaching
+      this._savedRoadPositions[sessionId] = { x: playerState.x, y: playerState.y };
+      player.detachFromWorld();
+    } else {
+      // Restore at saved road position
+      const saved = this._savedRoadPositions[sessionId] ?? { x: playerState.x, y: playerState.y };
+      player.attachToWorld(saved.x, saved.y);
+      playerState.x = saved.x;
+      playerState.y = saved.y;
+      delete this._savedRoadPositions[sessionId];
+    }
+  }
+
   setPlayerSpeaking(sessionId: string, isSpeaking: boolean) {
     const player = this.players[sessionId];
     if (!player) return;
@@ -394,7 +420,13 @@ export class GameEngine {
    */
   removePLayer(sessionId: string) {
     const player = this.players[sessionId];
-    player.removePlayer();
+    const playerState = this.state.players.get(sessionId);
+
+    // If player disconnects while in an interior, bodies are already detached — skip removePlayer
+    if (playerState?.zone === Zone.ROAD) {
+      player.removePlayer();
+    }
+    delete this._savedRoadPositions[sessionId];
 
     if (this.state.players.has(sessionId)) {
       this.state.players.delete(sessionId);
@@ -425,6 +457,7 @@ export class GameEngine {
   update(deltaTime: number): void {
     Matter.Engine.update(this.engine, deltaTime);
 
+    // TODO: create a dedicated system for logging
     // Log entity counts every 5 seconds
     this._logTimer += deltaTime;
     if (this._logTimer >= 5000) {

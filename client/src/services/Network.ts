@@ -165,6 +165,10 @@ export class Network {
     this.room?.send(Message.UPDATE_PLAYER_SPEAKING, { isSpeaking });
   }
 
+  setZone(zone: string) {
+    this.room?.send(Message.UPDATE_PLAYER_ZONE, { zone });
+  }
+
   /**
    * Register event listener and call back function when a player updated
    */

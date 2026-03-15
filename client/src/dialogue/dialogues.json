@@ -1,4 +1,49 @@
 {
+  "ghost": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Boo ! ...Oh pardon, je ne voulais pas te faire peur. Je suis coincé ici depuis... longtemps.",
+        "choices": [
+          { "label": "Que s'est-il passé ?", "next": "story" },
+          { "label": "Tu as l'air triste.", "next": "sad" }
+        ]
+      },
+      "story": {
+        "text": "Je cherchais un développeur capable de me libérer. Quelqu'un qui comprend les systèmes complexes... Erwan peut-être ?",
+        "choices": [
+          { "label": "Je lui en parlerai.", "next": "hope" },
+          { "label": "Je ne sais pas.", "next": "doubt" }
+        ]
+      },
+      "sad": {
+        "text": "Un peu, oui. Mais ta visite me réchauffe le cœur... enfin, ce qu'il en reste.",
+        "choices": [
+          { "label": "Que puis-je faire ?", "next": "story" }
+        ]
+      },
+      "hope": {
+        "text": "Merci ! En attendant, veux-tu entrer voir mon repaire ?",
+        "choices": [
+          { "label": "Oui, j'entre !", "next": "enter" },
+          { "label": "Pas maintenant.", "next": "bye" }
+        ]
+      },
+      "enter": {
+        "text": "Bienvenue...",
+        "action": "enter_interior:interior_old_house",
+        "choices": []
+      },
+      "bye": {
+        "text": "Bonne chance là dehors.",
+        "choices": []
+      },
+      "doubt": {
+        "text": "C'est déjà bien d'être passé me voir. Bonne chance là dehors.",
+        "choices": []
+      }
+    }
+  },
   "robot": {
     "start": "intro",
     "nodes": {

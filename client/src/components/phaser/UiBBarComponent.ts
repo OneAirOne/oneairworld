@@ -55,14 +55,16 @@ export class UiBarComponent implements IComponent {
   update(dt: number) {
     if (!this._graphics) return;
 
+    const visible = (this._gameObject as any).visible ?? true;
+    this._graphics.setVisible(visible);
+    if (!visible) return;
+
     const percent =
       this._gameObject instanceof Player ? this._gameObject.life / 100 : 1;
 
     this.updateLifeBar(percent);
 
     this._graphics.x = this._gameObject.x - BAR_WIDHT / 2;
-
     this._graphics.y = this._gameObject.y - SHARED_CONFIG.SPRITE_SIZE - 10;
-    this._graphics;
   }
 }

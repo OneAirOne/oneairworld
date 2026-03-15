@@ -10,7 +10,8 @@ import { Arrow, ARROW_ANIM_KEYS } from "../characters/Arrow";
 
 // Others
 import { SCENES } from "./scene.config";
-import { createSpeakingBubble } from "./game.helpers";
+import { createSpeakingBubble, buildTilesets } from "./game.helpers";
+import { ROAD_MAP_CONFIG } from "./road.config";
 import CLIENT_CONFIG, { SERVER_DATA } from "client.config";
 
 // Components
@@ -26,17 +27,18 @@ import { phaserEvents, PhaserEvent } from "../events/eventManager";
 
 // Shared
 import type { IPlayer, IEnemy, IArrow } from "../../../shared/types";
-import { Anim } from "../../../shared/types";
+import { Anim, Zone } from "../../../shared/types";
 import {
   GAME_SCENE_LAYERS,
   TiledLayer,
   TiledObjectType,
 } from "../../../shared/map.config";
 import { SHARED_CONFIG, ENEMY_CONFIG, getCharCombatConfig, PNJ_LIST } from "../../../shared/shared.config";
+import { INTERIORS } from "./interior.config";
 
 const ROBOT_INTERACTION_RADIUS = 50;
 
-export class GameScene extends Phaser.Scene {
+export class Road extends Phaser.Scene {
   private network!: Network;
   private players = new Map<string, Player>();
   private myPlayer!: Player;
@@ -44,8 +46,7 @@ export class GameScene extends Phaser.Scene {
   private enemyDebugGraphics!: Phaser.GameObjects.Graphics;
   private enemies = new Map<string, Enemy>();
   private arrows = new Map<string, Arrow>();
-  private robotSprite: Phaser.GameObjects.Sprite | null = null;
-  private robotBubble: Phaser.GameObjects.Text | null = null;
+  private interactivePnjs: { sprite: Phaser.GameObjects.Sprite; bubble: Phaser.GameObjects.Text; dialogueId: string }[] = [];
   private dialogueManager = new DialogueManager();
 
   sceneMap!: Phaser.Tilemaps.Tilemap;
@@ -68,6 +69,12 @@ export class GameScene extends Phaser.Scene {
 
     // Update component after the scene loop
     this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.lateUpdate, this);
+
+    // Fade back in + restore local player when returning from an interior scene
+    this.events.on(Phaser.Scenes.Events.RESUME, () => {
+      this.cameras.main.fadeIn(400, 0, 0, 0);
+      this.myPlayer?.setVisible(true);
+    });
   }
 
   /**
@@ -77,54 +84,10 @@ export class GameScene extends Phaser.Scene {
 
   displayMap() {
     // Create Tilemap
-    this.sceneMap = this.make.tilemap({
-      key: CLIENT_CONFIG.MAP.TILE_MAP.NAME,
-    });
+    this.sceneMap = this.make.tilemap({ key: ROAD_MAP_CONFIG.mapKey });
 
-    // Create Tilesets
-    const LOGOS = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILE_SETS.LOGOS.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.LOGOS.NAME
-    );
-    const MODERN_CITY = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME
-    );
-    const CITY_JAP = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILE_SETS.CITY_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.CITY_JAP.NAME
-    );
-    const INTERIOR_JAP = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILE_SETS.INTERIOR_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.INTERIOR_JAP.NAME
-    );
-    const RURAL_JAP = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME
-    );
-    const ARCADE = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME
-    );
-    const OSAKA = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME
-    );
-    const TEST = this.sceneMap.addTilesetImage(
-      CLIENT_CONFIG.MAP.TILE_SETS.TEST.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.TEST.NAME
-    );
-
-    const tileSets = [
-      LOGOS,
-      MODERN_CITY,
-      CITY_JAP,
-      INTERIOR_JAP,
-      RURAL_JAP,
-      ARCADE,
-      OSAKA,
-      TEST,
-    ];
+    // Create Tilesets from config
+    const tileSets = buildTilesets(this.sceneMap, ROAD_MAP_CONFIG.tilesets);
 
     // Create layers
     GAME_SCENE_LAYERS.forEach((layer) => {
@@ -324,12 +287,12 @@ export class GameScene extends Phaser.Scene {
       const tiledObj = obj as unknown as { x: number; y: number; name: string };
       for (const pnj of PNJ_LIST) {
         if (tiledObj.name !== pnj.spawnPoint || !pnj.visible) continue;
-        const sprite = this.add.sprite(tiledObj.x + pnj.offsetX, tiledObj.y + pnj.offsetY, pnj.texture);
+        const sprite = this.add.sprite(tiledObj.x + pnj.offsetX, tiledObj.y + pnj.offsetY, pnj.atlasKey ?? pnj.texture);
         sprite.setDepth(1);
         sprite.play(PNJ_ANIM_KEYS[pnj.texture]);
-        if (pnj.isRobot) {
-          this.robotSprite = sprite;
-          this.robotBubble = createSpeakingBubble(this, sprite, 10, 14);
+        if (pnj.dialogueId) {
+          const bubble = createSpeakingBubble(this, sprite, 10, 14);
+          this.interactivePnjs.push({ sprite, bubble, dialogueId: pnj.dialogueId });
         }
       }
     });
@@ -371,6 +334,27 @@ export class GameScene extends Phaser.Scene {
         // because Phaser's rAF loop breaks the user-activation context.
         if (!this.sys.game.device.input.touch) {
           window.open("https://fr.linkedin.com/in/erwan-gilbert-b184241b", "_blank", "noopener,noreferrer");
+        }
+      }
+
+      // enter_interior:<zone>
+      if (action.startsWith("enter_interior:")) {
+        const zone = action.split(":")[1] as Zone;
+        if (INTERIORS[zone]) {
+          this.dialogueManager.close();
+          this.cameras.main.fadeOut(400, 0, 0, 0);
+          this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+            // Notify server + hide local sprite
+            this.network.setZone(zone);
+            this.myPlayer?.setVisible(false);
+
+            this.scene.launch(SCENES.INTERIOR, {
+              zone,
+              playerTexture: this.myPlayer?.texture.key ?? CLIENT_CONFIG.ACTIVE_PLAYER,
+              network: this.network,
+            });
+            this.scene.pause(SCENES.GAME);
+          });
         }
       }
     });
@@ -601,8 +585,13 @@ export class GameScene extends Phaser.Scene {
       this.myPlayer.update(field, value);
     } else {
       const player = this.players.get(id);
-
       if (!player) return;
+
+      // Hide/show other players based on their zone
+      if (field === SERVER_DATA.ZONE) {
+        player.setVisible(value === Zone.ROAD);
+        return;
+      }
 
       player.update(field, value);
     }
@@ -704,19 +693,21 @@ export class GameScene extends Phaser.Scene {
     // UPDATE ENEMIES
     this.updateEnemies();
 
-    // Robot interaction zone
-    if (this.robotSprite && this.robotBubble) {
+    // PNJ interaction zones
+    let nearestPnj: typeof this.interactivePnjs[0] | null = null;
+    for (const pnj of this.interactivePnjs) {
       const dist = Phaser.Math.Distance.Between(
         this.myPlayer.x, this.myPlayer.y,
-        this.robotSprite.x, this.robotSprite.y
+        pnj.sprite.x, pnj.sprite.y
       );
       const inZone = dist <= ROBOT_INTERACTION_RADIUS;
-      this.robotBubble.setVisible(inZone);
-      if (inZone) {
-        this.dialogueManager.enterZone("robot");
-      } else {
-        this.dialogueManager.leaveZone();
-      }
+      pnj.bubble.setVisible(inZone);
+      if (inZone) nearestPnj = pnj;
+    }
+    if (nearestPnj) {
+      this.dialogueManager.enterZone(nearestPnj.dialogueId);
+    } else {
+      this.dialogueManager.leaveZone();
     }
 
     // DEBUG: draw enemy bounding boxes

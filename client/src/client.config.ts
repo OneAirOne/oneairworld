@@ -1,32 +1,4 @@
-// @ts-ignore
-import PhaserAnimatedTiles from "phaser-animated-tiles/src/plugin/main";
-
-import { BootScene, BackgroundScene, GameScene, UIScene } from "scenes";
 import { Characters } from "../../shared/types";
-
-export const PHASER_CONFIG: Phaser.Types.Core.GameConfig = {
-  type: Phaser.AUTO,
-  parent: "game-container",
-  backgroundColor: "012622",
-  pixelArt: true,
-  width: window.innerWidth,
-  height: window.innerWidth,
-  scale: {
-    mode: Phaser.Scale.ScaleModes.RESIZE, // Place the player on center of screen with camera startFollow
-  },
-  // https://phaser.discourse.group/t/how-to-show-tilemap-animated-tiles-in-phaser-game/9972
-  plugins: {
-    scene: [
-      {
-        key: "animatedTiles",
-        plugin: PhaserAnimatedTiles,
-        start: true,
-        mapping: "animatedTiles",
-      },
-    ],
-  },
-  scene: [BootScene, BackgroundScene, GameScene, UIScene],
-};
 
 export enum SERVER_DATA {
   X = "x",
@@ -37,6 +9,7 @@ export enum SERVER_DATA {
   IS_ATTACKING = "isAttacking",
   IS_DEAD = "isDead",
   IS_SPEAKING = "isSpeaking",
+  ZONE = "zone",
 }
 
 const CLIENT_CONFIG = {

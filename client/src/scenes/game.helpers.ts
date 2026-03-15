@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { TilesetConfig } from "./road.config";
 
 // ---- Speaking bubble ----
 
@@ -50,6 +51,19 @@ ServerX ${options.lastServerX.toFixed(2)}, ClientX ${options.clientX.toFixed(2)}
 ServerY ${options.lastServerY.toFixed(2)} ClientY ${options.clientY.toFixed(
     2
   )}`;
+}
+
+/**
+ * Add tilesets to a tilemap from a config array.
+ * Returns the array of Phaser tilesets ready to pass to createLayer().
+ */
+export function buildTilesets(
+  map: Phaser.Tilemaps.Tilemap,
+  tilesets: TilesetConfig[]
+): Phaser.Tilemaps.Tileset[] {
+  return tilesets
+    .map((ts) => map.addTilesetImage(ts.name, ts.name))
+    .filter((ts): ts is Phaser.Tilemaps.Tileset => ts !== null);
 }
 
 export async function waitFor(time: number = 500): Promise<void> {

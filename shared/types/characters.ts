@@ -48,6 +48,7 @@ export interface IPlayer {
   isSpeaking: boolean;
   isCollided: boolean;
   collisionDirection: DIRECTION;
+  zone: string;
 
   inputQueue: any[];
 
