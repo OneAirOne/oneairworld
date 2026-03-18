@@ -76,10 +76,11 @@ export class Game extends Room<GameState> {
     });
 
     // Update player zone (road / interior_xxx)
+    // NOTE: do NOT update player.zone here — setPlayerZone reads the current zone
+    // to decide whether to save the road position, then updates it itself.
     this.onMessage(Message.UPDATE_PLAYER_ZONE, (client, data: { zone: string }) => {
       const player = this.state.players.get(client.sessionId);
       if (!player) return;
-      player.zone = data.zone;
       this.engine.setPlayerZone(client.sessionId, data.zone);
     });
 
