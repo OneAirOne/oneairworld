@@ -74,6 +74,8 @@ export default class ComponentService {
     while (this._queuedForStart.length > 0) {
       const component = this._queuedForStart.shift();
       if (component?.start) {
+        const go = (component as any)._gameObject ?? (component as any).gameObject;
+        if (go && !go.scene) continue; // game object was destroyed before start ran
         component.start();
       }
     }

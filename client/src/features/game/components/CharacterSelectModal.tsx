@@ -41,7 +41,7 @@ export function CharacterSelectModal({ onSelect }: Props) {
 
         <div className="flex justify-center">
           <PushButton disabled={!selected} onClick={() => selected && onSelect(selected)}>
-            Play
+            PLAY
           </PushButton>
         </div>
       </div>

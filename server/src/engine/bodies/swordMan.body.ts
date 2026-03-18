@@ -30,9 +30,11 @@ export class SwordMan extends Player {
     id: string,
     world: Matter.World,
     engine: Matter.Engine,
-    playerState: PlayerState
+    playerState: PlayerState,
+    spawnX: number = 0,
+    spawnY: number = 0,
   ) {
-    super(id, world, engine, playerState);
+    super(id, world, engine, playerState, spawnX, spawnY);
 
     const cc = getCharCombatConfig(playerState.texture);
 
@@ -96,8 +98,9 @@ export class SwordMan extends Player {
     Matter.World.remove(this._world, [this._body, this._hitBox, this._hurtBox]);
   }
 
-  /** Re-add all bodies to the world at a given position */
-  attachToWorld(x: number, y: number) {
+  /** Re-add all bodies to a (potentially new) zone world at a given position */
+  attachToWorld(world: Matter.World, x: number, y: number) {
+    this._world = world;
     Matter.Body.setPosition(this._body, { x, y });
     Matter.Body.setVelocity(this._body, { x: 0, y: 0 });
     Matter.Body.setStatic(this._body, false);

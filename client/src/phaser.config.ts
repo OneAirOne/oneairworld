@@ -9,7 +9,7 @@ export const PHASER_CONFIG: Phaser.Types.Core.GameConfig = {
   backgroundColor: "012622",
   pixelArt: true,
   width: window.innerWidth,
-  height: window.innerWidth,
+  height: window.innerHeight,
   scale: {
     mode: Phaser.Scale.ScaleModes.RESIZE,
   },

@@ -47,8 +47,8 @@ export class UiBarComponent implements IComponent {
   }
 
   start() {
-    const scene = this._scene ?? this._gameObject.scene;
-
+    const scene = this._scene ?? this._gameObject?.scene;
+    if (!scene) return;
     this._graphics = scene.add.graphics();
   }
 

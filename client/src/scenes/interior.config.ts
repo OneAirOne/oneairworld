@@ -1,4 +1,6 @@
 import { Zone } from "../../../shared/types";
+import type { LayerConfig } from "./road.config";
+import { TiledLayer } from "./road.config";
 
 export interface InteriorTileset {
   name: string;
@@ -17,6 +19,18 @@ export interface InteriorConfig {
   /** Optional label shown as the room title */
   label?: string;
 }
+
+export const INTERIOR_SCENE_LAYERS: LayerConfig[] = [
+  { name: TiledLayer.BEHIND },
+  { name: TiledLayer.GROUND },
+  { name: TiledLayer.BEHIND_STUFF,         depth: 1 },
+  { name: TiledLayer.STUFF_UNDER_PLAYER },
+  { name: TiledLayer.COLLIDE_UNDER_PLAYER },
+  { name: TiledLayer.STUFF_ABOVE_PLAYER,   depth: 1 },
+  { name: TiledLayer.COLLIDE_ABOVE_PLAYER, depth: 2 },
+  { name: TiledLayer.ABOVE,                depth: 3 },
+  { name: TiledLayer.ANIMATED,             depth: 10 },
+];
 
 export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
   [Zone.INTERIOR_OLD_HOUSE]: {
@@ -38,5 +52,16 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
     playerSpawn: { x: 128, y: 200 },
     returnSpawn: { x: 0, y: 0 },
     label: "Robot's lab",
+  },
+  [Zone.INTERIOR_ARCADE]: {
+    mapKey: "interior-arcade",
+    mapPath: "assets/map/interior-arcade.json",
+    tilesets: [
+      { name: "arcade",       path: "assets/map/arcade.png" },
+      { name: "interior-jap", path: "assets/map/interior-jap.png" },
+    ],
+    playerSpawn: { x: 128, y: 200 },
+    returnSpawn: { x: 0, y: 0 },
+    label: "Arcade",
   },
 };

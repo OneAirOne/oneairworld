@@ -38,6 +38,10 @@ export class Player extends Phaser.GameObjects.Sprite {
   };
   id: string;
   lastAnim: Anim = Anim.IDDLE_DOWN;
+
+  get characterId(): string {
+    return this._playerTexture;
+  }
   life: number = 100;
   isCollided: boolean = false;
   private _speakingBubble: Phaser.GameObjects.Text | null = null;
@@ -69,6 +73,10 @@ export class Player extends Phaser.GameObjects.Sprite {
 
     // Build anim key list from the character's own anim config
     this._animKeys = Object.values(getAnimConfig(texture)).map((a) => a.key);
+
+    // Play default idle animation immediately to avoid missing-texture placeholder on first render
+    const defaultKey = `${texture}${Anim.IDDLE_DOWN}`;
+    if (this.scene.anims.exists(defaultKey)) this.play(defaultKey, true);
 
     const isAttackAnim = (anim: Phaser.Animations.Animation) =>
       this._animKeys

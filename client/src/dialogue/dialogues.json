@@ -44,6 +44,34 @@
       }
     }
   },
+  "dino": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Yo ! T'as vu la nouvelle salle arcade ? J'y passe toutes mes nuits.",
+        "choices": [
+          { "label": "Je peux entrer ?", "next": "enter_ask" },
+          { "label": "Cool, bonne session.", "next": "bye" }
+        ]
+      },
+      "enter_ask": {
+        "text": "Bien sûr ! Les machines t'attendent.",
+        "choices": [
+          { "label": "J'y vais !", "next": "enter" },
+          { "label": "Peut-être une prochaine fois.", "next": "bye" }
+        ]
+      },
+      "enter": {
+        "text": "Amuse-toi bien !",
+        "action": "enter_interior:interior_arcade",
+        "choices": []
+      },
+      "bye": {
+        "text": "À plus !",
+        "choices": []
+      }
+    }
+  },
   "robot": {
     "start": "intro",
     "nodes": {

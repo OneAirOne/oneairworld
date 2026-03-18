@@ -23,8 +23,8 @@ const CLIENT_CONFIG = {
   DEBUG_LAYER: 7,
   MAP: {
     TILE_MAP: {
-      NAME: "map",
-      PAHT: `assets/map/map.json`,
+      NAME: "road",
+      PAHT: `assets/map/road.json`,
     },
     TILE_SETS: {
       LOGOS: {
@@ -54,6 +54,10 @@ const CLIENT_CONFIG = {
       OSAKA: {
         NAME: "osaka",
         PATH: "assets/map/osaka.png",
+      },
+      PUNK: {
+        NAME: "punk",
+        PATH: "assets/map/punk.png",
       },
       TEST: {
         NAME: "test",

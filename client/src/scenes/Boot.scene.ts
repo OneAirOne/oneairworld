@@ -79,6 +79,10 @@ export class BootScene extends Phaser.Scene {
       CLIENT_CONFIG.MAP.TILE_SETS.OSAKA.PATH
     );
     this.load.image(
+      CLIENT_CONFIG.MAP.TILE_SETS.PUNK.NAME,
+      CLIENT_CONFIG.MAP.TILE_SETS.PUNK.PATH
+    );
+    this.load.image(
       CLIENT_CONFIG.MAP.TILE_SETS.TEST.NAME,
       CLIENT_CONFIG.MAP.TILE_SETS.TEST.PATH
     );

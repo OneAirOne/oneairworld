@@ -11,8 +11,11 @@ import { BootScene, SCENES } from "scenes";
 // Shared
 import { Characters } from "../../../../../shared/types";
 
+const FADE_DURATION = 500;
+
 export function StartGame() {
   const [visible, setVisible] = React.useState(true);
+  const [fading, setFading] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
   const mail = "gilberterwan@gmail.com";
 
@@ -22,6 +25,7 @@ export function StartGame() {
 
   const handleCharacterSelect = React.useCallback(async (character: Characters) => {
     setShowModal(false);
+    setFading(true);
     try {
       const bootScene = phaserGame.scene.keys[SCENES.BOOT] as BootScene;
       bootScene.launchGame();
@@ -32,13 +36,16 @@ export function StartGame() {
     } catch (error) {
       console.error(error);
     }
-    setVisible(false);
+    setTimeout(() => setVisible(false), FADE_DURATION);
   }, []);
 
   if (!visible) return null;
 
   return (
-    <div className="absolute inset-0 z-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center pointer-events-auto">
+    <div
+        className="absolute inset-0 z-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center pointer-events-auto"
+        style={{ transition: `opacity ${FADE_DURATION}ms ease`, opacity: fading ? 0 : 1 }}
+      >
       <div className="max-w-lg w-full px-8">
 
         {/* Avatar */}

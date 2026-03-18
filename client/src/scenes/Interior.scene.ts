@@ -1,10 +1,15 @@
 import Phaser from "phaser";
 import { SCENES } from "./scene.config";
-import { INTERIORS } from "./interior.config";
+import { INTERIORS, INTERIOR_SCENE_LAYERS } from "./interior.config";
 import { Network } from "../services/Network";
 import { Zone } from "../../../shared/types";
-
-const PLAYER_SPEED = 2;
+import { SERVER_DATA } from "client.config";
+import { Player } from "../characters/player";
+import { PlayerManager } from "./playerManager";
+import { Arrow } from "../characters/Arrow";
+import type { IArrow } from "../../../shared/types";
+import ComponentService from "../services/Component.service";
+import { UiBarComponent } from "../components/phaser";
 
 interface InitData {
   zone: Zone;
@@ -16,8 +21,17 @@ export class InteriorScene extends Phaser.Scene {
   private _zone!: Zone;
   private _playerTexture!: string;
   private _network!: Network;
-  private _player!: Phaser.GameObjects.Sprite;
-  private _cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private _playerManager!: PlayerManager;
+  private _onJoin!: Function;
+  private _onUpdate!: Function;
+  private _onLeave!: Function;
+  private _arrows = new Map<string, Arrow>();
+  private _onArrowJoin!: Function;
+  private _onArrowUpdated!: Function;
+  private _onArrowLeft!: Function;
+  private _components!: ComponentService;
+
+  private get _player(): Player { return this._playerManager?.myPlayer; }
 
   constructor() {
     super(SCENES.INTERIOR);
@@ -46,33 +60,109 @@ export class InteriorScene extends Phaser.Scene {
   create() {
     this.cameras.main.fadeIn(400, 0, 0, 0);
 
+    this._components = new ComponentService();
+    this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => this._components.destroy());
+    this.events.on(Phaser.Scenes.Events.POST_UPDATE, (time: number, delta: number) => this._components.update(delta));
+
+    // PlayerManager — shows other players in the same interior zone
+    this._playerManager = new PlayerManager(this, () => this._network.sessionId, {
+      isInCurrentZone: (zone) => zone === this._zone,
+      onOtherPlayerCreated: (player) => {
+        this._components.addComponent(player, new UiBarComponent());
+      },
+    });
+
+    this._onJoin   = (p: any, id: string) => this._playerManager.handleJoin(p, id);
+    this._onLeave  = (id: string) => this._playerManager.handleLeave(id);
+
+    // Handle zone changes: create sprite when entering, remove when leaving
+    this._onUpdate = (field: string, value: any, id: string) => {
+      if (field === SERVER_DATA.ZONE && id !== this._network.sessionId) {
+        if (value === this._zone) {
+          const p = this._network.getPlayers()?.get(id);
+          if (p) this._playerManager.handleJoin(p, id);
+        } else {
+          this._playerManager.handleLeave(id);
+        }
+        return;
+      }
+      this._playerManager.handleUpdate(field, value, id);
+    };
+
+    this._onArrowJoin = (arrow: IArrow, id: string) => {
+      const sprite = new Arrow(this, arrow.x, arrow.y, arrow.direction);
+      this._arrows.set(id, sprite);
+    };
+    this._onArrowUpdated = (field: string, value: number | string, id: string) => {
+      const arrow = this._arrows.get(id);
+      if (!arrow) return;
+      if (field === "x") arrow.x = value as number;
+      if (field === "y") arrow.y = value as number;
+    };
+    this._onArrowLeft = (id: string) => {
+      const arrow = this._arrows.get(id);
+      if (arrow) arrow.destroy();
+      this._arrows.delete(id);
+    };
+
+    this._network.onPlayerJoin(this._onJoin as any);
+    this._network.onPlayerUpdated(this._onUpdate as any);
+    this._network.onPlayerLeft(this._onLeave as any);
+    this._network.onArrowJoin(this._onArrowJoin as any);
+    this._network.onArrowUpdated(this._onArrowUpdated as any);
+    this._network.onArrowLeft(this._onArrowLeft as any);
+
     const config = INTERIORS[this._zone];
     if (!config || !this.cache.tilemap.has(config.mapKey)) {
       this._createPlaceholder();
       return;
     }
 
-    // --- Tilemap ---
+    // --- Tilemap (must be created before player sprites so depth-0 tiles sit below depth-0 players) ---
     const map = this.make.tilemap({ key: config.mapKey });
     const tilesets = config.tilesets.map((ts) =>
       map.addTilesetImage(ts.name, ts.name)
     );
-    map.layers.forEach((layerData) => {
-      map.createLayer(layerData.name, tilesets as Phaser.Tilemaps.Tileset[]);
+    INTERIOR_SCENE_LAYERS.forEach((layerConfig) => {
+      const layer = map.createLayer(layerConfig.name, tilesets as Phaser.Tilemaps.Tileset[]);
+      if (!layer) {
+        console.warn(`[Interior] createLayer returned null for layer: ${layerConfig.name}`);
+        return;
+      }
+      if (layerConfig.depth && layerConfig.depth > 0) {
+        layer.setDepth(layerConfig.depth);
+      }
     });
 
-    // --- Player sprite ---
-    this._player = this.add
-      .sprite(config.playerSpawn.x, config.playerSpawn.y, this._playerTexture)
-      .setDepth(1);
+    // @ts-ignore (PhaserAnimatedTiles types not defined)
+    this.animatedTiles.init(map);
 
-    this.cameras.main.startFollow(this._player, true);
+    // --- Spawn point from "info" layer, fallback to config ---
+    const infoLayer = map.getObjectLayer("info");
+    const startObj = infoLayer?.objects.find((o) => o.name === "start");
+    const spawnX = startObj?.x ?? config.playerSpawn.x;
+    const spawnY = startObj?.y ?? config.playerSpawn.y;
+
+    // --- Local player ---
+    const localPlayer = new Player(this, spawnX, spawnY, this._playerTexture, this._network.sessionId);
+    this._playerManager.setMyPlayer(localPlayer);
+    this._components.addComponent(localPlayer, new UiBarComponent());
+
+    // --- Sync other players already in this zone (after tilemap so insertion order is correct) ---
+    this._network.getPlayers()?.forEach((player, id) => {
+      if (player.zone === this._zone && id !== this._network.sessionId) {
+        this._playerManager.handleJoin(player, id);
+      }
+    });
+
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    this.cameras.main.startFollow(localPlayer, true);
     this.cameras.main.setZoom(2);
 
     // --- Label ---
     if (config.label) {
       this.add
-        .text(config.playerSpawn.x, config.playerSpawn.y - 40, config.label, {
+        .text(spawnX, spawnY - 40, config.label, {
           fontSize: "8px",
           color: "#ffffff99",
         })
@@ -80,7 +170,7 @@ export class InteriorScene extends Phaser.Scene {
         .setDepth(2);
     }
 
-    this._setupControls();
+    this.input.keyboard!.on("keydown-ESC", this._exit, this);
   }
 
   private _createPlaceholder() {
@@ -104,34 +194,35 @@ export class InteriorScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    this._setupControls();
-  }
-
-  private _setupControls() {
-    this._cursors = this.input.keyboard!.createCursorKeys();
     this.input.keyboard!.on("keydown-ESC", this._exit, this);
   }
 
   update() {
-    if (!this._player || !this._cursors) return;
+    if (!this._player) return;
 
-    let vx = 0;
-    let vy = 0;
-    if (this._cursors.left.isDown)  vx = -PLAYER_SPEED;
-    if (this._cursors.right.isDown) vx =  PLAYER_SPEED;
-    if (this._cursors.up.isDown)    vy = -PLAYER_SPEED;
-    if (this._cursors.down.isDown)  vy =  PLAYER_SPEED;
+    // Send inputs to server
+    const inputs = this._player.handleInput();
+    this._network.updatePlayer(inputs);
 
-    this._player.x += vx;
-    this._player.y += vy;
+    // Lerp local player from server state
+    this._playerManager.updateMyPlayer();
+
+    // Lerp other players from server state
+    this._playerManager.updateOtherPlayers();
   }
 
   private _exit() {
+    // Remove network listeners before leaving to avoid stale callbacks in Road
+    this._network?.offPlayerJoin(this._onJoin);
+    this._network?.offPlayerUpdated(this._onUpdate);
+    this._network?.offPlayerLeft(this._onLeave);
+    this._network?.offArrowJoin(this._onArrowJoin);
+    this._network?.offArrowUpdated(this._onArrowUpdated);
+    this._network?.offArrowLeft(this._onArrowLeft);
+
     this.cameras.main.fadeOut(400, 0, 0, 0);
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-      // Notify server: back on the road
       this._network?.setZone(Zone.ROAD);
-
       this.scene.resume(SCENES.GAME);
       this.scene.stop(SCENES.INTERIOR);
     });
