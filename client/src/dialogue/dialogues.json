@@ -72,6 +72,27 @@
       }
     }
   },
+  "exit_interior": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Voulez-vous sortir ?",
+        "choices": [
+          { "label": "Oui, je sors.", "next": "yes" },
+          { "label": "Non, je reste.", "next": "no" }
+        ]
+      },
+      "yes": {
+        "text": "À bientôt !",
+        "action": "exit_interior",
+        "choices": []
+      },
+      "no": {
+        "text": "Bonne session !",
+        "choices": []
+      }
+    }
+  },
   "robot": {
     "start": "intro",
     "nodes": {

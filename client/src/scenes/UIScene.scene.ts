@@ -59,6 +59,7 @@ export class UIScene extends Phaser.Scene {
   }
 
   create() {
+    this.scene.bringToTop();
     const W = this.scale.width;
     const H = this.scale.height;
     this.boxY = H - DIALOGUE_BOX_HEIGHT - DIALOGUE_BOX_MARGIN;
@@ -131,6 +132,8 @@ export class UIScene extends Phaser.Scene {
       this.dialogueHint.setText(choices.length === 0 ? "Fermer ✕" : "Entrée ▶").setVisible(true);
       this._renderChoices(choices, 0);
       this._syncMobileButtons();
+      // Always render UI on top of every other scene
+      this.scene.bringToTop();
     };
 
     const onNavigate = ({ selectedIndex }: DialogueNavigatePayload) => {

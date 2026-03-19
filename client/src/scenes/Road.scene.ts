@@ -47,6 +47,7 @@ export class Road extends Phaser.Scene {
   private arrows = new Map<string, Arrow>();
   private interactivePnjs: { sprite: Phaser.GameObjects.Sprite; bubble: Phaser.GameObjects.Text; dialogueId: string }[] = [];
   private dialogueManager = new DialogueManager();
+  private _pnjCooldown = false;
 
   sceneMap!: Phaser.Tilemaps.Tilemap;
   lastServerX: number = 0;
@@ -71,8 +72,19 @@ export class Road extends Phaser.Scene {
 
     // Fade back in + restore local player when returning from an interior scene
     this.events.on(Phaser.Scenes.Events.RESUME, () => {
-      this.cameras.main.fadeIn(400, 0, 0, 0);
+      // Reset dialogue state and block PNJ detection briefly
+      this.dialogueManager.leaveZone();
+      this._pnjCooldown = true;
+      this.time.delayedCall(1200, () => { this._pnjCooldown = false; });
       this.myPlayer?.setVisible(true);
+      // Snap player to last known road position so there's no lerp slide-in
+      if (this.myPlayer && this.lastServerX && this.lastServerY) {
+        this.myPlayer.x = this.lastServerX;
+        this.myPlayer.y = this.lastServerY;
+        this.myPlayer.setData(SERVER_DATA.X, this.lastServerX);
+        this.myPlayer.setData(SERVER_DATA.Y, this.lastServerY);
+      }
+      this.cameras.main.fadeIn(400, 0, 0, 0);
       showSceneTitle(this, "Road");
     });
   }
@@ -149,12 +161,7 @@ export class Road extends Phaser.Scene {
    * Create and initialize the scene
    */
   create(data: { network: Network }) {
-    // Fade in
-    this.cameras.main.fadeIn(1200, 0, 0, 0);
-
     this.displayMap();
-
-    showSceneTitle(this, "Road");
 
     // UI
     this.scene.run(SCENES.UI);
@@ -177,6 +184,9 @@ export class Road extends Phaser.Scene {
         if (CLIENT_CONFIG.DEBUG) {
           this.components.addComponent(player, new DebugPlayer(this.scene.get(SCENES.UI)));
         }
+        // Fade in only now: player is at correct spawn position
+        this.cameras.main.fadeIn(1200, 0, 0, 0);
+        showSceneTitle(this, "Road");
       },
       onOtherPlayerCreated: (player) => {
         this.components.addComponent(player, new UiBarComponent());
@@ -624,14 +634,14 @@ export class Road extends Phaser.Scene {
     // UPDATE ENEMIES
     this.updateEnemies();
 
-    // PNJ interaction zones
+    // PNJ interaction zones (skipped during cooldown after returning from interior)
     let nearestPnj: typeof this.interactivePnjs[0] | null = null;
     for (const pnj of this.interactivePnjs) {
       const dist = Phaser.Math.Distance.Between(
         this.myPlayer.x, this.myPlayer.y,
         pnj.sprite.x, pnj.sprite.y
       );
-      const inZone = dist <= ROBOT_INTERACTION_RADIUS;
+      const inZone = !this._pnjCooldown && dist <= ROBOT_INTERACTION_RADIUS;
       pnj.bubble.setVisible(inZone);
       if (inZone) nearestPnj = pnj;
     }
