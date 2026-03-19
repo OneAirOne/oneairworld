@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="47" nextobjectid="68">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="47" nextobjectid="70">
  <editorsettings>
   <export target="road.json" format="json"/>
  </editorsettings>
@@ -260911,19 +260911,19 @@
 </data>
  </layer>
  <objectgroup id="35" name="info">
-  <object id="48" name="pnj3" x="822.262" y="288.561">
+  <object id="48" name="pnj3" x="760.497" y="271.649">
    <point/>
   </object>
   <object id="59" name="start" x="463.121" y="319.858">
    <point/>
   </object>
-  <object id="61" name="pnj1" x="499.022" y="307.801">
+  <object id="61" name="pnj1" x="482.11" y="325.448">
    <point/>
   </object>
-  <object id="62" name="pnj2" x="632.384" y="267.201">
+  <object id="62" name="pnj2" x="633.119" y="249.554">
    <point/>
   </object>
-  <object id="63" name="pnj4" x="534.043" y="478.723">
+  <object id="63" name="pnj4" x="530.367" y="490.488">
    <point/>
   </object>
   <object id="64" name="pnj5" x="980.851" y="136.17">
@@ -260936,6 +260936,9 @@
    <point/>
   </object>
   <object id="67" name="pnj8" x="143.262" y="76.5957">
+   <point/>
+  </object>
+  <object id="68" name="maisonErwan" x="432.353" y="252.206">
    <point/>
   </object>
  </objectgroup>

@@ -323,8 +323,10 @@ export class Road extends Phaser.Scene {
         sprite.setDepth(1);
         sprite.play(PNJ_ANIM_KEYS[pnj.texture]);
         if (pnj.dialogueId) {
+          const isTouch = this.sys.game.device.input.touch;
+          const dialogueId = (!isTouch && pnj.dialogueIdDesktop) ? pnj.dialogueIdDesktop : pnj.dialogueId;
           const bubble = createSpeakingBubble(this, sprite, pnj.bubbleOffsetX ?? 10, pnj.bubbleOffsetY ?? 14);
-          this.interactivePnjs.push({ sprite, bubble, dialogueId: pnj.dialogueId });
+          this.interactivePnjs.push({ sprite, bubble, dialogueId });
         }
       }
     });

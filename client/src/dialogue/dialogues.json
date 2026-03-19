@@ -3,43 +3,51 @@
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "Boo ! ...Oh pardon, je ne voulais pas te faire peur. Je suis coincé ici depuis... longtemps.",
+        "text": "Je hante ce lieu depuis le tout début du projet d'Erwan. Si tu veux en savoir plus sur lui, va parler à Wendy — elle gère la salle d'arcade juste à côté. Tu ne le regretteras pas !",
         "choices": [
-          { "label": "Que s'est-il passé ?", "next": "story" },
-          { "label": "Tu as l'air triste.", "next": "sad" }
+          { "label": "J'y vais !", "next": "bye" },
+          { "label": "Merci du conseil.", "next": "bye" }
         ]
       },
-      "story": {
-        "text": "Je cherchais un développeur capable de me libérer. Quelqu'un qui comprend les systèmes complexes... Erwan peut-être ?",
+      "bye": {
+        "text": "Bonne visite... et méfie-toi des slimes.",
+        "choices": []
+      }
+    }
+  },
+  "ghost_pc": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Je hante ce lieu depuis le tout début du projet d'Erwan. Si tu veux en savoir plus sur lui, va parler à Wendy — elle gère la salle d'arcade juste à côté.",
         "choices": [
-          { "label": "Je lui en parlerai.", "next": "hope" },
-          { "label": "Je ne sais pas.", "next": "doubt" }
+          { "label": "J'y vais !", "next": "bye" },
+          { "label": "Merci du conseil.", "next": "bye" }
         ]
       },
-      "sad": {
-        "text": "Un peu, oui. Mais ta visite me réchauffe le cœur... enfin, ce qu'il en reste.",
-        "choices": [
-          { "label": "Que puis-je faire ?", "next": "story" }
-        ]
-      },
-      "hope": {
-        "text": "Merci ! En attendant, veux-tu entrer voir mon repaire ?",
+      "bye": {
+        "text": "Bonne visite... et méfie-toi des slimes. Tu peux les attaquer avec la touche Espace !",
+        "choices": []
+      }
+    }
+  },
+  "wendy": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Bienvenue ! Je gère cette salle d'arcade. À l'intérieur tu trouveras les projets d'Erwan — il a tout présenté là-dedans. Tu veux jeter un œil ?",
         "choices": [
           { "label": "Oui, j'entre !", "next": "enter" },
           { "label": "Pas maintenant.", "next": "bye" }
         ]
       },
       "enter": {
-        "text": "Bienvenue...",
-        "action": "enter_interior:interior_old_house",
+        "text": "Entre, prends ton temps. Il y a de belles choses à découvrir.",
+        "action": "enter_interior:interior_arcade",
         "choices": []
       },
       "bye": {
-        "text": "Bonne chance là dehors.",
-        "choices": []
-      },
-      "doubt": {
-        "text": "C'est déjà bien d'être passé me voir. Bonne chance là dehors.",
+        "text": "Pas de souci, la salle reste ouverte.",
         "choices": []
       }
     }
@@ -48,26 +56,20 @@
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "Yo ! T'as vu la nouvelle salle arcade ? J'y passe toutes mes nuits.",
+        "text": "RAWRRR ! Bienvenue chez TacoRex ! Les meilleurs tacos de la ville, préparés avec amour... et quelques épices secrètes.",
         "choices": [
-          { "label": "Je peux entrer ?", "next": "enter_ask" },
-          { "label": "Cool, bonne session.", "next": "bye" }
+          { "label": "Ça sent drôlement bon !", "next": "smell" },
+          { "label": "Je reviendrai plus tard.", "next": "bye" }
         ]
       },
-      "enter_ask": {
-        "text": "Bien sûr ! Les machines t'attendent.",
+      "smell": {
+        "text": "C'est notre recette spéciale dino ! Inchangée depuis 65 millions d'années.",
         "choices": [
-          { "label": "J'y vais !", "next": "enter" },
-          { "label": "Peut-être une prochaine fois.", "next": "bye" }
+          { "label": "Impressionnant.", "next": "bye" }
         ]
-      },
-      "enter": {
-        "text": "Amuse-toi bien !",
-        "action": "enter_interior:interior_arcade",
-        "choices": []
       },
       "bye": {
-        "text": "À plus !",
+        "text": "À bientôt chez TacoRex !",
         "choices": []
       }
     }
@@ -97,26 +99,19 @@
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "Hello compagnon, tu viens pour parler du jeune développeur Erwan ?",
+        "text": "Bonjour ! Si tu veux en savoir plus sur le parcours d'Erwan — ses expériences, ses compétences, ses ambitions — son LinkedIn est la meilleure ressource. Tu veux que je t'y emmène ?",
         "choices": [
-          { "label": "Oui", "next": "linkedin_question" },
-          { "label": "Non", "next": "no" }
-        ]
-      },
-      "linkedin_question": {
-        "text": "Erwan est un développeur passionné et curieux ! Veux-tu visiter son LinkedIn ?",
-        "choices": [
-          { "label": "Oui", "next": "linkedin_open" },
-          { "label": "Non", "next": "no" }
+          { "label": "Oui, allons-y !", "next": "linkedin_open" },
+          { "label": "Non merci.", "next": "no" }
         ]
       },
       "linkedin_open": {
-        "text": "Super ! Bonne visite :)",
+        "text": "Parfait. Tu y trouveras tout son parcours professionnel. Bonne visite !",
         "action": "open_linkedin",
         "choices": []
       },
       "no": {
-        "text": "Ah ok... et bien débarrasse moi de tous ces slimes s'il te plaît :)",
+        "text": "Pas de problème. Tu sais où me trouver si tu changes d'avis.",
         "choices": []
       }
     }

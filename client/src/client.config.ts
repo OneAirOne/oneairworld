@@ -58,11 +58,7 @@ const CLIENT_CONFIG = {
       PUNK: {
         NAME: "punk",
         PATH: "assets/map/punk.png",
-      },
-      TEST: {
-        NAME: "test",
-        PATH: "assets/map/test.png",
-      },
+      }
     },
   },
   CHARACTERS: {

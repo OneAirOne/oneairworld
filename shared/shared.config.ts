@@ -86,17 +86,19 @@ export interface PnjConfig {
   atlasKey?: string;
   /** If set, player can interact with this PNJ (dialogue key in dialogues.json) */
   dialogueId?: string;
+  /** Override dialogueId on non-touch (desktop) devices */
+  dialogueIdDesktop?: string;
   /** Bubble offset relative to sprite (defaults to 10, 14) */
   bubbleOffsetX?: number;
   bubbleOffsetY?: number;
 }
 
 export const PNJ_LIST: PnjConfig[] = [
-  { texture: "ghost",  spawnPoint: "pnj1", offsetX:  40, offsetY: 0, visible: true,  dialogueId: "ghost"  },
+  { texture: "ghost",  spawnPoint: "pnj1", offsetX:  0, offsetY: 0, visible: true,  dialogueId: "ghost", dialogueIdDesktop: "ghost_pc", bubbleOffsetX: 10, bubbleOffsetY: 5 },
   { texture: "wizard", spawnPoint: "pnj9", offsetX:   0, offsetY: 0, visible: false },
-  { texture: "dino",   spawnPoint: "pnj2", offsetX:   0, offsetY: 0, visible: true, dialogueId: "dino", bubbleOffsetX: 10, bubbleOffsetY: 5 },
-  { texture: "wendy",  spawnPoint: "pnj1", offsetX:  20, offsetY: 0, visible: true  },
-  { texture: "john",   spawnPoint: "pnj1", offsetX:  55, offsetY: 0, visible: true  },
+  { texture: "wendy",  spawnPoint: "pnj2", offsetX:   0, offsetY: 0, visible: true, dialogueId: "wendy", bubbleOffsetX: 10, bubbleOffsetY: 15 },
+  { texture: "dino",   spawnPoint: "pnj4", offsetX:   0, offsetY: 0, visible: true, dialogueId: "dino" },
+  { texture: "john",   spawnPoint: "pnj7", offsetX:   0, offsetY: 0, visible: true  },
   { texture: "robot",  spawnPoint: "pnj3", offsetX:   0, offsetY: 0, visible: true,  dialogueId: "robot"  },
 ];
 

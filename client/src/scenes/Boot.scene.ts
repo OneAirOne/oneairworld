@@ -89,10 +89,6 @@ export class BootScene extends Phaser.Scene {
       CLIENT_CONFIG.MAP.TILE_SETS.PUNK.NAME,
       CLIENT_CONFIG.MAP.TILE_SETS.PUNK.PATH
     );
-    this.load.image(
-      CLIENT_CONFIG.MAP.TILE_SETS.TEST.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.TEST.PATH
-    );
 
     // Load Tilemap
     this.load.tilemapTiledJSON(
@@ -185,7 +181,7 @@ export class BootScene extends Phaser.Scene {
     const tilesets = [
       MAP.TILE_SETS.LOGOS, MAP.TILE_SETS.MODERN_CITY, MAP.TILE_SETS.CITY_JAP,
       MAP.TILE_SETS.INTERIOR_JAP, MAP.TILE_SETS.RURAL_JAP, MAP.TILE_SETS.ARCADE,
-      MAP.TILE_SETS.OSAKA, MAP.TILE_SETS.PUNK, MAP.TILE_SETS.TEST,
+      MAP.TILE_SETS.OSAKA, MAP.TILE_SETS.PUNK,
     ];
     const ts = tilesets.find((t) => t.NAME === key);
     if (ts) { this.load.image(ts.NAME, ts.PATH); return; }
