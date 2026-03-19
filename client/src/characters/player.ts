@@ -2,8 +2,10 @@ import Phaser from "phaser";
 
 import { SERVER_DATA } from "client.config";
 
-import { Anim, InputPayload } from "../../../shared/types";
-import { anims } from "characters";
+import { Anim, Characters, InputPayload } from "../../../shared/types";
+import { animOneAir } from "./anims/oneair.anims";
+import { animTimothee } from "./anims/timothee.anims";
+import { animLink } from "./anims/link.anims";
 import { getBubblePosition, createSpeakingBubble } from "../scenes/game.helpers";
 import { mobileInput } from "../input/mobileInput";
 
@@ -13,6 +15,12 @@ const INTERPOLATION_PERCENT = 0.2;
 const ANIM_SUFFIX_ATTACK = "Attack";
 const ANIM_SUFFIX_HIT = "Hit";
 
+function getAnimConfig(texture: string) {
+  if (texture === Characters.TIMOTHEE) return animTimothee;
+  if (texture === Characters.LINK)     return animLink;
+  return animOneAir;
+}
+
 /* ---------------------------------- Class --------------------------------- */
 
 export class Player extends Phaser.GameObjects.Sprite {
@@ -20,6 +28,7 @@ export class Player extends Phaser.GameObjects.Sprite {
   private _cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   private _animKeys: string[] = [];
   private _canUpdateAnim: boolean = true;
+  private _isDying: boolean = false;
   private _inputPayload: InputPayload = {
     left: false,
     right: false,
@@ -29,6 +38,10 @@ export class Player extends Phaser.GameObjects.Sprite {
   };
   id: string;
   lastAnim: Anim = Anim.IDDLE_DOWN;
+
+  get characterId(): string {
+    return this._playerTexture;
+  }
   life: number = 100;
   isCollided: boolean = false;
   private _speakingBubble: Phaser.GameObjects.Text | null = null;
@@ -45,51 +58,52 @@ export class Player extends Phaser.GameObjects.Sprite {
     super(scene, x, y, texture);
 
     this.scene.add.existing(this);
-    this.scene as Phaser.Scene;
     this.id = id;
     this._playerTexture = texture;
+
+    if (texture === Characters.ONEAIR || texture === Characters.LINK) {
+      this.setScale(1.1);
+    }
+
     if (this.scene) {
       this._cursors = this.scene!.input!.keyboard!.createCursorKeys();
     } else {
       throw new Error("Scene is not initialized");
     }
 
-    this._animKeys = Object.keys(anims.animOneAir).map(
-      (key) => anims.animOneAir[key].key
-    );
-    const isAttackAnim = (anim: Phaser.Animations.Animation) => {
-      return this._animKeys
+    // Build anim key list from the character's own anim config
+    this._animKeys = Object.values(getAnimConfig(texture)).map((a) => a.key);
+
+    // Play default idle animation immediately to avoid missing-texture placeholder on first render
+    const defaultKey = `${texture}${Anim.IDDLE_DOWN}`;
+    if (this.scene.anims.exists(defaultKey)) this.play(defaultKey, true);
+
+    const isAttackAnim = (anim: Phaser.Animations.Animation) =>
+      this._animKeys
         .filter((key) => key.endsWith(ANIM_SUFFIX_ATTACK))
         .includes(anim?.key || "");
-    };
-    const isHitAnim = (anim: Phaser.Animations.Animation) => {
-      return this._animKeys
+
+    const isHitAnim = (anim: Phaser.Animations.Animation) =>
+      this._animKeys
         .filter((key) => key.endsWith(ANIM_SUFFIX_HIT))
         .includes(anim?.key || "");
-    };
 
-    // Block anims when attack animation START
+    // Block anim updates while an attack or hit animation plays
     this.on(
       Phaser.Animations.Events.ANIMATION_START,
       (anim: Phaser.Animations.Animation) => {
-        if (isAttackAnim(anim)) {
-          this._canUpdateAnim = false;
-        }
-
-        if (isHitAnim(anim)) {
+        if (isAttackAnim(anim) || isHitAnim(anim)) {
           this._canUpdateAnim = false;
         }
       }
     );
 
-    // Release anims when attack animation COMPLETE
+    // Unblock when attack / hit animation completes (not for death)
     this.on(
       Phaser.Animations.Events.ANIMATION_COMPLETE,
       (anim: Phaser.Animations.Animation) => {
-        if (isAttackAnim(anim)) {
-          this._canUpdateAnim = true;
-        }
-        if (isHitAnim(anim)) {
+        if (this._isDying) return; // death anim handles its own cleanup
+        if (isAttackAnim(anim) || isHitAnim(anim)) {
           this._canUpdateAnim = true;
         }
       }
@@ -100,6 +114,11 @@ export class Player extends Phaser.GameObjects.Sprite {
    * Synx player input payload with phaser cursors
    */
   handleInput(): InputPayload {
+    // Block all input while death animation is playing
+    if (this._isDying) {
+      return { left: false, right: false, up: false, down: false, space: false };
+    }
+
     this._inputPayload.left  = this._cursors.left.isDown  || mobileInput.left;
     this._inputPayload.right = this._cursors.right.isDown || mobileInput.right;
     this._inputPayload.up    = this._cursors.up.isDown    || mobileInput.up;
@@ -118,6 +137,10 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.life = newLife;
   }
 
+  /**
+   * Play the hit animation only if the character has one.
+   * (e.g. timothee has no hit anims → skipped gracefully)
+   */
   private _playHitAnim() {
     const directionToHit: Partial<Record<Anim, Anim>> = {
       [Anim.UP]: Anim.HIT_UP, [Anim.IDDLE_UP]: Anim.HIT_UP, [Anim.ATTACK_UP]: Anim.HIT_UP,
@@ -126,8 +149,27 @@ export class Player extends Phaser.GameObjects.Sprite {
       [Anim.RIGHT]: Anim.HIT_RIGHT, [Anim.IDDLE_RIGHT]: Anim.HIT_RIGHT, [Anim.ATTACK_RIGHT]: Anim.HIT_RIGHT,
     };
     const hitAnim = directionToHit[this.lastAnim] ?? Anim.HIT_DOWN;
+    const key = `${this._playerTexture}${hitAnim}`;
+    if (!this.scene.anims.exists(key)) return; // character has no hit anims
     this._canUpdateAnim = false;
-    this.play(`${this._playerTexture}${hitAnim}`, true);
+    this.play(key, true);
+  }
+
+  /**
+   * Play the death animation if the character has one, then unblock.
+   * Position lerp and inputs are frozen until the anim completes.
+   * (e.g. oneair has no dead anim → skipped gracefully)
+   */
+  private _playDeathAnim() {
+    const key = `${this._playerTexture}${Anim.DEAD}`;
+    if (!this.scene.anims.exists(key)) return; // character has no dead anim
+    this._isDying = true;
+    this._canUpdateAnim = false;
+    this.play(key, false);
+    this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+      this._isDying = false;
+      this._canUpdateAnim = true;
+    });
   }
 
   private _flashOnHit() {
@@ -139,7 +181,7 @@ export class Player extends Phaser.GameObjects.Sprite {
       callback: () => {
         flashes++;
         if (flashes % 2 === 1) {
-          this.setTint(0xffffff);
+          this.setTintFill(0xffffff);
         } else {
           this.clearTint();
         }
@@ -178,45 +220,26 @@ export class Player extends Phaser.GameObjects.Sprite {
     }
   }
 
-  /**
-   * Fonction called by the update loop of the scene
-   * to update the position X
-   */
   lerpPositionX(x: number) {
+    if (this._isDying) return; // freeze position during death anim
     this.x = Phaser.Math.Linear(this.x, x, INTERPOLATION_PERCENT);
   }
 
-  /**
-   * Fonction called by the update loop of the scene
-   * to update the position Y
-   */
   lerpPositionY(y: number) {
+    if (this._isDying) return;
     this.y = Phaser.Math.Linear(this.y, y, INTERPOLATION_PERCENT);
   }
 
-  /**
-   * Update sprite animation according to the direction
-   */
   updateAnim(value: Anim) {
     if (this._canUpdateAnim) {
-      this.play(`${this._playerTexture}${value}`, true);
+      const key = `${this._playerTexture}${value}`;
+      if (this.scene.anims.exists(key)) {
+        this.play(key, true);
+      }
     }
-
     this.lastAnim = value;
   }
 
-  /**
-   * Update player
-   *
-   * Interpolation method is applied :
-   *
-   * Colyseus sends state updates to the client at every 50ms (20fps)
-   * Client-side re-renders at every 16.6ms (60fps).
-   *
-   * Key-value are stored with "setData" and sync later in the scene loop
-   *
-   * Credits: https://learn.colyseus.io/phaser/2-linear-interpolation.html
-   */
   update(field: string, value: number | string | boolean): void {
     switch (field) {
       case SERVER_DATA.X:
@@ -244,6 +267,9 @@ export class Player extends Phaser.GameObjects.Sprite {
         break;
       case SERVER_DATA.IS_ATTACKING:
         this.setData(SERVER_DATA.IS_ATTACKING, value);
+        break;
+      case SERVER_DATA.IS_DEAD:
+        if (value === true) this._playDeathAnim();
         break;
       case SERVER_DATA.IS_SPEAKING:
         if (value) {

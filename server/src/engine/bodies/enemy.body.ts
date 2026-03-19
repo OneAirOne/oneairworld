@@ -48,6 +48,10 @@ export class Enemy {
   attackDamageDealt: boolean = false;
   attackLungeVx: number = 0;
   attackLungeVy: number = 0;
+  attackOriginX: number = 0;
+  attackOriginY: number = 0;
+  attackTargetX: number = 0;
+  attackTargetY: number = 0;
   knockbackTimer: number = 0;
   private _directionTimer: number = 0;
   private _directionInterval: number =

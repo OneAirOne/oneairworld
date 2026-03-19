@@ -1,5 +1,6 @@
 export enum Characters {
   ONEAIR = "oneair",
+  TIMOTHEE = "timothee",
   LINK = "link",
   FLUPPY = "fluppy",
   SLIME = "slime",
@@ -47,6 +48,7 @@ export interface IPlayer {
   isSpeaking: boolean;
   isCollided: boolean;
   collisionDirection: DIRECTION;
+  zone: string;
 
   inputQueue: any[];
 
@@ -67,6 +69,14 @@ export interface IEnemy {
   collisionDirection: DIRECTION;
 
   decreaseLife: () => void;
+}
+
+export interface IArrow {
+  id: string;
+  x: number;
+  y: number;
+  direction: string;
+  ownerId: string;
 }
 
 export const PLAYER_VELOCITY = 2;

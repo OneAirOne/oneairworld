@@ -1,31 +1,4 @@
-// @ts-ignore
-import PhaserAnimatedTiles from "phaser-animated-tiles/src/plugin/main";
-
-import { BootScene, BackgroundScene, GameScene, UIScene } from "scenes";
-
-export const PHASER_CONFIG: Phaser.Types.Core.GameConfig = {
-  type: Phaser.AUTO,
-  parent: "game-container",
-  backgroundColor: "012622",
-  pixelArt: true,
-  width: window.innerWidth,
-  height: window.innerWidth,
-  scale: {
-    mode: Phaser.Scale.ScaleModes.RESIZE, // Place the player on center of screen with camera startFollow
-  },
-  // https://phaser.discourse.group/t/how-to-show-tilemap-animated-tiles-in-phaser-game/9972
-  plugins: {
-    scene: [
-      {
-        key: "animatedTiles",
-        plugin: PhaserAnimatedTiles,
-        start: true,
-        mapping: "animatedTiles",
-      },
-    ],
-  },
-  scene: [BootScene, BackgroundScene, GameScene, UIScene],
-};
+import { Characters } from "../../shared/types";
 
 export enum SERVER_DATA {
   X = "x",
@@ -36,15 +9,22 @@ export enum SERVER_DATA {
   IS_ATTACKING = "isAttacking",
   IS_DEAD = "isDead",
   IS_SPEAKING = "isSpeaking",
+  ZONE = "zone",
 }
 
 const CLIENT_CONFIG = {
+  // ── Switch player character here ─────────────────────────────────────────
+  // Characters.ONEAIR  → hit anims ✓  dead anim ✗
+  // Characters.TIMOTHEE → hit anims ✗  dead anim ✓
+  // Characters.LINK    → archer, fires arrows instead of sword
+  ACTIVE_PLAYER: Characters.LINK,
+  // ─────────────────────────────────────────────────────────────────────────
   DEBUG: false,
   DEBUG_LAYER: 7,
   MAP: {
     TILE_MAP: {
-      NAME: "map",
-      PAHT: `assets/map/map.json`,
+      NAME: "road",
+      PAHT: `assets/map/road.json`,
     },
     TILE_SETS: {
       LOGOS: {
@@ -75,10 +55,10 @@ const CLIENT_CONFIG = {
         NAME: "osaka",
         PATH: "assets/map/osaka.png",
       },
-      TEST: {
-        NAME: "test",
-        PATH: "assets/map/test.png",
-      },
+      PUNK: {
+        NAME: "punk",
+        PATH: "assets/map/punk.png",
+      }
     },
   },
   CHARACTERS: {
@@ -104,6 +84,26 @@ const CLIENT_CONFIG = {
       NAME: "dino",
       SPRITE_SHEET_ATLAS_PATH: `assets/characters/dino.json`,
       SPRITE_SHEET_TEXTURE_PATH: `assets/characters/dino.png`,
+    },
+    TIMOTHEE: {
+      NAME: "timothee",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/timothee.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/timothee.png`,
+    },
+    GHOST: {
+      NAME: "ghost",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/ghost.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/ghost.png`,
+    },
+    WENDY: {
+      NAME: "wendy",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/wendy.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/wendy.png`,
+    },
+    JOHN: {
+      NAME: "john",
+      SPRITE_SHEET_ATLAS_PATH: `assets/characters/john.json`,
+      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/john.png`,
     },
   },
   ITEMS: {

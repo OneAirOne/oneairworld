@@ -1,28 +1,117 @@
 {
+  "ghost": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Je hante ce lieu depuis le tout début du projet d'Erwan. Si tu veux en savoir plus sur lui, va parler à Wendy — elle gère la salle d'arcade juste à côté. Tu ne le regretteras pas !",
+        "choices": [
+          { "label": "J'y vais !", "next": "bye" },
+          { "label": "Merci du conseil.", "next": "bye" }
+        ]
+      },
+      "bye": {
+        "text": "Bonne visite... et méfie-toi des slimes.",
+        "choices": []
+      }
+    }
+  },
+  "ghost_pc": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Je hante ce lieu depuis le tout début du projet d'Erwan. Si tu veux en savoir plus sur lui, va parler à Wendy — elle gère la salle d'arcade juste à côté.",
+        "choices": [
+          { "label": "J'y vais !", "next": "bye" },
+          { "label": "Merci du conseil.", "next": "bye" }
+        ]
+      },
+      "bye": {
+        "text": "Bonne visite... et méfie-toi des slimes. Tu peux les attaquer avec la touche Espace !",
+        "choices": []
+      }
+    }
+  },
+  "wendy": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Bienvenue ! Je gère cette salle d'arcade. À l'intérieur tu trouveras les projets d'Erwan — il a tout présenté là-dedans. Tu veux jeter un œil ?",
+        "choices": [
+          { "label": "Oui, j'entre !", "next": "enter" },
+          { "label": "Pas maintenant.", "next": "bye" }
+        ]
+      },
+      "enter": {
+        "text": "Entre, prends ton temps. Il y a de belles choses à découvrir.",
+        "action": "enter_interior:interior_arcade",
+        "choices": []
+      },
+      "bye": {
+        "text": "Pas de souci, la salle reste ouverte.",
+        "choices": []
+      }
+    }
+  },
+  "dino": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "RAWRRR ! Bienvenue chez TacoRex ! Les meilleurs tacos de la ville, préparés avec amour... et quelques épices secrètes.",
+        "choices": [
+          { "label": "Ça sent drôlement bon !", "next": "smell" },
+          { "label": "Je reviendrai plus tard.", "next": "bye" }
+        ]
+      },
+      "smell": {
+        "text": "C'est notre recette spéciale dino ! Inchangée depuis 65 millions d'années.",
+        "choices": [
+          { "label": "Impressionnant.", "next": "bye" }
+        ]
+      },
+      "bye": {
+        "text": "À bientôt chez TacoRex !",
+        "choices": []
+      }
+    }
+  },
+  "exit_interior": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Voulez-vous sortir ?",
+        "choices": [
+          { "label": "Oui, je sors.", "next": "yes" },
+          { "label": "Non, je reste.", "next": "no" }
+        ]
+      },
+      "yes": {
+        "text": "À bientôt !",
+        "action": "exit_interior",
+        "choices": []
+      },
+      "no": {
+        "text": "Bonne session !",
+        "choices": []
+      }
+    }
+  },
   "robot": {
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "Hello compagnon, tu viens pour parler du jeune développeur Erwan ?",
+        "text": "Bonjour ! Si tu veux en savoir plus sur le parcours d'Erwan — ses expériences, ses compétences, ses ambitions — son LinkedIn est la meilleure ressource. Tu veux que je t'y emmène ?",
         "choices": [
-          { "label": "Oui", "next": "linkedin_question" },
-          { "label": "Non", "next": "no" }
-        ]
-      },
-      "linkedin_question": {
-        "text": "Erwan est un développeur passionné et curieux ! Veux-tu visiter son LinkedIn ?",
-        "choices": [
-          { "label": "Oui", "next": "linkedin_open" },
-          { "label": "Non", "next": "no" }
+          { "label": "Oui, allons-y !", "next": "linkedin_open" },
+          { "label": "Non merci.", "next": "no" }
         ]
       },
       "linkedin_open": {
-        "text": "Super ! Bonne visite :)",
+        "text": "Parfait. Tu y trouveras tout son parcours professionnel. Bonne visite !",
         "action": "open_linkedin",
         "choices": []
       },
       "no": {
-        "text": "Ah ok... et bien débarrasse moi de tous ces slimes s'il te plaît :)",
+        "text": "Pas de problème. Tu sais où me trouver si tu changes d'avis.",
         "choices": []
       }
     }

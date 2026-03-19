@@ -11,6 +11,7 @@ import {
 
 import { Player } from "./Player";
 import { Enemy } from "./Enemy";
+import { Arrow } from "./Arrow";
 
 export class GameState extends Schema {
   @type("number") worldWidth = SHARED_CONFIG.WORLD_WIDTH;
@@ -18,6 +19,7 @@ export class GameState extends Schema {
 
   @type({ map: Player }) players = new MapSchema<Player>();
   @type({ map: Enemy }) enemies = new MapSchema<Enemy>();
+  @type({ map: Arrow }) arrows = new MapSchema<Arrow>();
 
   createPlayer(sessionId: string, lauchOptions: LauchOptions) {
     const newPlayer = new Player();
@@ -26,6 +28,17 @@ export class GameState extends Schema {
     this.players.set(sessionId, newPlayer);
 
     return newPlayer;
+  }
+
+  createArrow(id: string, x: number, y: number, direction: string, ownerId: string) {
+    const arrow = new Arrow();
+    arrow.id = id;
+    arrow.x = x;
+    arrow.y = y;
+    arrow.direction = direction;
+    arrow.ownerId = ownerId;
+    this.arrows.set(id, arrow);
+    return arrow;
   }
 
   createEnemy(texture: EnemyTextures, position: { x: number; y: number }) {

@@ -28,8 +28,8 @@ export class Enemy extends Schema {
   @type("boolean") isCollided = false;
   @type("string") collisionDirection = DIRECTION.DOWN;
 
-  decreaseLife() {
-    const unit = COMBAT_CONFIG.ENEMY_HIT_DAMAGE;
+  decreaseLife(damage: number = COMBAT_CONFIG.ENEMY_HIT_DAMAGE) {
+    const unit = damage;
     if (this.life - unit <= 0) {
       if (SERVER_CONFIG.debug) {
         this.life = 100;

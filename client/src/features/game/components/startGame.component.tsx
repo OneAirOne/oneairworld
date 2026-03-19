@@ -2,6 +2,7 @@ import * as React from "react";
 
 // Components
 import LaunchButton from "./lauchButton";
+import { CharacterSelectModal } from "./CharacterSelectModal";
 
 // Others
 import phaserGame from "Game";
@@ -10,35 +11,48 @@ import { BootScene, SCENES } from "scenes";
 // Shared
 import { Characters } from "../../../../../shared/types";
 
+const FADE_DURATION = 500;
+
 export function StartGame() {
   const [visible, setVisible] = React.useState(true);
+  const [fading, setFading] = React.useState(false);
+  const [showModal, setShowModal] = React.useState(false);
   const mail = "gilberterwan@gmail.com";
 
-  const handleLaunch = React.useCallback(async () => {
+  const handleLaunch = React.useCallback(() => {
+    setShowModal(true);
+  }, []);
+
+  const handleCharacterSelect = React.useCallback(async (character: Characters) => {
+    setShowModal(false);
+    setFading(true);
     try {
       const bootScene = phaserGame.scene.keys[SCENES.BOOT] as BootScene;
       bootScene.launchGame();
       await bootScene.network.joinOrCreatePublic({
         name: "Erwan",
-        texture: Characters.ONEAIR,
+        texture: character,
       });
     } catch (error) {
       console.error(error);
     }
-    setVisible(false);
+    setTimeout(() => setVisible(false), FADE_DURATION);
   }, []);
 
   if (!visible) return null;
 
   return (
-    <div className="absolute inset-0 z-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center pointer-events-auto">
+    <div
+        className="absolute inset-0 z-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center pointer-events-auto"
+        style={{ transition: `opacity ${FADE_DURATION}ms ease`, opacity: fading ? 0 : 1 }}
+      >
       <div className="max-w-lg w-full px-8">
 
         {/* Avatar */}
         <div className="flex justify-center mb-8 animate-float">
           <img
             src="assets/avatar.jpg"
-            className="w-24 h-24 rounded-full ring-2 ring-purple-500/30"
+            className="w-24 h-24 rounded-full ring-2 ring-brand/30"
           />
         </div>
 
@@ -63,7 +77,7 @@ export function StartGame() {
               href={`mailto:${mail}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-purple-400 hover:text-pink-400 transition-colors duration-200 underline underline-offset-4"
+              className="text-brand hover:text-brand/70 transition-colors duration-200 underline underline-offset-4"
             >
               {mail}
             </a>
@@ -84,6 +98,8 @@ export function StartGame() {
         </div>
 
       </div>
+
+      {showModal && <CharacterSelectModal onSelect={handleCharacterSelect} />}
     </div>
   );
 }

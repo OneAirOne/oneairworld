@@ -33,6 +33,7 @@ export class UIScene extends Phaser.Scene {
 
   // Mobile controls
   private _isTouchDevice = false;
+  private _safeBottom = 0;
   private _joyBase!: Phaser.GameObjects.Graphics;
   private _joyThumb!: Phaser.GameObjects.Graphics;
   private _joyBaseX = 0;
@@ -59,9 +60,11 @@ export class UIScene extends Phaser.Scene {
   }
 
   create() {
+    this.scene.bringToTop();
     const W = this.scale.width;
     const H = this.scale.height;
-    this.boxY = H - DIALOGUE_BOX_HEIGHT - DIALOGUE_BOX_MARGIN;
+    this._safeBottom = this._getSafeAreaBottom();
+    this.boxY = H - DIALOGUE_BOX_HEIGHT - DIALOGUE_BOX_MARGIN - this._safeBottom;
     this.boxW = W - DIALOGUE_BOX_MARGIN * 2;
 
     // --- Zone hint ---
@@ -131,6 +134,8 @@ export class UIScene extends Phaser.Scene {
       this.dialogueHint.setText(choices.length === 0 ? "Fermer ✕" : "Entrée ▶").setVisible(true);
       this._renderChoices(choices, 0);
       this._syncMobileButtons();
+      // Always render UI on top of every other scene
+      this.scene.bringToTop();
     };
 
     const onNavigate = ({ selectedIndex }: DialogueNavigatePayload) => {
@@ -195,10 +200,27 @@ export class UIScene extends Phaser.Scene {
 
   // ── Mobile controls ─────────────────────────────────────────────────────────
 
+  /** Returns the height of the bottom safe-area inset (gesture bar, notch, etc.) in Phaser pixels. */
+  private _getSafeAreaBottom(): number {
+    try {
+      const el = document.createElement("div");
+      el.style.cssText =
+        "position:fixed;bottom:0;left:0;width:0;padding-bottom:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none";
+      document.body.appendChild(el);
+      const val = parseFloat(getComputedStyle(el).paddingBottom) || 0;
+      document.body.removeChild(el);
+      return val;
+    } catch {
+      return 0;
+    }
+  }
+
   private _createMobileControls(W: number, H: number) {
+    const sb = this._safeBottom;
+
     // Joystick
     this._joyBaseX = JOY_X_MARGIN;
-    this._joyBaseY = H - JOY_Y_MARGIN;
+    this._joyBaseY = H - JOY_Y_MARGIN - sb;
 
     this._joyBase = this.add.graphics()
       .fillStyle(0x000000, 0.4)
@@ -215,10 +237,10 @@ export class UIScene extends Phaser.Scene {
       .setDepth(51);
 
     // Attack button (bottom-right)
-    this._btnAttack = this._makeButton(W - 70, H - 90, BTN_RADIUS, "⚔️", 0x555555);
+    this._btnAttack = this._makeButton(W - 70, H - 90 - sb, BTN_RADIUS, "⚔️", 0x555555);
 
     // Interact/Confirm button (left of attack)
-    this._btnInteract = this._makeButton(W - 150, H - 90, BTN_RADIUS, "💬", 0x336699);
+    this._btnInteract = this._makeButton(W - 150, H - 90 - sb, BTN_RADIUS, "💬", 0x336699);
     this._btnInteract.setVisible(false);
 
     // Dialogue buttons – placed above the dialogue box

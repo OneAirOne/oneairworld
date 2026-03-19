@@ -3,11 +3,8 @@ import Matter from "matter-js";
 import { Player as PlayerState } from "../../rooms/schema/Player";
 import { COLLISION_CATEGORY } from "../engine.config";
 
-import { SHARED_CONFIG } from "../../../../shared/shared.config";
+import { SHARED_CONFIG, getCharCombatConfig } from "../../../../shared/shared.config";
 import { DIRECTION } from "../../../../shared/types";
-import { getTiledInfos } from "./map/map.body";
-
-const { start } = getTiledInfos();
 
 export interface BodyConfig {
   label: string;
@@ -18,10 +15,10 @@ export const PLAYER_CONFIG = {
   collisionFilter: {
     category: COLLISION_CATEGORY.PLAYER,
   },
-  inertia: 0.2,
-  restitution: 0.5,
-  friction: 0.8,
-  frictionAir: 0,
+  inertia: Infinity, // prevent rotation
+  restitution: 0,    // no bounce on walls
+  friction: 0,       // no lateral sticking during wall contact
+  frictionAir: 0.2,  // light damping so residual velocity dies quickly
   frictionStatic: 0,
   density: 10,
   mass: 0.2,
@@ -41,18 +38,21 @@ export class Player {
     id: string,
     world: Matter.World,
     engine: Matter.Engine,
-    playerState: PlayerState
+    playerState: PlayerState,
+    spawnX: number = 0,
+    spawnY: number = 0,
   ) {
     this.id = id;
     this._engine = engine;
     this._world = world;
     this._playerState = playerState;
 
+    const charConfig = getCharCombatConfig(playerState.texture);
     this._body = Matter.Bodies.rectangle(
-      start.x,
-      start.y,
-      SHARED_CONFIG.SPRITE_SIZE,
-      SHARED_CONFIG.SPRITE_SIZE,
+      spawnX,
+      spawnY,
+      charConfig.bodyW,
+      charConfig.bodyH,
       {
         label: id,
         ...PLAYER_CONFIG,

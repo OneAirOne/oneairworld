@@ -2,7 +2,7 @@ import { Schema, type } from "@colyseus/schema";
 
 import { COMBAT_CONFIG } from "../../../../shared/shared.config";
 
-import { Characters, DIRECTION } from "../../../../shared/types";
+import { Characters, DIRECTION, Zone } from "../../../../shared/types";
 
 import { ANIM_START } from "../../constants";
 import { SERVER_CONFIG } from "../../server.config";
@@ -24,6 +24,7 @@ export class Player extends Schema {
   @type("boolean") isSpeaking = false;
   @type("boolean") isCollided = false;
   @type("string") collisionDirection = DIRECTION.DOWN;
+  @type("string") zone: string = Zone.ROAD;
 
   inputQueue: any[] = [];
 

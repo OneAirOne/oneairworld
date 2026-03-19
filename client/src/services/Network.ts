@@ -11,6 +11,7 @@ import {
   IGameState,
   IPlayer,
   IEnemy,
+  IArrow,
   Message,
   InputPayload,
   LauchOptions,
@@ -121,6 +122,19 @@ export class Network {
       phaserEvents.emit(Event.ENEMY_LEFT, id);
     };
 
+    this.room.state.arrows.onAdd = (arrow: IArrow, id: string) => {
+      phaserEvents.emit(Event.ARROW_JOINED, arrow, id);
+      (arrow as any).onChange = (changes: any[]) => {
+        changes.forEach(({ field, value }) => {
+          phaserEvents.emit(Event.ARROW_UPDATED, field, value, id);
+        });
+      };
+    };
+
+    this.room.state.arrows.onRemove = (_arrow: IArrow, id: string) => {
+      phaserEvents.emit(Event.ARROW_LEFT, id);
+    };
+
     /**
      * When the server sends room data
      */
@@ -151,6 +165,10 @@ export class Network {
     this.room?.send(Message.UPDATE_PLAYER_SPEAKING, { isSpeaking });
   }
 
+  setZone(zone: string) {
+    this.room?.send(Message.UPDATE_PLAYER_ZONE, { zone });
+  }
+
   /**
    * Register event listener and call back function when a player updated
    */
@@ -172,6 +190,18 @@ export class Network {
     phaserEvents.on(Event.PLAYER_LEFT, callback, context);
   }
 
+  offPlayerJoin(callback: Function, context?: any) {
+    phaserEvents.off(Event.PLAYER_JOINED, callback, context);
+  }
+
+  offPlayerUpdated(callback: Function, context?: any) {
+    phaserEvents.off(Event.PLAYER_UPDATED, callback, context);
+  }
+
+  offPlayerLeft(callback: Function, context?: any) {
+    phaserEvents.off(Event.PLAYER_LEFT, callback, context);
+  }
+
   onEnemyJoin(callback: (enemy: IEnemy, id: string) => void, context?: any) {
     phaserEvents.on(Event.ENEMY_JOINED, callback, context);
   }
@@ -185,6 +215,34 @@ export class Network {
 
   onEnemyLeft(callback: (id: string) => void, context?: any) {
     phaserEvents.on(Event.ENEMY_LEFT, callback, context);
+  }
+
+  onArrowJoin(callback: (arrow: IArrow, id: string) => void, context?: any) {
+    phaserEvents.on(Event.ARROW_JOINED, callback, context);
+  }
+
+  onArrowUpdated(callback: (field: string, value: number | string, id: string) => void, context?: any) {
+    phaserEvents.on(Event.ARROW_UPDATED, callback, context);
+  }
+
+  onArrowLeft(callback: (id: string) => void, context?: any) {
+    phaserEvents.on(Event.ARROW_LEFT, callback, context);
+  }
+
+  offArrowJoin(callback: Function, context?: any) {
+    phaserEvents.off(Event.ARROW_JOINED, callback, context);
+  }
+
+  offArrowUpdated(callback: Function, context?: any) {
+    phaserEvents.off(Event.ARROW_UPDATED, callback, context);
+  }
+
+  offArrowLeft(callback: Function, context?: any) {
+    phaserEvents.off(Event.ARROW_LEFT, callback, context);
+  }
+
+  getPlayers(): IGameState["players"] | undefined {
+    return this.room?.state.players;
   }
 
   getEnemies(): IGameState["enemies"] | undefined {
