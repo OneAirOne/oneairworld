@@ -10,7 +10,7 @@ import { Arrow, ARROW_ANIM_KEYS } from "../characters/Arrow";
 
 // Others
 import { SCENES } from "./scene.config";
-import { createSpeakingBubble, buildTilesets } from "./game.helpers";
+import { createSpeakingBubble, buildTilesets, showSceneTitle } from "./game.helpers";
 import { ROAD_MAP_CONFIG } from "./road.config";
 import CLIENT_CONFIG, { SERVER_DATA } from "client.config";
 
@@ -73,6 +73,7 @@ export class Road extends Phaser.Scene {
     this.events.on(Phaser.Scenes.Events.RESUME, () => {
       this.cameras.main.fadeIn(400, 0, 0, 0);
       this.myPlayer?.setVisible(true);
+      showSceneTitle(this, "Road");
     });
   }
 
@@ -152,6 +153,8 @@ export class Road extends Phaser.Scene {
     this.cameras.main.fadeIn(1200, 0, 0, 0);
 
     this.displayMap();
+
+    showSceneTitle(this, "Road");
 
     // UI
     this.scene.run(SCENES.UI);

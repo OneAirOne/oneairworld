@@ -10,6 +10,7 @@ export enum TiledLayer {
   STUFF_UNDER_PLAYER   = "stuff_under_player",
   BEHIND_STUFF         = "behind_stuff",
   ANIMATED             = "animated",
+  ANIMATED_UNDER_PLAYER = "animated_under_player",
   BEHIND               = "behind",
   GROUND               = "ground",
 }

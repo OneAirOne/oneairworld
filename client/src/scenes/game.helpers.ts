@@ -66,6 +66,51 @@ export function buildTilesets(
     .filter((ts): ts is Phaser.Tilemaps.Tileset => ts !== null);
 }
 
+/**
+ * Display a full-screen scene title that fades out after a short hold.
+ * Uses setScrollFactor(0) so it stays fixed on screen regardless of camera
+ * position or zoom. Font size is responsive (scales with the smallest dimension).
+ */
+export function showSceneTitle(scene: Phaser.Scene, title: string) {
+  const cam   = scene.cameras.main;
+  const W     = cam.width;
+  const H     = cam.height;
+  const depth = 999999;
+
+  // Semi-transparent black overlay
+  const overlay = scene.add
+    .rectangle(W / 2, H / 2, W, H, 0x000000, 0.55)
+    .setScrollFactor(0)
+    .setDepth(depth);
+
+  // Responsive font: 10 % of the shortest screen dimension, clamped 28–120 px
+  const fontSize = Math.round(Math.min(Math.min(W, H) * 0.06, 64));
+
+  const text = scene.add
+    .text(W / 2, H / 2, title, {
+      fontSize:   `${fontSize}px`,
+      fontStyle:  "bold",
+      color:      "#ffffff",
+      stroke:     "#000000",
+      strokeThickness: Math.max(2, fontSize * 0.06),
+      resolution: 2,
+    })
+    .setOrigin(0.5)
+    .setScrollFactor(0)
+    .setDepth(depth + 1);
+
+  // Hold 1.2 s then fade out over 0.9 s
+  scene.time.delayedCall(1200, () => {
+    scene.tweens.add({
+      targets:  [overlay, text],
+      alpha:    0,
+      duration: 900,
+      ease:     "Power2",
+      onComplete: () => { overlay.destroy(); text.destroy(); },
+    });
+  });
+}
+
 export async function waitFor(time: number = 500): Promise<void> {
   return new Promise<void>((resolve) => {
     setTimeout(() => {

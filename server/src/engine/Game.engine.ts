@@ -482,11 +482,12 @@ export class GameEngine {
       console.log(`[Engine] players=${playerCount} enemies=${enemyCount} arrows=${arrowCount}`);
     }
 
-    // Player respawn at initial start position
+    // Player respawn at the start of their current zone
     this.state.players.forEach((playerState, id) => {
       if (!playerState.isDead) return;
       const playerBody = this.players[id];
-      const start = this.roadCtx.start;
+      const ctx = this.zoneContexts.get(playerState.zone as Zone) ?? this.roadCtx;
+      const start = ctx.start;
       if (playerBody) Matter.Body.setPosition(playerBody.getBody(), start);
       playerState.x = start.x;
       playerState.y = start.y;

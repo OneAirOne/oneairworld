@@ -23,13 +23,14 @@ export interface InteriorConfig {
 export const INTERIOR_SCENE_LAYERS: LayerConfig[] = [
   { name: TiledLayer.BEHIND },
   { name: TiledLayer.GROUND },
-  { name: TiledLayer.BEHIND_STUFF,         depth: 1 },
+  { name: TiledLayer.BEHIND_STUFF,          depth: 1 },
   { name: TiledLayer.STUFF_UNDER_PLAYER },
   { name: TiledLayer.COLLIDE_UNDER_PLAYER },
-  { name: TiledLayer.STUFF_ABOVE_PLAYER,   depth: 1 },
-  { name: TiledLayer.COLLIDE_ABOVE_PLAYER, depth: 2 },
-  { name: TiledLayer.ABOVE,                depth: 3 },
-  { name: TiledLayer.ANIMATED,             depth: 10 },
+  { name: TiledLayer.ANIMATED_UNDER_PLAYER },  // above ground, below player (same depth 0, added before player)
+  { name: TiledLayer.STUFF_ABOVE_PLAYER,    depth: 1 },
+  { name: TiledLayer.COLLIDE_ABOVE_PLAYER,  depth: 2 },
+  { name: TiledLayer.ABOVE,                 depth: 3 },
+  { name: TiledLayer.ANIMATED,              depth: 10 },
 ];
 
 export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {

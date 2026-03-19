@@ -10,6 +10,7 @@ import { Arrow } from "../characters/Arrow";
 import type { IArrow } from "../../../shared/types";
 import ComponentService from "../services/Component.service";
 import { UiBarComponent } from "../components/phaser";
+import { showSceneTitle } from "./game.helpers";
 
 interface InitData {
   zone: Zone;
@@ -159,16 +160,7 @@ export class InteriorScene extends Phaser.Scene {
     this.cameras.main.startFollow(localPlayer, true);
     this.cameras.main.setZoom(2);
 
-    // --- Label ---
-    if (config.label) {
-      this.add
-        .text(spawnX, spawnY - 40, config.label, {
-          fontSize: "8px",
-          color: "#ffffff99",
-        })
-        .setOrigin(0.5)
-        .setDepth(2);
-    }
+    if (config.label) showSceneTitle(this, config.label);
 
     this.input.keyboard!.on("keydown-ESC", this._exit, this);
   }
