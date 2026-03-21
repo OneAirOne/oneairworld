@@ -23,6 +23,7 @@ import {
 
 // Dialogue
 import { DialogueManager } from "../dialogue/DialogueManager";
+import { DialogueInputHandler } from "../dialogue/DialogueInputHandler";
 import { phaserEvents, PhaserEvent } from "../events/eventManager";
 
 // Shared
@@ -47,6 +48,7 @@ export class Road extends Phaser.Scene {
   private arrows = new Map<string, Arrow>();
   private interactivePnjs: { sprite: Phaser.GameObjects.Sprite; bubble: Phaser.GameObjects.Text; dialogueId: string }[] = [];
   private dialogueManager = new DialogueManager();
+  private dialogueInput!: DialogueInputHandler;
   private _pnjCooldown = false;
 
   sceneMap!: Phaser.Tilemaps.Tilemap;
@@ -336,67 +338,39 @@ export class Road extends Phaser.Scene {
       }
     });
 
-    // Dialogue keyboard controls + speaking state sync
-    this.input.keyboard!.on("keydown-ENTER", () => {
-      if (this.dialogueManager.isOpen()) {
-        this.dialogueManager.confirm();
-      } else if (this.dialogueManager.isInZone()) {
-        this.dialogueManager.open();
-      }
-    });
-
-    this.input.keyboard!.on("keydown-UP", () => {
-      if (this.dialogueManager.isOpen()) this.dialogueManager.navigateUp();
-    });
-    this.input.keyboard!.on("keydown-DOWN", () => {
-      if (this.dialogueManager.isOpen()) this.dialogueManager.navigateDown();
-    });
-    this.input.keyboard!.on("keydown-ESC", () => {
-      if (this.dialogueManager.isOpen()) this.dialogueManager.close();
-    });
-    // Mobile dialogue controls (mirror keyboard shortcuts)
-    phaserEvents.on(PhaserEvent.MOBILE_INTERACT, () => {
-      if (this.dialogueManager.isOpen()) {
-        this.dialogueManager.confirm();
-      } else if (this.dialogueManager.isInZone()) {
-        this.dialogueManager.open();
-      }
-    });
-    phaserEvents.on(PhaserEvent.MOBILE_NAV_UP,  () => { if (this.dialogueManager.isOpen()) this.dialogueManager.navigateUp(); });
-    phaserEvents.on(PhaserEvent.MOBILE_NAV_DOWN, () => { if (this.dialogueManager.isOpen()) this.dialogueManager.navigateDown(); });
-    phaserEvents.on(PhaserEvent.MOBILE_CLOSE,   () => { if (this.dialogueManager.isOpen()) this.dialogueManager.close(); });
-
-    phaserEvents.on(PhaserEvent.DIALOGUE_ACTION, (action: string) => {
-      if (action === "open_linkedin") {
-        // On desktop: call directly (user-activation is preserved).
-        // On mobile: UIScene handles it via a native touchend listener instead,
-        // because Phaser's rAF loop breaks the user-activation context.
-        if (!this.sys.game.device.input.touch) {
-          window.open("https://fr.linkedin.com/in/erwan-gilbert-b184241b", "_blank", "noopener,noreferrer");
+    this.dialogueInput = new DialogueInputHandler(
+      this.dialogueManager,
+      (action) => {
+        if (action === "open_linkedin") {
+          // On desktop: call directly (user-activation is preserved).
+          // On mobile: UIScene handles it via a native touchend listener instead,
+          // because Phaser's rAF loop breaks the user-activation context.
+          if (!this.sys.game.device.input.touch) {
+            window.open("https://fr.linkedin.com/in/erwan-gilbert-b184241b", "_blank", "noopener,noreferrer");
+          }
         }
-      }
 
-      // enter_interior:<zone>
-      if (action.startsWith("enter_interior:")) {
-        const zone = action.split(":")[1] as Zone;
-        if (INTERIORS[zone]) {
-          this.dialogueManager.close();
-          this.cameras.main.fadeOut(400, 0, 0, 0);
-          this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-            // Notify server + hide local sprite
-            this.network.setZone(zone);
-            this.myPlayer?.setVisible(false);
-
-            this.scene.launch(SCENES.INTERIOR, {
-              zone,
-              playerTexture: this.myPlayer?.characterId ?? CLIENT_CONFIG.ACTIVE_PLAYER,
-              network: this.network,
+        // enter_interior:<zone>
+        if (action.startsWith("enter_interior:")) {
+          const zone = action.split(":")[1] as Zone;
+          if (INTERIORS[zone]) {
+            this.dialogueManager.close();
+            this.cameras.main.fadeOut(400, 0, 0, 0);
+            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+              this.network.setZone(zone);
+              this.myPlayer?.setVisible(false);
+              this.scene.launch(SCENES.INTERIOR, {
+                zone,
+                playerTexture: this.myPlayer?.characterId ?? CLIENT_CONFIG.ACTIVE_PLAYER,
+                network: this.network,
+              });
+              this.scene.pause(SCENES.GAME);
             });
-            this.scene.pause(SCENES.GAME);
-          });
+          }
         }
-      }
-    });
+      },
+    );
+    this.dialogueInput.register(this);
 
     phaserEvents.on(PhaserEvent.DIALOGUE_OPEN, () => {
       this.network.setSpeaking(true);

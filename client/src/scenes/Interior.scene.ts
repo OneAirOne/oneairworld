@@ -7,12 +7,12 @@ import { SERVER_DATA } from "client.config";
 import { Player } from "../characters/player";
 import { PlayerManager } from "./playerManager";
 import { Arrow } from "../characters/Arrow";
-import type { IArrow } from "../../../shared/types";
+import type { IArrow, IPlayer } from "../../../shared/types";
 import ComponentService from "../services/Component.service";
 import { UiBarComponent } from "../components/phaser";
 import { showSceneTitle } from "./game.helpers";
 import { DialogueManager } from "../dialogue/DialogueManager";
-import { phaserEvents, PhaserEvent } from "../events/eventManager";
+import { DialogueInputHandler } from "../dialogue/DialogueInputHandler";
 
 const RETURN_INTERACTION_RADIUS = 24;
 const RETURN_DIALOGUE_ID = "exit_interior";
@@ -28,15 +28,16 @@ export class InteriorScene extends Phaser.Scene {
   private _playerTexture!: string;
   private _network!: Network;
   private _playerManager!: PlayerManager;
-  private _onJoin!: Function;
-  private _onUpdate!: Function;
-  private _onLeave!: Function;
+  private _onJoin!: (p: IPlayer, id: string) => void;
+  private _onUpdate!: (field: string, value: string | number | boolean, id: string) => void;
+  private _onLeave!: (id: string) => void;
   private _arrows = new Map<string, Arrow>();
-  private _onArrowJoin!: Function;
-  private _onArrowUpdated!: Function;
-  private _onArrowLeft!: Function;
+  private _onArrowJoin!: (arrow: IArrow, id: string) => void;
+  private _onArrowUpdated!: (field: string, value: number | string, id: string) => void;
+  private _onArrowLeft!: (id: string) => void;
   private _components!: ComponentService;
   private _dialogueManager = new DialogueManager();
+  private _dialogueInput!: DialogueInputHandler;
   private _returnPoint: { x: number; y: number } | null = null;
   private _inReturnZone = false;
 
@@ -80,11 +81,11 @@ export class InteriorScene extends Phaser.Scene {
       },
     });
 
-    this._onJoin   = (p: any, id: string) => this._playerManager.handleJoin(p, id);
+    this._onJoin   = (p: IPlayer, id: string) => this._playerManager.handleJoin(p, id);
     this._onLeave  = (id: string) => this._playerManager.handleLeave(id);
 
     // Handle zone changes: create sprite when entering, remove when leaving
-    this._onUpdate = (field: string, value: any, id: string) => {
+    this._onUpdate = (field: string, value: string | number | boolean, id: string) => {
       if (field === SERVER_DATA.ZONE && id !== this._network.sessionId) {
         if (value === this._zone) {
           const p = this._network.getPlayers()?.get(id);
@@ -113,42 +114,19 @@ export class InteriorScene extends Phaser.Scene {
       this._arrows.delete(id);
     };
 
-    this._network.onPlayerJoin(this._onJoin as any);
-    this._network.onPlayerUpdated(this._onUpdate as any);
-    this._network.onPlayerLeft(this._onLeave as any);
-    this._network.onArrowJoin(this._onArrowJoin as any);
-    this._network.onArrowUpdated(this._onArrowUpdated as any);
-    this._network.onArrowLeft(this._onArrowLeft as any);
+    this._network.onPlayerJoin(this._onJoin);
+    this._network.onPlayerUpdated(this._onUpdate);
+    this._network.onPlayerLeft(this._onLeave);
+    this._network.onArrowJoin(this._onArrowJoin);
+    this._network.onArrowUpdated(this._onArrowUpdated);
+    this._network.onArrowLeft(this._onArrowLeft);
 
-    // TODO: Create helpers to use in every scene
-    // Dialogue keyboard controls
-    this.input.keyboard!.on("keydown-ENTER", () => {
-      if (this._dialogueManager.isOpen()) {
-        this._dialogueManager.confirm();
-      } else if (this._dialogueManager.isInZone()) {
-        this._dialogueManager.open();
-      }
-    });
-    this.input.keyboard!.on("keydown-UP",   () => { if (this._dialogueManager.isOpen()) this._dialogueManager.navigateUp(); });
-    this.input.keyboard!.on("keydown-DOWN", () => { if (this._dialogueManager.isOpen()) this._dialogueManager.navigateDown(); });
-    this.input.keyboard!.on("keydown-ESC",  () => {
-      if (this._dialogueManager.isOpen()) this._dialogueManager.close();
-      else this._exit();
-    });
-
-    // Mobile dialogue controls
-    phaserEvents.on(PhaserEvent.MOBILE_INTERACT, () => {
-      if (this._dialogueManager.isOpen()) this._dialogueManager.confirm();
-      else if (this._dialogueManager.isInZone()) this._dialogueManager.open();
-    });
-    phaserEvents.on(PhaserEvent.MOBILE_NAV_UP,   () => { if (this._dialogueManager.isOpen()) this._dialogueManager.navigateUp(); });
-    phaserEvents.on(PhaserEvent.MOBILE_NAV_DOWN,  () => { if (this._dialogueManager.isOpen()) this._dialogueManager.navigateDown(); });
-    phaserEvents.on(PhaserEvent.MOBILE_CLOSE,     () => { if (this._dialogueManager.isOpen()) this._dialogueManager.close(); });
-
-    // Trigger exit when dialogue action fires
-    phaserEvents.on(PhaserEvent.DIALOGUE_ACTION, (action: string) => {
-      if (action === "exit_interior") this._exit();
-    });
+    this._dialogueInput = new DialogueInputHandler(
+      this._dialogueManager,
+      (action) => { if (action === "exit_interior") this._exit(); },
+      () => this._exit(),
+    );
+    this._dialogueInput.register(this);
 
     const config = INTERIORS[this._zone];
     if (!config || !this.cache.tilemap.has(config.mapKey)) {
@@ -263,8 +241,9 @@ export class InteriorScene extends Phaser.Scene {
   }
 
   private _exit() {
-    // Close any open dialogue before leaving so UIScene doesn't keep it visible
-    this._dialogueManager.close();
+    // Reset dialogue state + remove global listeners before returning to Road
+    this._dialogueManager.leaveZone();
+    this._dialogueInput.unregister();
 
     // Remove network listeners before leaving to avoid stale callbacks in Road
     this._network?.offPlayerJoin(this._onJoin);
