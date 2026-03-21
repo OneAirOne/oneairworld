@@ -156,6 +156,9 @@ export class InteriorScene extends Phaser.Scene {
       return;
     }
 
+    // Black background to hide the Road scene behind
+    this.cameras.main.setBackgroundColor(0x000000);
+
     // --- Tilemap ---
     const map = this.make.tilemap({ key: config.mapKey });
     const tilesets = config.tilesets.map((ts) =>
