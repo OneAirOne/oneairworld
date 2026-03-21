@@ -414,6 +414,11 @@ export class Road extends Phaser.Scene {
     // Register network event listener
     this.registerNetworkListeners();
 
+    // Sync players already in state (joined before scene was ready — production race condition)
+    this.network.getPlayers()?.forEach((player, id) => {
+      this.handleJoinPLayer(player, id);
+    });
+
     // Sync enemies already in state (spawned before scene was ready)
     this.network.getEnemies()?.forEach((enemy: IEnemy, id: string) => {
       this.handleEnemyJoin(enemy, id);
