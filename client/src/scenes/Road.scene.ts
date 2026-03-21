@@ -72,6 +72,13 @@ export class Road extends Phaser.Scene {
     // Update component after the scene loop
     this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.lateUpdate, this);
 
+    // Stop receiving arrow events while interior is active (arrows belong to the interior scene)
+    this.events.on(Phaser.Scenes.Events.PAUSE, () => {
+      this.network.offArrowJoin(this.handleArrowJoin, this);
+      this.network.offArrowUpdated(this.handleArrowUpdated, this);
+      this.network.offArrowLeft(this.handleArrowLeft, this);
+    });
+
     // Fade back in + restore local player when returning from an interior scene
     this.events.on(Phaser.Scenes.Events.RESUME, () => {
       // Reset dialogue state and block PNJ detection briefly
@@ -86,6 +93,9 @@ export class Road extends Phaser.Scene {
         this.myPlayer.setData(SERVER_DATA.X, this.lastServerX);
         this.myPlayer.setData(SERVER_DATA.Y, this.lastServerY);
       }
+      this.network.onArrowJoin(this.handleArrowJoin, this);
+      this.network.onArrowUpdated(this.handleArrowUpdated, this);
+      this.network.onArrowLeft(this.handleArrowLeft, this);
       this.cameras.main.fadeIn(400, 0, 0, 0);
       showSceneTitle(this, "Road");
     });
