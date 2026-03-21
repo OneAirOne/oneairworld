@@ -5,10 +5,12 @@ import { phaserEvents, PhaserEvent } from "../events/eventManager";
 import { mobileInput } from "../input/mobileInput";
 import type { DialoguePayload, DialogueNavigatePayload } from "../dialogue/DialogueManager";
 
-const DIALOGUE_BOX_HEIGHT = 140;
+const DIALOGUE_BOX_HEIGHT = 140;    // fixed height on PC
+const DIALOGUE_BOX_MIN_HEIGHT = 80; // minimum height on mobile (dynamic)
 const DIALOGUE_BOX_MARGIN = 12;
 const DIALOGUE_BOX_PADDING = 14;
-const CHOICES_Y_OFFSET = 62; // y offset from boxY where choices start
+const CHOICES_Y_OFFSET = 62; // choices Y offset from boxY on PC (fixed layout)
+const CHOICES_GAP = 8;       // gap between text and choices on mobile (dynamic)
 const CHOICE_LINE_HEIGHT = 18;
 
 // ── Mobile controls layout ────────────────────────────────────────────────────
@@ -18,8 +20,8 @@ const JOY_X_MARGIN = 90;   // from left edge
 const JOY_Y_MARGIN = 100;  // from bottom edge
 const BTN_RADIUS = 32;
 const BTN_ALPHA = 0.75;
-// Dialogue nav buttons row is placed above the dialogue box
-const DIAG_BTN_Y_ABOVE = 45; // px above boxY
+// Bottom button row Y offset from bottom edge (attack, interact, dialogue nav)
+const BTN_Y_FROM_BOTTOM = 90;
 
 export class UIScene extends Phaser.Scene {
   private zoneHint!: Phaser.GameObjects.Text;
@@ -30,6 +32,8 @@ export class UIScene extends Phaser.Scene {
   private choiceTexts: Phaser.GameObjects.Text[] = [];
   private boxY = 0;
   private boxW = 0;
+  private _boxBottom = 0;   // fixed bottom edge of dialogue box (above controls)
+  private _choicesStartY = 0; // Y where choices begin (set by _redrawDialogueBox)
 
   // Mobile controls
   private _isTouchDevice = false;
@@ -63,8 +67,17 @@ export class UIScene extends Phaser.Scene {
     this.scene.bringToTop();
     const W = this.scale.width;
     const H = this.scale.height;
+    this._isTouchDevice = this.sys.game.device.input.touch;
     this._safeBottom = this._getSafeAreaBottom();
-    this.boxY = H - DIALOGUE_BOX_HEIGHT - DIALOGUE_BOX_MARGIN - this._safeBottom;
+    if (this._isTouchDevice) {
+      // Mobile: box sits above the button row, height is dynamic
+      this._boxBottom = H - BTN_Y_FROM_BOTTOM - BTN_RADIUS - DIALOGUE_BOX_MARGIN - this._safeBottom;
+      this.boxY = this._boxBottom - DIALOGUE_BOX_MIN_HEIGHT;
+    } else {
+      // PC: box fixed at the bottom of the screen, constant height
+      this.boxY = H - DIALOGUE_BOX_HEIGHT - DIALOGUE_BOX_MARGIN - this._safeBottom;
+      this._boxBottom = this.boxY + DIALOGUE_BOX_HEIGHT;
+    }
     this.boxW = W - DIALOGUE_BOX_MARGIN * 2;
 
     // --- Zone hint ---
@@ -87,13 +100,8 @@ export class UIScene extends Phaser.Scene {
       .lineStyle(2, 0xffffff, 1).strokeRoundedRect(hintX, hintY, hintW, hintH, 6)
       .setDepth(0).setVisible(false);
 
-    // --- Dialogue box background ---
-    this.dialogueBg = this.add.graphics()
-      .fillStyle(0x0a0a0a, 0.88)
-      .fillRoundedRect(DIALOGUE_BOX_MARGIN, this.boxY, this.boxW, DIALOGUE_BOX_HEIGHT, 6)
-      .lineStyle(2, 0xffffff, 1)
-      .strokeRoundedRect(DIALOGUE_BOX_MARGIN, this.boxY, this.boxW, DIALOGUE_BOX_HEIGHT, 6)
-      .setVisible(false);
+    // --- Dialogue box background (drawn dynamically on each open) ---
+    this.dialogueBg = this.add.graphics().setVisible(false);
 
     // --- Dialogue text ---
     this.dialogueText = this.add
@@ -107,17 +115,14 @@ export class UIScene extends Phaser.Scene {
 
     // --- "Enter ▶" hint bottom-right ---
     this.dialogueHint = this.add
-      .text(
-        W - DIALOGUE_BOX_MARGIN - DIALOGUE_BOX_PADDING,
-        this.boxY + DIALOGUE_BOX_HEIGHT - DIALOGUE_BOX_PADDING,
-        "Entrée ▶",
-        { fontSize: "11px", color: "#888888" }
-      )
+      .text(W - DIALOGUE_BOX_MARGIN - DIALOGUE_BOX_PADDING, 0, "Entrée ▶", {
+        fontSize: "11px",
+        color: "#888888",
+      })
       .setOrigin(1, 1)
       .setVisible(false);
 
     // --- Mobile controls ---
-    this._isTouchDevice = this.sys.game.device.input.touch;
     if (this._isTouchDevice) {
       this.input.addPointer(2); // support 3 simultaneous touches
       this._createMobileControls(W, H);
@@ -129,8 +134,25 @@ export class UIScene extends Phaser.Scene {
       this._hasChoices = choices.length > 0;
       this.zoneHintBg.setVisible(false);
       this.zoneHint.setVisible(false);
-      this.dialogueBg.setVisible(true);
+      // Set text first so Phaser computes its height
       this.dialogueText.setText(text).setVisible(true);
+      if (this._isTouchDevice) {
+        // Mobile: box grows upward dynamically to fit text + choices
+        this._redrawDialogueBox(this.dialogueText.height, choices.length);
+      } else {
+        // PC: fixed position and height
+        this._choicesStartY = this.boxY + CHOICES_Y_OFFSET;
+        this.dialogueBg.clear()
+          .fillStyle(0x0a0a0a, 0.88)
+          .fillRoundedRect(DIALOGUE_BOX_MARGIN, this.boxY, this.boxW, DIALOGUE_BOX_HEIGHT, 6)
+          .lineStyle(2, 0xffffff, 1)
+          .strokeRoundedRect(DIALOGUE_BOX_MARGIN, this.boxY, this.boxW, DIALOGUE_BOX_HEIGHT, 6);
+        this.dialogueHint.setPosition(
+          W - DIALOGUE_BOX_MARGIN - DIALOGUE_BOX_PADDING,
+          this.boxY + DIALOGUE_BOX_HEIGHT - DIALOGUE_BOX_PADDING
+        );
+      }
+      this.dialogueBg.setVisible(true);
       this.dialogueHint.setText(choices.length === 0 ? "Fermer ✕" : "Entrée ▶").setVisible(true);
       this._renderChoices(choices, 0);
       this._syncMobileButtons();
@@ -243,13 +265,13 @@ export class UIScene extends Phaser.Scene {
     this._btnInteract = this._makeButton(W - 150, H - 90 - sb, BTN_RADIUS, "💬", 0x336699);
     this._btnInteract.setVisible(false);
 
-    // Dialogue buttons – placed above the dialogue box
-    // Layout: [↓ cycle — left]          [✓ confirm] [✕ close — right]
-    const diagBtnY = this.boxY - DIAG_BTN_Y_ABOVE;
+    // Dialogue buttons – placed in the bottom button row (same Y as attack/interact)
+    // Layout: [↓ cycle — left]    [✓ confirm] [✕ close — right]
+    const diagBtnY = H - BTN_Y_FROM_BOTTOM - sb;
     const btnR = BTN_RADIUS - 4; // 28px radius → 56px diameter
     this._btnCycle   = this._makeButton(60,      diagBtnY, btnR, "↓", 0x445566);
-    this._btnConfirm = this._makeButton(W - 105, diagBtnY, btnR, "✓", 0x336644);
-    this._btnClose   = this._makeButton(W - 45,  diagBtnY, btnR, "✕", 0x664433);
+    this._btnConfirm = this._makeButton(W - 70,  diagBtnY, btnR, "✓", 0x336644);
+    this._btnClose   = this._makeButton(W - 150, diagBtnY, btnR, "✕", 0x664433);
     this._btnCycle.setVisible(false);
     this._btnConfirm.setVisible(false);
     this._btnClose.setVisible(false);
@@ -421,6 +443,34 @@ export class UIScene extends Phaser.Scene {
 
   // ── Dialogue rendering (shared keyboard + touch) ─────────────────────────────
 
+  /** Recalculate boxY and redraw the dialogue background to fit text + choices. */
+  private _redrawDialogueBox(textH: number, choiceCount: number) {
+    const choicesH = choiceCount > 0 ? CHOICES_GAP + choiceCount * CHOICE_LINE_HEIGHT : 0;
+    const boxH = Math.max(
+      DIALOGUE_BOX_MIN_HEIGHT,
+      DIALOGUE_BOX_PADDING + textH + choicesH + DIALOGUE_BOX_PADDING
+    );
+    this.boxY = this._boxBottom - boxH;
+    this._choicesStartY = this.boxY + DIALOGUE_BOX_PADDING + textH + CHOICES_GAP;
+
+    // Reposition text (top of box)
+    this.dialogueText.setPosition(
+      DIALOGUE_BOX_MARGIN + DIALOGUE_BOX_PADDING,
+      this.boxY + DIALOGUE_BOX_PADDING
+    );
+    // Reposition hint (bottom-right of box)
+    this.dialogueHint.setPosition(
+      this.scale.width - DIALOGUE_BOX_MARGIN - DIALOGUE_BOX_PADDING,
+      this.boxY + boxH - DIALOGUE_BOX_PADDING
+    );
+    // Redraw background
+    this.dialogueBg.clear()
+      .fillStyle(0x0a0a0a, 0.88)
+      .fillRoundedRect(DIALOGUE_BOX_MARGIN, this.boxY, this.boxW, boxH, 6)
+      .lineStyle(2, 0xffffff, 1)
+      .strokeRoundedRect(DIALOGUE_BOX_MARGIN, this.boxY, this.boxW, boxH, 6);
+  }
+
   private _renderChoices(choices: { label: string }[], selectedIndex: number) {
     this._clearChoices();
     choices.forEach((choice, i) => {
@@ -428,7 +478,7 @@ export class UIScene extends Phaser.Scene {
       const t = this.add
         .text(
           DIALOGUE_BOX_MARGIN + DIALOGUE_BOX_PADDING,
-          this.boxY + CHOICES_Y_OFFSET + i * CHOICE_LINE_HEIGHT,
+          this._choicesStartY + i * CHOICE_LINE_HEIGHT,
           `${isSelected ? "▶ " : "  "}${choice.label}`,
           { fontSize: "13px", color: isSelected ? "#ffffff" : "#888888" }
         )

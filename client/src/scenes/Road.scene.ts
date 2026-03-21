@@ -161,6 +161,9 @@ export class Road extends Phaser.Scene {
    * Create and initialize the scene
    */
   create(data: { network: Network }) {
+    // Black screen immediately — nothing visible until the player and camera are ready
+    this.cameras.main.fadeOut(0, 0, 0, 0);
+
     this.displayMap();
 
     // UI
@@ -184,7 +187,9 @@ export class Road extends Phaser.Scene {
         if (CLIENT_CONFIG.DEBUG) {
           this.components.addComponent(player, new DebugPlayer(this.scene.get(SCENES.UI)));
         }
-        // Fade in only now: player is at correct spawn position
+        // Camera must be configured (zoom + follow) BEFORE fading in,
+        // so the very first visible frame is already the correct framing.
+        this.setupCamera();
         this.cameras.main.fadeIn(1200, 0, 0, 0);
         showSceneTitle(this, "Road");
       },
