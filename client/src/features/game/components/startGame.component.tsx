@@ -28,11 +28,11 @@ export function StartGame() {
     setFading(true);
     try {
       const bootScene = phaserGame.scene.keys[SCENES.BOOT] as BootScene;
-      bootScene.launchGame();
       await bootScene.network.joinOrCreatePublic({
         name: "Erwan",
         texture: character,
       });
+      bootScene.launchGame();
     } catch (error) {
       console.error(error);
     }
