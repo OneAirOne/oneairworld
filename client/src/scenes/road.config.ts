@@ -59,6 +59,11 @@ export const ROAD_POI_ZONES: PoiZoneConfig[] = [
     text: "C'est fermé... Je pense que je devrais aller dans l'autre direction pour voir cette fameuse salle d'arcade.",
     radius: 30,
   },
+  {
+    spawnPoint: "notHere",
+    text: "Je crois que je suis en train de m'égarer... Je devrais peut-être aller voir cette salle d'arcade.",
+    radius: 30,
+  },
 ];
 
 export const ROAD_MAP_CONFIG: MapConfig = {
