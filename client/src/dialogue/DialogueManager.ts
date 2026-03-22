@@ -108,6 +108,11 @@ export class DialogueManager {
   isInZone() { return this.activeNpcId !== null; }
 
   private _goToNode(node: DialogueNode, event: PhaserEvent) {
+    // Empty leaf node — close silently without showing the box
+    if (!node.text && (!node.choices || node.choices.length === 0)) {
+      this.close();
+      return;
+    }
     this.currentNode = node;
     this.selectedChoiceIndex = 0;
     phaserEvents.emit(event, {

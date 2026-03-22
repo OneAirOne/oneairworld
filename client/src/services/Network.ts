@@ -169,6 +169,10 @@ export class Network {
     this.room?.send(Message.UPDATE_PLAYER_ZONE, { zone });
   }
 
+  restoreLife() {
+    this.room?.send(Message.RESTORE_LIFE);
+  }
+
   /**
    * Register event listener and call back function when a player updated
    */

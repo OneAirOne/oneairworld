@@ -1,4 +1,5 @@
 import CLIENT_CONFIG from "client.config";
+import type { PoiZoneConfig } from "./game.helpers";
 
 export enum TiledLayer {
   INFO                 = "info",
@@ -45,6 +46,19 @@ export const ROAD_SCENE_LAYERS: LayerConfig[] = [
   { name: TiledLayer.COLLIDE_ABOVE_PLAYER, depth: 2 },
   { name: TiledLayer.ABOVE,                depth: 3 },
   { name: TiledLayer.ANIMATED,             depth: 10 },
+];
+
+export const ROAD_POI_ZONES: PoiZoneConfig[] = [
+  {
+    spawnPoint: "maisonErwan",
+    text: "La maison d'Erwan... mais il n'est pas là. Je devrais vraiment aller voir cette salle d'arcade.",
+    radius: 30,
+  },
+  {
+    spawnPoint: "maisonRandom",
+    text: "C'est fermé... Je pense que je devrais aller dans l'autre direction pour voir cette fameuse salle d'arcade.",
+    radius: 30,
+  },
 ];
 
 export const ROAD_MAP_CONFIG: MapConfig = {

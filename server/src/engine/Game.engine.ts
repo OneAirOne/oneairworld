@@ -3,7 +3,7 @@ import Matter from "matter-js";
 import { GameState } from "../rooms/schema";
 import { processPlayerAction, collisionPlayers, collisionPlayerEnemy, processEnemyAI } from "./actions";
 
-import { SwordMan, createZone, Fluppy, PLAYER_CONFIG, ArrowBody } from "./bodies";
+import { SwordMan, createZone, createPnjBodies, Fluppy, PLAYER_CONFIG, ArrowBody } from "./bodies";
 import { COLLISION_CATEGORY } from "./engine.config";
 import { SERVER_CONFIG } from "../server.config";
 
@@ -247,6 +247,7 @@ export class GameEngine {
       engine.gravity.y = 0;
 
       createZone(zone, world);
+      createPnjBodies(zone, world);
 
       // Camera bounds (only road needs them for physics)
       if (zone === Zone.ROAD) {

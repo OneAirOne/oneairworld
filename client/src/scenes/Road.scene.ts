@@ -10,7 +10,7 @@ import { Arrow, ARROW_ANIM_KEYS } from "../characters/Arrow";
 
 // Others
 import { SCENES } from "./scene.config";
-import { createSpeakingBubble, buildTilesets, showSceneTitle, renderCollisionDebug } from "./game.helpers";
+import { createSpeakingBubble, buildTilesets, showSceneTitle, renderCollisionDebug, renderDebugZones, loadPoiZones, type PoiZone } from "./game.helpers";
 import { ROAD_MAP_CONFIG } from "./road.config";
 import CLIENT_CONFIG, { SERVER_DATA } from "client.config";
 
@@ -29,7 +29,7 @@ import { phaserEvents, PhaserEvent } from "../events/eventManager";
 // Shared
 import type { IPlayer, IEnemy, IArrow } from "../../../shared/types";
 import { Anim, Zone } from "../../../shared/types";
-import { ROAD_SCENE_LAYERS, TiledLayer, TiledObjectType } from "./road.config";
+import { ROAD_SCENE_LAYERS, ROAD_POI_ZONES, TiledLayer, TiledObjectType } from "./road.config";
 import { SHARED_CONFIG, ENEMY_CONFIG, getCharCombatConfig, PNJ_LIST } from "../../../shared/shared.config";
 import { INTERIORS } from "./interior.config";
 import { PlayerManager } from "./playerManager";
@@ -50,6 +50,8 @@ export class Road extends Phaser.Scene {
   private dialogueManager = new DialogueManager();
   private dialogueInput!: DialogueInputHandler;
   private _pnjCooldown = false;
+  private _poiZones: PoiZone[] = [];
+  private _activePoi: PoiZone | null = null;
 
   sceneMap!: Phaser.Tilemaps.Tilemap;
   lastServerX: number = 0;
@@ -322,6 +324,9 @@ export class Road extends Phaser.Scene {
         }
       }
     });
+    this._poiZones = loadPoiZones(this.sceneMap, ROAD_POI_ZONES);
+    this._activePoi = null;
+    renderDebugZones(this, this.interactivePnjs, ROBOT_INTERACTION_RADIUS, [], this._poiZones);
 
     this.dialogueInput = new DialogueInputHandler(
       this.dialogueManager,
@@ -333,6 +338,16 @@ export class Road extends Phaser.Scene {
           if (!this.sys.game.device.input.touch) {
             window.open("https://fr.linkedin.com/in/erwan-gilbert-b184241b", "_blank", "noopener,noreferrer");
           }
+        }
+
+        if (action === "open_github") {
+          if (!this.sys.game.device.input.touch) {
+            window.open("https://github.com/OneAirOne", "_blank", "noopener,noreferrer");
+          }
+        }
+
+        if (action === "restore_life") {
+          this.network.restoreLife();
         }
 
         // enter_interior:<zone>
@@ -621,6 +636,21 @@ export class Road extends Phaser.Scene {
       this.dialogueManager.enterZone(nearestPnj.dialogueId);
     } else {
       this.dialogueManager.leaveZone();
+    }
+
+    // POI zones — text overlay on proximity, no Enter action
+    let nearestPoi: PoiZone | null = null;
+    for (const zone of this._poiZones) {
+      const dist = Phaser.Math.Distance.Between(this.myPlayer.x, this.myPlayer.y, zone.x, zone.y);
+      if (dist <= zone.radius) { nearestPoi = zone; break; }
+    }
+    if (nearestPoi !== this._activePoi) {
+      this._activePoi = nearestPoi;
+      if (nearestPoi) {
+        phaserEvents.emit(PhaserEvent.POI_ENTER, nearestPoi.text);
+      } else {
+        phaserEvents.emit(PhaserEvent.POI_LEAVE);
+      }
     }
 
     // DEBUG: draw enemy bounding boxes

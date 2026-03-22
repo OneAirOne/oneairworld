@@ -84,6 +84,13 @@ export class Game extends Room<GameState> {
       this.engine.setPlayerZone(client.sessionId, data.zone);
     });
 
+    // Restore player life to 100 (e.g. after eating at TacoRex)
+    this.onMessage(Message.RESTORE_LIFE, (client) => {
+      const player = this.state.players.get(client.sessionId);
+      if (!player || player.isDead) return;
+      player.life = 100;
+    });
+
     // Run update loop at 60 fps
     this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }

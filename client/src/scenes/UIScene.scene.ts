@@ -86,19 +86,15 @@ export class UIScene extends Phaser.Scene {
         fontSize: "13px",
         color: "#ffffff",
         padding: { x: 10, y: 5 },
+        wordWrap: { width: W - DIALOGUE_BOX_MARGIN * 4 },
+        align: "center",
       })
       .setOrigin(0.5, 1)
       .setDepth(1)
       .setVisible(false);
 
-    const hintW = this.zoneHint.width;
-    const hintH = this.zoneHint.height;
-    const hintX = W / 2 - hintW / 2;
-    const hintY = this.boxY - 8 - hintH;
-    this.zoneHintBg = this.add.graphics()
-      .fillStyle(0x0a0a0a, 0.88).fillRoundedRect(hintX, hintY, hintW, hintH, 6)
-      .lineStyle(2, 0xffffff, 1).strokeRoundedRect(hintX, hintY, hintW, hintH, 6)
-      .setDepth(0).setVisible(false);
+    this.zoneHintBg = this.add.graphics().setDepth(0).setVisible(false);
+    this._redrawHintBg(W);
 
     // --- Dialogue box background (drawn dynamically on each open) ---
     this.dialogueBg = this.add.graphics().setVisible(false);
@@ -180,6 +176,7 @@ export class UIScene extends Phaser.Scene {
 
     const ACTION_URLS: Record<string, string> = {
       open_linkedin: "https://fr.linkedin.com/in/erwan-gilbert-b184241b",
+      open_github:   "https://github.com/OneAirOne",
     };
     const onAction = (action: string) => {
       this._pendingUrl = ACTION_URLS[action] ?? null;
@@ -189,20 +186,27 @@ export class UIScene extends Phaser.Scene {
       this._inZone = true;
       // On mobile the interact button replaces the text hint
       if (!this._isTouchDevice) {
-        this.zoneHintBg.setVisible(true);
-        this.zoneHint.setVisible(true);
+        this._showHint("Appuyer sur Entrée pour parler");
       }
       this._syncMobileButtons();
     };
     const onZoneLeave = () => {
       this._inZone = false;
-      this.zoneHintBg.setVisible(false);
-      this.zoneHint.setVisible(false);
+      this._hideHint();
       this._syncMobileButtons();
+    };
+
+    const onPoiEnter = (text: string) => {
+      this._showHint(text);
+    };
+    const onPoiLeave = () => {
+      this._hideHint();
     };
 
     phaserEvents.on(PhaserEvent.DIALOGUE_ZONE_ENTER, onZoneEnter);
     phaserEvents.on(PhaserEvent.DIALOGUE_ZONE_LEAVE, onZoneLeave);
+    phaserEvents.on(PhaserEvent.POI_ENTER, onPoiEnter);
+    phaserEvents.on(PhaserEvent.POI_LEAVE, onPoiLeave);
     phaserEvents.on(PhaserEvent.DIALOGUE_OPEN, renderDialogue);
     phaserEvents.on(PhaserEvent.DIALOGUE_UPDATE, renderDialogue);
     phaserEvents.on(PhaserEvent.DIALOGUE_NAVIGATE, onNavigate);
@@ -212,6 +216,8 @@ export class UIScene extends Phaser.Scene {
     this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
       phaserEvents.off(PhaserEvent.DIALOGUE_ZONE_ENTER, onZoneEnter);
       phaserEvents.off(PhaserEvent.DIALOGUE_ZONE_LEAVE, onZoneLeave);
+      phaserEvents.off(PhaserEvent.POI_ENTER, onPoiEnter);
+      phaserEvents.off(PhaserEvent.POI_LEAVE, onPoiLeave);
       phaserEvents.off(PhaserEvent.DIALOGUE_OPEN, renderDialogue);
       phaserEvents.off(PhaserEvent.DIALOGUE_UPDATE, renderDialogue);
       phaserEvents.off(PhaserEvent.DIALOGUE_NAVIGATE, onNavigate);
@@ -351,6 +357,30 @@ export class UIScene extends Phaser.Scene {
       zone.on("pointerup",  () => this._highlightBtn(btn, false));
       zone.on("pointerout", () => this._highlightBtn(btn, false));
     }
+  }
+
+  private _redrawHintBg(W: number) {
+    const hW = this.zoneHint.width;
+    const hH = this.zoneHint.height;
+    const hX = W / 2 - hW / 2;
+    const hY = this.boxY - 8 - hH;
+    this.zoneHintBg.clear()
+      .fillStyle(0x0a0a0a, 0.88).fillRoundedRect(hX, hY, hW, hH, 6)
+      .lineStyle(2, 0xffffff, 1).strokeRoundedRect(hX, hY, hW, hH, 6);
+  }
+
+  private _showHint(text: string) {
+    const W = this.scale.width;
+    this.zoneHint.setWordWrapWidth(W - DIALOGUE_BOX_MARGIN * 4);
+    this.zoneHint.setText(text);
+    this._redrawHintBg(W);
+    this.zoneHintBg.setVisible(true);
+    this.zoneHint.setVisible(true);
+  }
+
+  private _hideHint() {
+    this.zoneHintBg.setVisible(false);
+    this.zoneHint.setVisible(false);
   }
 
   private _highlightBtn(btn: Phaser.GameObjects.Container, pressed: boolean) {

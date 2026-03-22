@@ -1,6 +1,7 @@
 import { Zone } from "../../../shared/types";
 import type { LayerConfig } from "./road.config";
 import { TiledLayer } from "./road.config";
+import type { PnjSpawnConfig, InteractionZoneConfig } from "./game.helpers";
 
 export interface InteriorTileset {
   name: string;
@@ -18,6 +19,10 @@ export interface InteriorConfig {
   returnSpawn: { x: number; y: number };
   /** Optional label shown as the room title */
   label?: string;
+  /** PNJs to spawn in this interior */
+  pnjs?: PnjSpawnConfig[];
+  /** Proximity zones that open a dialogue (arcade machines, objects…) */
+  interactionZones?: InteractionZoneConfig[];
 }
 
 export const INTERIOR_SCENE_LAYERS: LayerConfig[] = [
@@ -64,5 +69,15 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
     playerSpawn: { x: 128, y: 200 },
     returnSpawn: { x: 0, y: 0 },
     label: "Arcade",
+    pnjs: [
+      { spawnPoint: "pnj1_arcade", texture: "wendy", animKey: "wendyIdle", dialogueId: "wendy_arcade", bubbleOffsetX: 10, bubbleOffsetY: 15 },
+    ],
+    interactionZones: [
+      { spawnPoint: "project1", dialogueId: "project1", radius: 30 },
+      { spawnPoint: "project2", dialogueId: "project2", radius: 30 },
+      { spawnPoint: "project3", dialogueId: "project3", radius: 30 },
+      { spawnPoint: "project4", dialogueId: "project4", radius: 30 },
+      { spawnPoint: "project5", dialogueId: "project5", radius: 30 },
+    ],
   },
 };

@@ -4,6 +4,7 @@ const fs = require("fs");
 import { COLLISION_CATEGORY } from "../../engine.config";
 import { TiledInfoObject } from "../../../../../shared/map.config";
 import { Zone } from "../../../../../shared/types";
+import { PNJ_LIST } from "../../../../../shared/shared.config";
 
 // ── Zone configuration ────────────────────────────────────────────────────────
 
@@ -110,6 +111,43 @@ export function createZone(zone: Zone, world: Matter.World): void {
       );
     });
   });
+}
+
+const PNJ_BODY_SIZE = 14; // px — collision box width & height for each NPC
+
+/**
+ * Add static collision bodies for every visible PNJ in the zone.
+ * Bodies are static (won't move on contact) and block players, enemies, and arrows.
+ */
+export function createPnjBodies(zone: Zone, world: Matter.World): void {
+  if (zone !== Zone.ROAD) return; // PNJs only live on the road map
+  const map = readMap(zone);
+  if (!map) return;
+
+  const infoLayer = map.layers.find((l: TiledData) => l.name === "info");
+  if (!infoLayer?.objects) return;
+
+  const spawnByName: Record<string, { x: number; y: number }> = {};
+  for (const obj of infoLayer.objects as TiledObject[]) {
+    spawnByName[obj.name] = { x: obj.x, y: obj.y };
+  }
+
+  for (const pnj of PNJ_LIST) {
+    if (!pnj.visible) continue;
+    const pos = spawnByName[pnj.spawnPoint];
+    if (!pos) continue;
+
+    Matter.World.addBody(
+      world,
+      Matter.Bodies.rectangle(
+        pos.x + pnj.offsetX,
+        pos.y + pnj.offsetY,
+        PNJ_BODY_SIZE,
+        PNJ_BODY_SIZE,
+        { ...WALL_CONFIG, label: `pnj_${pnj.texture}` }
+      )
+    );
+  }
 }
 
 /**

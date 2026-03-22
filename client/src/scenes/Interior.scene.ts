@@ -10,7 +10,8 @@ import { Arrow } from "../characters/Arrow";
 import type { IArrow, IPlayer } from "../../../shared/types";
 import ComponentService from "../services/Component.service";
 import { UiBarComponent } from "../components/phaser";
-import { showSceneTitle, renderCollisionDebug } from "./game.helpers";
+import { showSceneTitle, renderCollisionDebug, spawnInteractivePnjs, loadInteractionZones, renderDebugZones, type InteractivePnj, type InteractionZone } from "./game.helpers";
+import { getProject } from "../config/projects.config";
 import { DialogueManager } from "../dialogue/DialogueManager";
 import { DialogueInputHandler } from "../dialogue/DialogueInputHandler";
 
@@ -40,6 +41,10 @@ export class InteriorScene extends Phaser.Scene {
   private _dialogueInput!: DialogueInputHandler;
   private _returnPoint: { x: number; y: number } | null = null;
   private _inReturnZone = false;
+  private _inInteractionZoneId: string | null = null;
+  private _interactivePnjs: InteractivePnj[] = [];
+  private _interactionZones: InteractionZone[] = [];
+  private _pnjCooldown = false;
 
   private get _player(): Player { return this._playerManager?.myPlayer; }
 
@@ -71,6 +76,7 @@ export class InteriorScene extends Phaser.Scene {
 
     this._components = new ComponentService();
     this._inReturnZone = false;
+    this._inInteractionZoneId = null;
     this._exiting = false;
     this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
       this._components.destroy();
@@ -130,7 +136,7 @@ export class InteriorScene extends Phaser.Scene {
 
     this._dialogueInput = new DialogueInputHandler(
       this._dialogueManager,
-      (action) => { if (action === "exit_interior") this._exit(); },
+      (action) => this._handleAction(action),
       () => this._exit(),
     );
     this._dialogueInput.register(this);
@@ -191,6 +197,12 @@ export class InteriorScene extends Phaser.Scene {
       }
     });
 
+    // --- PNJs ---
+    this._pnjCooldown = false;
+    this._interactivePnjs = config.pnjs ? spawnInteractivePnjs(this, map, config.pnjs) : [];
+    this._interactionZones = config.interactionZones ? loadInteractionZones(map, config.interactionZones) : [];
+    renderDebugZones(this, this._interactivePnjs, RETURN_INTERACTION_RADIUS, this._interactionZones);
+
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.startFollow(localPlayer, true);
     this.cameras.main.setZoom(2);
@@ -231,21 +243,65 @@ export class InteriorScene extends Phaser.Scene {
     this._playerManager.updateMyPlayer();
     this._playerManager.updateOtherPlayers();
 
+    // PNJ proximity check
+    let nearestPnj: typeof this._interactivePnjs[0] | null = null;
+    for (const pnj of this._interactivePnjs) {
+      const dist = Phaser.Math.Distance.Between(this._player.x, this._player.y, pnj.sprite.x, pnj.sprite.y);
+      const inZone = !this._pnjCooldown && dist <= RETURN_INTERACTION_RADIUS;
+      pnj.bubble.setVisible(inZone);
+      if (inZone) nearestPnj = pnj;
+    }
+
+    // Interaction zones proximity check (arcade machines, objects…)
+    let inInteractionZone = false;
+    for (const zone of this._interactionZones) {
+      const dist = Phaser.Math.Distance.Between(this._player.x, this._player.y, zone.x, zone.y);
+      if (dist <= zone.radius) {
+        inInteractionZone = true;
+        if (this._inInteractionZoneId !== zone.dialogueId) {
+          this._inInteractionZoneId = zone.dialogueId;
+          this._dialogueManager.enterZone(zone.dialogueId);
+          this._dialogueManager.open();
+        }
+        break;
+      }
+    }
+    if (!inInteractionZone && this._inInteractionZoneId !== null) {
+      this._inInteractionZoneId = null;
+      this._dialogueManager.leaveZone();
+    }
+
     // Return-point proximity check — auto-open dialogue on enter, close on leave
+    let inReturnZone = false;
     if (this._returnPoint) {
       const dist = Phaser.Math.Distance.Between(
         this._player.x, this._player.y,
         this._returnPoint.x, this._returnPoint.y,
       );
-      const inZone = dist <= RETURN_INTERACTION_RADIUS;
-      if (inZone && !this._inReturnZone) {
+      inReturnZone = dist <= RETURN_INTERACTION_RADIUS;
+      if (inReturnZone && !this._inReturnZone) {
         this._inReturnZone = true;
         this._dialogueManager.enterZone(RETURN_DIALOGUE_ID);
         this._dialogueManager.open();
-      } else if (!inZone && this._inReturnZone) {
+      } else if (!inReturnZone && this._inReturnZone) {
         this._inReturnZone = false;
         this._dialogueManager.leaveZone();
       }
+    }
+
+    // PNJ zone takes priority; interaction zones and return-point manage their own state
+    if (nearestPnj) {
+      this._dialogueManager.enterZone(nearestPnj.dialogueId);
+    } else if (!inReturnZone && !inInteractionZone) {
+      this._dialogueManager.leaveZone();
+    }
+  }
+
+  private _handleAction(action: string) {
+    if (action === "exit_interior") this._exit();
+    if (action.startsWith("open_project:")) {
+      const project = getProject(action.split(":")[1]);
+      if (project) window.open(project.url, "_blank", "noopener,noreferrer");
     }
   }
 

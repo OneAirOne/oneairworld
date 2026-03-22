@@ -22,6 +22,9 @@ export enum PhaserEvent {
   DIALOGUE_NAVIGATE = "dialogue-navigate",
   DIALOGUE_ACTION = "dialogue-action",
   DIALOGUE_CLOSE = "dialogue-close",
+  // Point of interest (proximity text, no action)
+  POI_ENTER = "poi-enter",
+  POI_LEAVE = "poi-leave",
   // Interior transitions
   ENTER_INTERIOR = "enter-interior",
   // Mobile touch actions (mirror keyboard shortcuts)

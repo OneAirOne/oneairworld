@@ -54,6 +54,139 @@ ServerY ${options.lastServerY.toFixed(2)} ClientY ${options.clientY.toFixed(
   )}`;
 }
 
+// ---- Point of interest zones (proximity text, no action) ----
+
+export interface PoiZoneConfig {
+  spawnPoint: string;
+  text: string;
+  radius?: number;
+  /** Optional action triggered when player presses Enter in the zone */
+  action?: string;
+}
+
+export interface PoiZone {
+  x: number;
+  y: number;
+  text: string;
+  radius: number;
+  action?: string;
+}
+
+export function loadPoiZones(
+  map: Phaser.Tilemaps.Tilemap,
+  points: PoiZoneConfig[]
+): PoiZone[] {
+  const result: PoiZone[] = [];
+  const loaded = new Set<number>();
+
+  // @ts-ignore
+  map.findObject("info", (obj) => {
+    const tiledObj = obj as unknown as { x: number; y: number; name: string };
+    points.forEach((pt, i) => {
+      if (loaded.has(i)) return;
+      if (tiledObj.name !== pt.spawnPoint) return;
+      loaded.add(i);
+      result.push({ x: tiledObj.x, y: tiledObj.y, text: pt.text, radius: pt.radius ?? 60, action: pt.action });
+    });
+  });
+
+  return result;
+}
+
+// ---- Interaction zones (proximity triggers without sprite) ----
+
+export interface InteractionZoneConfig {
+  spawnPoint: string;
+  dialogueId: string;
+  radius?: number;
+}
+
+export interface InteractionZone {
+  x: number;
+  y: number;
+  dialogueId: string;
+  radius: number;
+}
+
+/**
+ * Load interaction zones from the "info" layer of a tilemap.
+ * Each zone is a proximity trigger that opens a dialogue — no sprite.
+ */
+export function loadInteractionZones(
+  map: Phaser.Tilemaps.Tilemap,
+  points: InteractionZoneConfig[]
+): InteractionZone[] {
+  const result: InteractionZone[] = [];
+  const loaded = new Set<number>();
+
+  // @ts-ignore
+  map.findObject("info", (obj) => {
+    const tiledObj = obj as unknown as { x: number; y: number; name: string };
+    points.forEach((pt, i) => {
+      if (loaded.has(i)) return;
+      if (tiledObj.name !== pt.spawnPoint) return;
+      loaded.add(i);
+      result.push({ x: tiledObj.x, y: tiledObj.y, dialogueId: pt.dialogueId, radius: pt.radius ?? 30 });
+    });
+  });
+
+  return result;
+}
+
+// ---- PNJ spawning ----
+
+export interface PnjSpawnConfig {
+  spawnPoint: string;
+  texture: string;
+  atlasKey?: string;
+  animKey: string;
+  offsetX?: number;
+  offsetY?: number;
+  dialogueId: string;
+  bubbleOffsetX?: number;
+  bubbleOffsetY?: number;
+}
+
+export interface InteractivePnj {
+  sprite: Phaser.GameObjects.Sprite;
+  bubble: Phaser.GameObjects.Text;
+  dialogueId: string;
+}
+
+/**
+ * Spawn PNJ sprites on the "info" layer of a tilemap.
+ * Uses map.findObject — identical to the Road scene approach.
+ */
+export function spawnInteractivePnjs(
+  scene: Phaser.Scene,
+  map: Phaser.Tilemaps.Tilemap,
+  pnjs: PnjSpawnConfig[]
+): InteractivePnj[] {
+  const result: InteractivePnj[] = [];
+  const spawned = new Set<number>(); // track which pnj config indices have been spawned
+
+  // @ts-ignore (Phaser types for findObject callback are loose)
+  map.findObject("info", (obj) => {
+    const tiledObj = obj as unknown as { x: number; y: number; name: string };
+    pnjs.forEach((pnj, i) => {
+      if (spawned.has(i)) return;          // already spawned this pnj
+      if (tiledObj.name !== pnj.spawnPoint) return;
+      spawned.add(i);
+      const sprite = scene.add.sprite(
+        tiledObj.x + (pnj.offsetX ?? 0),
+        tiledObj.y + (pnj.offsetY ?? 0),
+        pnj.atlasKey ?? pnj.texture
+      );
+      sprite.setDepth(1);
+      if (scene.anims.exists(pnj.animKey)) sprite.play(pnj.animKey);
+      const bubble = createSpeakingBubble(scene, sprite, pnj.bubbleOffsetX ?? 10, pnj.bubbleOffsetY ?? 14);
+      result.push({ sprite, bubble, dialogueId: pnj.dialogueId });
+    });
+  });
+
+  return result;
+}
+
 /**
  * Add tilesets to a tilemap from a config array.
  * Returns the array of Phaser tilesets ready to pass to createLayer().
@@ -153,6 +286,40 @@ export function renderCollisionDebug(
     collidingTileColor: color,
     faceColor: new Phaser.Display.Color(40, 39, 37, 255),
   });
+}
+
+/**
+ * Draw debug circles for PNJ interaction radii and interaction zones.
+ * Only renders when CLIENT_CONFIG.DEBUG is true.
+ */
+export function renderDebugZones(
+  scene: Phaser.Scene,
+  pnjs: InteractivePnj[],
+  pnjRadius: number,
+  interactionZones: InteractionZone[],
+  poiZones: PoiZone[] = []
+): void {
+  if (!CLIENT_CONFIG.DEBUG) return;
+
+  const g = scene.add.graphics().setDepth(99998);
+
+  // PNJ zones — cyan
+  g.lineStyle(1, 0x00ffff, 0.7);
+  for (const pnj of pnjs) {
+    g.strokeCircle(pnj.sprite.x, pnj.sprite.y, pnjRadius);
+  }
+
+  // Interaction zones — orange
+  g.lineStyle(1, 0xff8800, 0.7);
+  for (const zone of interactionZones) {
+    g.strokeCircle(zone.x, zone.y, zone.radius);
+  }
+
+  // POI zones — yellow
+  g.lineStyle(1, 0xffff00, 0.7);
+  for (const zone of poiZones) {
+    g.strokeCircle(zone.x, zone.y, zone.radius);
+  }
 }
 
 export async function waitFor(time: number = 500): Promise<void> {

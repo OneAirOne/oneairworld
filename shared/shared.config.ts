@@ -98,7 +98,7 @@ export const PNJ_LIST: PnjConfig[] = [
   { texture: "wizard", spawnPoint: "pnj9", offsetX:   0, offsetY: 0, visible: false },
   { texture: "wendy",  spawnPoint: "pnj2", offsetX:   0, offsetY: 0, visible: true, dialogueId: "wendy", bubbleOffsetX: 10, bubbleOffsetY: 15 },
   { texture: "dino",   spawnPoint: "pnj4", offsetX:   0, offsetY: 0, visible: true, dialogueId: "dino" },
-  { texture: "john",   spawnPoint: "pnj7", offsetX:   0, offsetY: 0, visible: true  },
+  { texture: "john",   spawnPoint: "pnj7", offsetX:   0, offsetY: 0, visible: true,  dialogueId: "john"  },
   { texture: "robot",  spawnPoint: "pnj3", offsetX:   0, offsetY: 0, visible: true,  dialogueId: "robot"  },
 ];
 

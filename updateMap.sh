@@ -17,3 +17,4 @@ cp "./tools/map/arcade.json"      "./client/public/assets/map/interior-arcade.js
 
 # Server
 cp "./tools/map/road.json"        "./server/src/engine/bodies/map/road.json"
+cp "./tools/map/arcade.json"      "./server/src/engine/bodies/map/interior-arcade.json"

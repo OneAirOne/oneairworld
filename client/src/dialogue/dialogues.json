@@ -52,24 +52,137 @@
       }
     }
   },
+  "wendy_arcade": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Les bornes d'arcade présentent les projets d'Erwan — approche-toi d'une borne pour en savoir plus. Pour sortir, passe par la porte en haut de la salle.",
+        "choices": []
+      }
+    }
+  },
   "dino": {
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "RAWRRR ! Bienvenue chez TacoRex ! Les meilleurs tacos de la ville, préparés avec amour... et quelques épices secrètes.",
+        "text": "RAWRRR ! Bienvenue chez TacoRex ! Tu as l'air épuisé... un tacos et tu seras comme neuf. Tu en veux un ?",
         "choices": [
-          { "label": "Ça sent drôlement bon !", "next": "smell" },
-          { "label": "Je reviendrai plus tard.", "next": "bye" }
+          { "label": "Oui, avec plaisir !", "next": "eat" },
+          { "label": "Non merci, je suis pressé.", "next": "bye" }
         ]
       },
-      "smell": {
-        "text": "C'est notre recette spéciale dino ! Inchangée depuis 65 millions d'années.",
-        "choices": [
-          { "label": "Impressionnant.", "next": "bye" }
-        ]
+      "eat": {
+        "text": "Voilà ! Plein d'énergie maintenant. Au fait, tu cherches à en savoir plus sur Erwan ? Va faire un tour dans la salle d'arcade, juste à côté !",
+        "action": "restore_life",
+        "choices": []
       },
       "bye": {
-        "text": "À bientôt chez TacoRex !",
+        "text": "Pas de souci ! Si tu changes d'avis, TacoRex est toujours là. Et si tu cherches Erwan, jette un œil à la salle d'arcade !",
+        "choices": []
+      }
+    }
+  },
+  "project1": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Borne : «OneairWorld» — Veux-tu consulter ce projet ?",
+        "choices": [
+          { "label": "Oui !", "next": "open" },
+          { "label": "Non merci.", "next": "bye" }
+        ]
+      },
+      "open": {
+        "text": "Bonne visite !",
+        "action": "open_project:1",
+        "choices": []
+      },
+      "bye": {
+        "text": "",
+        "choices": []
+      }
+    }
+  },
+  "project2": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Borne : «Projet 2» — Veux-tu consulter ce projet ?",
+        "choices": [
+          { "label": "Oui !", "next": "open" },
+          { "label": "Non merci.", "next": "bye" }
+        ]
+      },
+      "open": {
+        "text": "Bonne visite !",
+        "action": "open_project:2",
+        "choices": []
+      },
+      "bye": {
+        "text": "",
+        "choices": []
+      }
+    }
+  },
+  "project3": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Borne : «Projet 3» — Veux-tu consulter ce projet ?",
+        "choices": [
+          { "label": "Oui !", "next": "open" },
+          { "label": "Non merci.", "next": "bye" }
+        ]
+      },
+      "open": {
+        "text": "Bonne visite !",
+        "action": "open_project:3",
+        "choices": []
+      },
+      "bye": {
+        "text": "",
+        "choices": []
+      }
+    }
+  },
+  "project4": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Borne : «Projet 4» — Veux-tu consulter ce projet ?",
+        "choices": [
+          { "label": "Oui !", "next": "open" },
+          { "label": "Non merci.", "next": "bye" }
+        ]
+      },
+      "open": {
+        "text": "Bonne visite !",
+        "action": "open_project:4",
+        "choices": []
+      },
+      "bye": {
+        "text": "",
+        "choices": []
+      }
+    }
+  },
+  "project5": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Borne : «Projet 5» — Veux-tu consulter ce projet ?",
+        "choices": [
+          { "label": "Oui !", "next": "open" },
+          { "label": "Non merci.", "next": "bye" }
+        ]
+      },
+      "open": {
+        "text": "Bonne visite !",
+        "action": "open_project:5",
+        "choices": []
+      },
+      "bye": {
+        "text": "",
         "choices": []
       }
     }
@@ -90,7 +203,28 @@
         "choices": []
       },
       "no": {
-        "text": "Bonne session !",
+        "text": "",
+        "choices": []
+      }
+    }
+  },
+  "john": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Hey ! Je suis John. Sur le GitHub d'Erwan, tu pourras voir le code source de ce projet. Tu veux y jeter un œil ?",
+        "choices": [
+          { "label": "Oui, montre-moi !", "next": "github_open" },
+          { "label": "Non merci.", "next": "no" }
+        ]
+      },
+      "github_open": {
+        "text": "Cool ! Tu trouveras tous ses repos là-bas. Bonne exploration !",
+        "action": "open_github",
+        "choices": []
+      },
+      "no": {
+        "text": "Pas de problème ! Dans ce cas, va faire un tour à la salle d'arcade — les projets d'Erwan y sont présentés interactivement.",
         "choices": []
       }
     }
