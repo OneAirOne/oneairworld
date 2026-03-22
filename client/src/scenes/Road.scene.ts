@@ -10,7 +10,7 @@ import { Arrow, ARROW_ANIM_KEYS } from "../characters/Arrow";
 
 // Others
 import { SCENES } from "./scene.config";
-import { createSpeakingBubble, buildTilesets, showSceneTitle } from "./game.helpers";
+import { createSpeakingBubble, buildTilesets, showSceneTitle, renderCollisionDebug } from "./game.helpers";
 import { ROAD_MAP_CONFIG } from "./road.config";
 import CLIENT_CONFIG, { SERVER_DATA } from "client.config";
 
@@ -120,11 +120,6 @@ export class Road extends Phaser.Scene {
         tileSets as Phaser.Tilemaps.Tileset[]
       );
 
-      const debugGraphics = this.add
-        .graphics()
-        .setAlpha(0.7)
-        .setDepth(CLIENT_CONFIG.DEBUG_LAYER);
-
       if (!phaserLayer) {
         console.warn(`[Road] createLayer returned null for layer: ${layer.name}`);
         return;
@@ -134,27 +129,7 @@ export class Road extends Phaser.Scene {
         phaserLayer.setDepth((this.players?.size ?? 0) + layer.depth);
       }
 
-      if (CLIENT_CONFIG.DEBUG) {
-        // Debug collision UNDER GREEN
-        if (layer.name === TiledLayer.COLLIDE_UNDER_PLAYER) {
-          phaserLayer.setCollisionByProperty({ collide: true });
-          phaserLayer.renderDebug(debugGraphics, {
-            tileColor: null,
-            collidingTileColor: new Phaser.Display.Color(139, 233, 40, 255),
-            faceColor: new Phaser.Display.Color(40, 39, 37, 255),
-          });
-        }
-
-        // Debug collision ABOVE YELLOW
-        if (layer.name === TiledLayer.COLLIDE_ABOVE_PLAYER) {
-          phaserLayer.setCollisionByProperty({ collide: true });
-          phaserLayer.renderDebug(debugGraphics, {
-            tileColor: null,
-            collidingTileColor: new Phaser.Display.Color(243, 234, 40, 255),
-            faceColor: new Phaser.Display.Color(40, 39, 37, 255),
-          });
-        }
-      }
+      renderCollisionDebug(this, phaserLayer, layer.name, CLIENT_CONFIG.DEBUG_LAYER);
     });
 
     // Analyse map objects
@@ -428,6 +403,7 @@ export class Road extends Phaser.Scene {
     console.log(`[Scene] enemy joined id=${id} x=${enemy.x} y=${enemy.y}`);
 
     const newEnemy = new Enemy(this, enemy.x, enemy.y, enemy.texture, id);
+    if (enemy.anim) newEnemy.updateAnim(enemy.anim as Anim);
     this.enemies.set(id, newEnemy);
   }
 

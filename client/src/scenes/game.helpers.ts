@@ -1,5 +1,6 @@
 import Phaser from "phaser";
-import { TilesetConfig } from "./road.config";
+import { TilesetConfig, TiledLayer } from "./road.config";
+import CLIENT_CONFIG from "client.config";
 
 // ---- Speaking bubble ----
 
@@ -108,6 +109,49 @@ export function showSceneTitle(scene: Phaser.Scene, title: string) {
       ease:     "Power2",
       onComplete: () => { overlay.destroy(); text.destroy(); },
     });
+  });
+}
+
+/**
+ * Render collision debug overlay for a tilemap layer (only when CLIENT_CONFIG.DEBUG is true).
+ * - COLLIDE_UNDER_PLAYER: green  (#8BE928)
+ * - COLLIDE_ABOVE_PLAYER: yellow (#F3EA28)
+ */
+/**
+ * Mark all collidable tiles in a collision layer.
+ * Tries the "collide" custom property first (Road tilesets),
+ * falls back to all non-empty tiles (Interior tilesets).
+ * Always runs, regardless of DEBUG mode.
+ */
+export function setupCollisionLayer(layer: Phaser.Tilemaps.TilemapLayer): void {
+  layer.setCollisionByProperty({ collide: true });
+  const hasCollision = layer.filterTiles((t: Phaser.Tilemaps.Tile) => t.collides).length > 0;
+  if (!hasCollision) layer.setCollisionByExclusion([-1]);
+}
+
+export function renderCollisionDebug(
+  scene: Phaser.Scene,
+  layer: Phaser.Tilemaps.TilemapLayer,
+  layerName: TiledLayer,
+  debugDepth: number
+): void {
+  const isUnder = layerName === TiledLayer.COLLIDE_UNDER_PLAYER;
+  const isAbove = layerName === TiledLayer.COLLIDE_ABOVE_PLAYER;
+  if (!isUnder && !isAbove) return;
+
+  setupCollisionLayer(layer);
+
+  if (!CLIENT_CONFIG.DEBUG) return;
+
+  const color = isUnder
+    ? new Phaser.Display.Color(139, 233, 40, 255)
+    : new Phaser.Display.Color(243, 234, 40, 255);
+
+  const debugGraphics = scene.add.graphics().setAlpha(0.7).setDepth(debugDepth);
+  layer.renderDebug(debugGraphics, {
+    tileColor: null,
+    collidingTileColor: color,
+    faceColor: new Phaser.Display.Color(40, 39, 37, 255),
   });
 }
 

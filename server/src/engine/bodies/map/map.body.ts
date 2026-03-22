@@ -15,7 +15,7 @@ interface ZoneMapConfig {
 
 const ZONE_CONFIG: Record<Zone, ZoneMapConfig> = {
   [Zone.ROAD]:               { mapFile: "road.json",             collideLayers: ["collide_above_player", "collide_under_player"] },
-  [Zone.INTERIOR_ARCADE]:    { mapFile: "interior-arcade.json",  collideLayers: ["collide_under_player"] },
+  [Zone.INTERIOR_ARCADE]:    { mapFile: "interior-arcade.json",  collideLayers: ["collide_above_player","collide_under_player"] },
   [Zone.INTERIOR_OLD_HOUSE]: {                                    collideLayers: ["collide_under_player"] },
   [Zone.INTERIOR_GAME_ROOM]: {                                    collideLayers: ["collide_under_player"] },
 };
@@ -96,13 +96,13 @@ export function createZone(zone: Zone, world: Matter.World): void {
     const layerWidth = layer.width;
     layer?.data?.forEach((tileRef: TileRefOnTileset, index: number) => {
       if (tileRef <= 0) return;
-      const tileX = (index % layerWidth) + COLLISION_OFFSET_X;
-      const tileY = index / layerWidth;
+      const col = index % layerWidth;
+      const row = Math.floor(index / layerWidth);
       Matter.World.addBody(
         world,
         Matter.Bodies.rectangle(
-          tileX * tileWidth,
-          tileY * tileHeight,
+          (col + COLLISION_OFFSET_X) * tileWidth,
+          (row + 0.5) * tileHeight,
           tileWidth,
           tileHeight,
           WALL_CONFIG

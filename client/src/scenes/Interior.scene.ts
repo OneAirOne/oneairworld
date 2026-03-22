@@ -3,14 +3,14 @@ import { SCENES } from "./scene.config";
 import { INTERIORS, INTERIOR_SCENE_LAYERS } from "./interior.config";
 import { Network } from "../services/Network";
 import { Zone } from "../../../shared/types";
-import { SERVER_DATA } from "client.config";
+import CLIENT_CONFIG, { SERVER_DATA } from "client.config";
 import { Player } from "../characters/player";
 import { PlayerManager } from "./playerManager";
 import { Arrow } from "../characters/Arrow";
 import type { IArrow, IPlayer } from "../../../shared/types";
 import ComponentService from "../services/Component.service";
 import { UiBarComponent } from "../components/phaser";
-import { showSceneTitle } from "./game.helpers";
+import { showSceneTitle, renderCollisionDebug } from "./game.helpers";
 import { DialogueManager } from "../dialogue/DialogueManager";
 import { DialogueInputHandler } from "../dialogue/DialogueInputHandler";
 
@@ -70,7 +70,14 @@ export class InteriorScene extends Phaser.Scene {
   create() {
 
     this._components = new ComponentService();
-    this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => this._components.destroy());
+    this._inReturnZone = false;
+    this._exiting = false;
+    this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this._components.destroy();
+      // Always clean up global listeners on shutdown regardless of how the scene exits
+      this._dialogueInput?.unregister();
+      this._dialogueManager.leaveZone();
+    });
     this.events.on(Phaser.Scenes.Events.POST_UPDATE, (_time: number, delta: number) => this._components.update(delta));
 
     // PlayerManager — shows other players in the same interior zone
@@ -151,6 +158,8 @@ export class InteriorScene extends Phaser.Scene {
       if (layerConfig.depth && layerConfig.depth > 0) {
         layer.setDepth(layerConfig.depth);
       }
+
+      renderCollisionDebug(this, layer, layerConfig.name, CLIENT_CONFIG.DEBUG_LAYER);
     });
 
     // @ts-ignore (PhaserAnimatedTiles types not defined)
@@ -240,7 +249,12 @@ export class InteriorScene extends Phaser.Scene {
     }
   }
 
+  private _exiting = false;
+
   private _exit() {
+    if (this._exiting) return;
+    this._exiting = true;
+
     // Reset dialogue state + remove global listeners before returning to Road
     this._dialogueManager.leaveZone();
     this._dialogueInput.unregister();
