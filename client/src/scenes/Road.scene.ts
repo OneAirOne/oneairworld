@@ -431,7 +431,10 @@ export class Road extends Phaser.Scene {
   handleEnemyLeft(id: string) {
     console.log(`[Scene] enemy left id=${id}`);
     const enemy = this.enemies.get(id);
-    if (enemy) enemy.destroy();
+    if (enemy) {
+      enemy.destroy();
+      phaserEvents.emit(PhaserEvent.SLIME_KILLED);
+    }
     this.enemies.delete(id);
   }
 

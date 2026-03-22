@@ -24,6 +24,10 @@ const BTN_ALPHA = 0.75;
 const BTN_Y_FROM_BOTTOM = 90;
 
 export class UIScene extends Phaser.Scene {
+  private _killCount = 0;
+  private _killBadge!: HTMLDivElement;
+  private _killCountSpan!: HTMLSpanElement;
+
   private zoneHint!: Phaser.GameObjects.Text;
   private zoneHintBg!: Phaser.GameObjects.Graphics;
   private dialogueBg!: Phaser.GameObjects.Graphics;
@@ -118,6 +122,27 @@ export class UIScene extends Phaser.Scene {
       .setOrigin(1, 1)
       .setVisible(false);
 
+    // --- Slime kill counter (DOM overlay, top-right) ---
+    this._killCount = 0;
+    this._killBadge = document.createElement("div");
+    this._killBadge.style.cssText =
+      "position:fixed;top:12px;right:12px;display:flex;align-items:center;gap:6px;" +
+      "background:rgba(0,0,0,0.6);padding:5px 10px;border-radius:8px;" +
+      "border:1px solid rgba(255,255,255,0.3);z-index:100;pointer-events:none;";
+
+    const slimeImg = document.createElement("img");
+    slimeImg.src = "/assets/slime.gif";
+    slimeImg.style.cssText = "width:40px;height:40px;image-rendering:pixelated;";
+
+    this._killCountSpan = document.createElement("span");
+    this._killCountSpan.style.cssText =
+      "color:white;font-size:14px;font-family:monospace;font-weight:bold;";
+    this._killCountSpan.textContent = "0";
+
+    this._killBadge.appendChild(slimeImg);
+    this._killBadge.appendChild(this._killCountSpan);
+    document.body.appendChild(this._killBadge);
+
     // --- Mobile controls ---
     if (this._isTouchDevice) {
       this.input.addPointer(2); // support 3 simultaneous touches
@@ -203,6 +228,11 @@ export class UIScene extends Phaser.Scene {
       this._hideHint();
     };
 
+    const onSlimeKilled = () => {
+      this._killCount++;
+      this._killCountSpan.textContent = String(this._killCount);
+    };
+
     phaserEvents.on(PhaserEvent.DIALOGUE_ZONE_ENTER, onZoneEnter);
     phaserEvents.on(PhaserEvent.DIALOGUE_ZONE_LEAVE, onZoneLeave);
     phaserEvents.on(PhaserEvent.POI_ENTER, onPoiEnter);
@@ -212,6 +242,7 @@ export class UIScene extends Phaser.Scene {
     phaserEvents.on(PhaserEvent.DIALOGUE_NAVIGATE, onNavigate);
     phaserEvents.on(PhaserEvent.DIALOGUE_CLOSE, onClose);
     phaserEvents.on(PhaserEvent.DIALOGUE_ACTION, onAction);
+    phaserEvents.on(PhaserEvent.SLIME_KILLED, onSlimeKilled);
 
     this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
       phaserEvents.off(PhaserEvent.DIALOGUE_ZONE_ENTER, onZoneEnter);
@@ -223,6 +254,8 @@ export class UIScene extends Phaser.Scene {
       phaserEvents.off(PhaserEvent.DIALOGUE_NAVIGATE, onNavigate);
       phaserEvents.off(PhaserEvent.DIALOGUE_CLOSE, onClose);
       phaserEvents.off(PhaserEvent.DIALOGUE_ACTION, onAction);
+      phaserEvents.off(PhaserEvent.SLIME_KILLED, onSlimeKilled);
+      this._killBadge?.remove();
     });
   }
 

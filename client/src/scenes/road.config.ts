@@ -64,6 +64,11 @@ export const ROAD_POI_ZONES: PoiZoneConfig[] = [
     text: "Je crois que je suis en train de m'égarer... Je devrais peut-être aller voir cette salle d'arcade.",
     radius: 30,
   },
+  {
+    spawnPoint: "tooLow",
+    text: "Il n'y a rien d'intéressant à voir en bas.",
+    radius: 30,
+  },
 ];
 
 export const ROAD_MAP_CONFIG: MapConfig = {

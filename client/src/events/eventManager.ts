@@ -25,6 +25,8 @@ export enum PhaserEvent {
   // Point of interest (proximity text, no action)
   POI_ENTER = "poi-enter",
   POI_LEAVE = "poi-leave",
+  // Kill counter
+  SLIME_KILLED = "slime-killed",
   // Interior transitions
   ENTER_INTERIOR = "enter-interior",
   // Mobile touch actions (mirror keyboard shortcuts)

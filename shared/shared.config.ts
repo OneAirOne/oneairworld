@@ -97,9 +97,9 @@ export const PNJ_LIST: PnjConfig[] = [
   { texture: "ghost",  spawnPoint: "pnj1", offsetX:  0, offsetY: 0, visible: true,  dialogueId: "ghost", dialogueIdDesktop: "ghost_pc", bubbleOffsetX: 10, bubbleOffsetY: 5 },
   { texture: "wizard", spawnPoint: "pnj9", offsetX:   0, offsetY: 0, visible: false },
   { texture: "wendy",  spawnPoint: "pnj2", offsetX:   0, offsetY: 0, visible: true, dialogueId: "wendy", bubbleOffsetX: 10, bubbleOffsetY: 15 },
-  { texture: "dino",   spawnPoint: "pnj4", offsetX:   0, offsetY: 0, visible: true, dialogueId: "dino" },
+  { texture: "dino",   spawnPoint: "pnj4", offsetX:   0, offsetY: 0, visible: true, dialogueId: "dino", bubbleOffsetX: 14, bubbleOffsetY: 7 },
   { texture: "john",   spawnPoint: "pnj7", offsetX:   0, offsetY: 0, visible: true,  dialogueId: "john"  },
-  { texture: "robot",  spawnPoint: "pnj3", offsetX:   0, offsetY: 0, visible: true,  dialogueId: "robot"  },
+  { texture: "robot",  spawnPoint: "pnj3", offsetX:   0, offsetY: 0, visible: true,  dialogueId: "robot", bubbleOffsetX: 14, bubbleOffsetY: 17   },
 ];
 
 export const ARROW_CONFIG = {
