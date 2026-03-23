@@ -83,14 +83,24 @@ export class Network {
       (player as any).onChange = (changes: DataChange<any>[]) => {
         changes.forEach((change) => {
           const { field, value } = change;
-          // if (field !== "tick") {
-          //   console.log("[Network] update ", field, value);
-          // }
-
           phaserEvents.emit(Event.PLAYER_UPDATED, field, value, sessionId);
         });
       };
     };
+
+    // In some Colyseus versions onAdd does not fire for players already in the
+    // initial state patch. Explicitly emit PLAYER_JOINED for any existing player
+    // so the Road scene's fallback is guaranteed to see them.
+    this.room.state.players.forEach((player: IPlayer, sessionId: string) => {
+      if (!(player as any).onChange) {
+        phaserEvents.emit(Event.PLAYER_JOINED, player, sessionId);
+        (player as any).onChange = (changes: DataChange<any>[]) => {
+          changes.forEach(({ field, value }) => {
+            phaserEvents.emit(Event.PLAYER_UPDATED, field, value, sessionId);
+          });
+        };
+      }
+    });
 
     /**
      * Remove player from the playes MapSchema

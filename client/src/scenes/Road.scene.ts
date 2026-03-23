@@ -397,6 +397,18 @@ export class Road extends Phaser.Scene {
     this.network.getEnemies()?.forEach((enemy: IEnemy, id: string) => {
       this.handleEnemyJoin(enemy, id);
     });
+
+    // Safety net: in production the initial Colyseus state patch can arrive after create() runs.
+    // Retry every 500 ms until the local player is confirmed created (max 10 s).
+    const playerRetry = this.time.addEvent({
+      delay: 500,
+      repeat: 19,
+      callback: () => {
+        if (this.myPlayer) { playerRetry.remove(); return; }
+        console.warn("[Road] local player not yet created — retrying sync…");
+        this.network.getPlayers()?.forEach((player, id) => this.handleJoinPLayer(player, id));
+      },
+    });
   }
 
   /**
