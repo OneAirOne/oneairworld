@@ -6,7 +6,7 @@ import { BootScene, BackgroundScene, Road, UIScene, InteriorScene } from "scenes
 export const PHASER_CONFIG: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: "game-container",
-  backgroundColor: "012622",
+  backgroundColor: "000000",
   pixelArt: true,
   width: window.innerWidth,
   height: window.innerHeight,
