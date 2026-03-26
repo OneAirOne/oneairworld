@@ -25,6 +25,11 @@ export enum PhaserEvent {
   // Point of interest (proximity text, no action)
   POI_ENTER = "poi-enter",
   POI_LEAVE = "poi-leave",
+  // Point of interest with direct action (no dialogue)
+  POI_ACTION_ENTER = "poi-action-enter",
+  POI_ACTION_LEAVE = "poi-action-leave",
+  // URL to open on next user gesture (mobile)
+  URL_PENDING = "url-pending",
   // Kill counter
   SLIME_KILLED = "slime-killed",
   // Interior transitions

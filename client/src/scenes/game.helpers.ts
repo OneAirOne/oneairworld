@@ -59,6 +59,8 @@ ServerY ${options.lastServerY.toFixed(2)} ClientY ${options.clientY.toFixed(
 export interface PoiZoneConfig {
   spawnPoint: string;
   text: string;
+  /** Alternative hint shown on touch devices */
+  textMobile?: string;
   radius?: number;
   /** Optional action triggered when player presses Enter in the zone */
   action?: string;
@@ -68,6 +70,7 @@ export interface PoiZone {
   x: number;
   y: number;
   text: string;
+  textMobile?: string;
   radius: number;
   action?: string;
 }
@@ -86,7 +89,7 @@ export function loadPoiZones(
       if (loaded.has(i)) return;
       if (tiledObj.name !== pt.spawnPoint) return;
       loaded.add(i);
-      result.push({ x: tiledObj.x, y: tiledObj.y, text: pt.text, radius: pt.radius ?? 60, action: pt.action });
+      result.push({ x: tiledObj.x, y: tiledObj.y, text: pt.text, textMobile: pt.textMobile, radius: pt.radius ?? 60, action: pt.action });
     });
   });
 

@@ -86,7 +86,7 @@
     "start": "ask",
     "nodes": {
       "ask": {
-        "text": "Borne : «OneairWorld» — Veux-tu consulter ce projet ?",
+        "text": "Borne : «CV d'Erwan» — Veux-tu consulter son CV ?",
         "choices": [
           { "label": "Oui !", "next": "open" },
           { "label": "Non merci.", "next": "bye" }
@@ -107,7 +107,7 @@
     "start": "ask",
     "nodes": {
       "ask": {
-        "text": "Borne : «Projet 2» — Veux-tu consulter ce projet ?",
+        "text": "Borne : «Samurai Ball» — Veux-tu découvrir ce jeu Unity ?",
         "choices": [
           { "label": "Oui !", "next": "open" },
           { "label": "Non merci.", "next": "bye" }

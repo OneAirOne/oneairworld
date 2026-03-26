@@ -1,7 +1,8 @@
 import { Zone } from "../../../shared/types";
 import type { LayerConfig } from "./road.config";
 import { TiledLayer } from "./road.config";
-import type { PnjSpawnConfig, InteractionZoneConfig } from "./game.helpers";
+import type { PnjSpawnConfig, PoiZoneConfig } from "./game.helpers";
+import { PROJECTS } from "../config/projects.config";
 
 export interface InteriorTileset {
   name: string;
@@ -21,8 +22,8 @@ export interface InteriorConfig {
   label?: string;
   /** PNJs to spawn in this interior */
   pnjs?: PnjSpawnConfig[];
-  /** Proximity zones that open a dialogue (arcade machines, objects…) */
-  interactionZones?: InteractionZoneConfig[];
+  /** Proximity zones that directly open a project (arcade machines, objects…) */
+  poiZones?: PoiZoneConfig[];
 }
 
 export const INTERIOR_SCENE_LAYERS: LayerConfig[] = [
@@ -65,6 +66,7 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
     tilesets: [
       { name: "arcade",       path: "assets/map/arcade.png" },
       { name: "interior-jap", path: "assets/map/interior-jap.png" },
+      { name: "logo",         path: "assets/map/logos.png" },
     ],
     playerSpawn: { x: 128, y: 200 },
     returnSpawn: { x: 0, y: 0 },
@@ -72,12 +74,12 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
     pnjs: [
       { spawnPoint: "pnj1_arcade", texture: "wendy", animKey: "wendyIdle", dialogueId: "wendy_arcade", bubbleOffsetX: 10, bubbleOffsetY: 15 },
     ],
-    interactionZones: [
-      { spawnPoint: "project1", dialogueId: "project1", radius: 30 },
-      { spawnPoint: "project2", dialogueId: "project2", radius: 30 },
-      { spawnPoint: "project3", dialogueId: "project3", radius: 30 },
-      { spawnPoint: "project4", dialogueId: "project4", radius: 30 },
-      { spawnPoint: "project5", dialogueId: "project5", radius: 30 },
-    ],
+    poiZones: PROJECTS.map((p) => ({
+      spawnPoint:  `project${p.id}`,
+      text:        p.hintDesktop ?? `Entrée — voir «${p.name}»`,
+      textMobile:  p.hintMobile  ?? `Voir «${p.name}»`,
+      action:      `open_project:${p.id}`,
+      radius:      30,
+    })),
   },
 };

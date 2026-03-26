@@ -56,6 +56,7 @@ export class UIScene extends Phaser.Scene {
   private _btnClose!: Phaser.GameObjects.Container;   // close ✕
   private _dialogueOpen = false;
   private _inZone = false;
+  private _inPoiZone = false;
   private _hasChoices = false;
   private _pendingUrl: string | null = null;
 
@@ -206,6 +207,9 @@ export class UIScene extends Phaser.Scene {
     const onAction = (action: string) => {
       this._pendingUrl = ACTION_URLS[action] ?? null;
     };
+    const onUrlPending = (url: string) => { this._pendingUrl = url; };
+    const onPoiActionEnter = () => { this._inPoiZone = true;  this._syncMobileButtons(); };
+    const onPoiActionLeave = () => { this._inPoiZone = false; this._syncMobileButtons(); };
 
     const onZoneEnter = () => {
       this._inZone = true;
@@ -237,6 +241,9 @@ export class UIScene extends Phaser.Scene {
     phaserEvents.on(PhaserEvent.DIALOGUE_ZONE_LEAVE, onZoneLeave);
     phaserEvents.on(PhaserEvent.POI_ENTER, onPoiEnter);
     phaserEvents.on(PhaserEvent.POI_LEAVE, onPoiLeave);
+    phaserEvents.on(PhaserEvent.POI_ACTION_ENTER, onPoiActionEnter);
+    phaserEvents.on(PhaserEvent.POI_ACTION_LEAVE, onPoiActionLeave);
+    phaserEvents.on(PhaserEvent.URL_PENDING, onUrlPending);
     phaserEvents.on(PhaserEvent.DIALOGUE_OPEN, renderDialogue);
     phaserEvents.on(PhaserEvent.DIALOGUE_UPDATE, renderDialogue);
     phaserEvents.on(PhaserEvent.DIALOGUE_NAVIGATE, onNavigate);
@@ -249,6 +256,9 @@ export class UIScene extends Phaser.Scene {
       phaserEvents.off(PhaserEvent.DIALOGUE_ZONE_LEAVE, onZoneLeave);
       phaserEvents.off(PhaserEvent.POI_ENTER, onPoiEnter);
       phaserEvents.off(PhaserEvent.POI_LEAVE, onPoiLeave);
+      phaserEvents.off(PhaserEvent.POI_ACTION_ENTER, onPoiActionEnter);
+      phaserEvents.off(PhaserEvent.POI_ACTION_LEAVE, onPoiActionLeave);
+      phaserEvents.off(PhaserEvent.URL_PENDING, onUrlPending);
       phaserEvents.off(PhaserEvent.DIALOGUE_OPEN, renderDialogue);
       phaserEvents.off(PhaserEvent.DIALOGUE_UPDATE, renderDialogue);
       phaserEvents.off(PhaserEvent.DIALOGUE_NAVIGATE, onNavigate);
@@ -334,10 +344,11 @@ export class UIScene extends Phaser.Scene {
       const scaleY = canvas.height / rect.height;
       const cx = (touch.clientX - rect.left) * scaleX;
       const cy = (touch.clientY - rect.top) * scaleY;
-      const dx = cx - this._btnConfirm.x;
-      const dy = cy - this._btnConfirm.y;
-      if (Math.sqrt(dx * dx + dy * dy) <= btnR) {
+      const nearConfirm  = Math.hypot(cx - this._btnConfirm.x,  cy - this._btnConfirm.y)  <= btnR;
+      const nearInteract = Math.hypot(cx - this._btnInteract.x, cy - this._btnInteract.y) <= btnR;
+      if (nearConfirm || nearInteract) {
         window.open(this._pendingUrl, "_blank", "noopener,noreferrer");
+        this._pendingUrl = null;
       }
     }, { passive: true });
   }
@@ -480,7 +491,7 @@ export class UIScene extends Phaser.Scene {
     if (!this._isTouchDevice) return;
 
     const dialogueOpen = this._dialogueOpen;
-    const inZone       = this._inZone;
+    const inZone       = this._inZone || this._inPoiZone;
     const hasChoices   = this._hasChoices;
 
     // Joystick + attack hidden during dialogue (movement blocked anyway)
@@ -489,7 +500,7 @@ export class UIScene extends Phaser.Scene {
     this._btnAttack.setVisible(!dialogueOpen);
     (this._btnAttack.getData("zone") as Phaser.GameObjects.Zone).setVisible(!dialogueOpen);
 
-    // Interact button visible when in zone (open dialogue) or dialogue open (confirm)
+    // Interact button visible when in zone (dialogue or POI action)
     this._btnInteract.setVisible(!dialogueOpen && inZone);
     (this._btnInteract.getData("zone") as Phaser.GameObjects.Zone).setVisible(!dialogueOpen && inZone);
 
