@@ -26,6 +26,7 @@ export default function PepperAtelierContent() {
           <video
             src="/assets/pepper-atelier/trailer.mov"
             autoPlay
+            playsInline
             muted
             loop
             controls

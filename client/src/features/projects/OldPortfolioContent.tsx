@@ -27,6 +27,7 @@ export default function OldPortfolioContent() {
           <video
             src="/assets/old-portfolio/old-portfolio.mov"
             autoPlay
+            playsInline
             muted
             loop
             controls

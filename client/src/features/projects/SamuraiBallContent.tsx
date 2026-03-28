@@ -33,6 +33,7 @@ export default function SamuraiBallContent() {
           <video
             src="/assets/samurail-ball/make-in-off-samurai-ball.mp4"
             autoPlay
+            playsInline
             muted
             loop
             controls
