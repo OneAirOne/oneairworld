@@ -29,12 +29,14 @@ export class Player extends Phaser.GameObjects.Sprite {
   private _animKeys: string[] = [];
   private _canUpdateAnim: boolean = true;
   private _isDying: boolean = false;
+  private _sprintKey!: Phaser.Input.Keyboard.Key;
   private _inputPayload: InputPayload = {
     left: false,
     right: false,
     up: false,
     down: false,
     space: false,
+    sprint: false,
   };
   id: string;
   lastAnim: Anim = Anim.IDDLE_DOWN;
@@ -66,7 +68,9 @@ export class Player extends Phaser.GameObjects.Sprite {
     }
 
     if (this.scene) {
+      // TODO: clean keyboard listeners
       this._cursors = this.scene!.input!.keyboard!.createCursorKeys();
+      this._sprintKey = this.scene!.input!.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S);
     } else {
       throw new Error("Scene is not initialized");
     }
@@ -116,14 +120,15 @@ export class Player extends Phaser.GameObjects.Sprite {
   handleInput(): InputPayload {
     // Block all input while death animation is playing
     if (this._isDying) {
-      return { left: false, right: false, up: false, down: false, space: false };
+      return { left: false, right: false, up: false, down: false, space: false, sprint: false };
     }
 
-    this._inputPayload.left  = this._cursors.left.isDown  || mobileInput.left;
-    this._inputPayload.right = this._cursors.right.isDown || mobileInput.right;
-    this._inputPayload.up    = this._cursors.up.isDown    || mobileInput.up;
-    this._inputPayload.down  = this._cursors.down.isDown  || mobileInput.down;
-    this._inputPayload.space = this._cursors.space.isDown || mobileInput.space;
+    this._inputPayload.left   = this._cursors.left.isDown  || mobileInput.left;
+    this._inputPayload.right  = this._cursors.right.isDown || mobileInput.right;
+    this._inputPayload.up     = this._cursors.up.isDown    || mobileInput.up;
+    this._inputPayload.down   = this._cursors.down.isDown  || mobileInput.down;
+    this._inputPayload.space  = this._cursors.space.isDown || mobileInput.space;
+    this._inputPayload.sprint = this._sprintKey?.isDown ?? false;
 
     return this._inputPayload;
   }
@@ -269,7 +274,13 @@ export class Player extends Phaser.GameObjects.Sprite {
         this.setData(SERVER_DATA.IS_ATTACKING, value);
         break;
       case SERVER_DATA.IS_DEAD:
-        if (value === true) this._playDeathAnim();
+        if (value === true) {
+          this._playDeathAnim();
+          this.setVisible(false);
+          this.hideSpeakingBubble();
+        } else {
+          this.setVisible(true);
+        }
         break;
       case SERVER_DATA.IS_SPEAKING:
         if (value) {

@@ -32,6 +32,12 @@ export enum PhaserEvent {
   URL_PENDING = "url-pending",
   // Kill counter
   SLIME_KILLED = "slime-killed",
+  // CV popup
+  CV_POPUP_OPEN = "cv-popup-open",
+  CV_POPUP_CLOSE = "cv-popup-close",
+  // Game over
+  GAME_OVER = "game-over",
+  GAME_OVER_RESTART = "game-over-restart",
   // Interior transitions
   ENTER_INTERIOR = "enter-interior",
   // Mobile touch actions (mirror keyboard shortcuts)

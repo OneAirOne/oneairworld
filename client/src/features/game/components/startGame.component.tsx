@@ -62,17 +62,18 @@ export function StartGame() {
           style={{ animationDelay: "0.1s" }}
         >
           <h1 className="text-4xl font-bold text-white mb-5 tracking-tight">
-            Hi,
+            Bonjour,
           </h1>
 
           <p className="text-slate-400 text-base leading-relaxed mb-4">
-            I'm Erwan a software developer from France. I really enjoy working
-            on digital projects, especially immersive experiences like gaming.
+            Je m'appelle Erwan, développeur logiciel basé en France. J'aime
+            concevoir des projets digitaux, en particulier les expériences
+            immersives comme le jeu vidéo.
           </p>
 
           <p className="text-slate-400 text-base leading-relaxed mb-4">
-            Do not hesitate to contact me for any requests or project inquiries
-            at{" "}
+            Pour toute demande ou collaboration, n'hésitez pas à me contacter
+            à{" "}
             <a
               href={`mailto:${mail}`}
               target="_blank"
@@ -84,8 +85,8 @@ export function StartGame() {
           </p>
 
           <p className="text-slate-400 text-base leading-relaxed">
-            If you want to see what I'm capable of or just kill some aliens,
-            click on the button
+            Explorez mon showroom interactif pour découvrir mes projets, mon
+            parcours… et peut-être croiser quelques monstres en chemin.
           </p>
         </div>
 

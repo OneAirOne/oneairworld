@@ -353,6 +353,19 @@ export class GameEngine {
    * Create a player with the session id
    * TODO: use lauchOptions to choose the player
    */
+  respawnPlayer(sessionId: string) {
+    const playerState = this.state.players.get(sessionId);
+    const playerBody = this.players[sessionId];
+    if (!playerState || !playerState.isDead) return;
+    const ctx = this.zoneContexts.get(playerState.zone as Zone) ?? this.roadCtx;
+    const start = ctx.start;
+    if (playerBody) Matter.Body.setPosition(playerBody.getBody(), start);
+    playerState.x = start.x;
+    playerState.y = start.y;
+    playerState.life = 100;
+    playerState.isDead = false;
+  }
+
   addPlayer(sessionId: string, lauchOptions: LauchOptions) {
     const { world, engine, start } = this.roadCtx;
     const playerState = this.state.createPlayer(sessionId, lauchOptions);
@@ -483,18 +496,6 @@ export class GameEngine {
       console.log(`[Engine] players=${playerCount} enemies=${enemyCount} arrows=${arrowCount}`);
     }
 
-    // Player respawn at the start of their current zone
-    this.state.players.forEach((playerState, id) => {
-      if (!playerState.isDead) return;
-      const playerBody = this.players[id];
-      const ctx = this.zoneContexts.get(playerState.zone as Zone) ?? this.roadCtx;
-      const start = ctx.start;
-      if (playerBody) Matter.Body.setPosition(playerBody.getBody(), start);
-      playerState.x = start.x;
-      playerState.y = start.y;
-      playerState.life = 100;
-      playerState.isDead = false;
-    });
 
     // Enemy death — delay removal to let death anim play
     const DEATH_ANIM_DURATION = 700;

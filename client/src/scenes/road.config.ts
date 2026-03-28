@@ -51,17 +51,43 @@ export const ROAD_SCENE_LAYERS: LayerConfig[] = [
 export const ROAD_POI_ZONES: PoiZoneConfig[] = [
   {
     spawnPoint: "maisonErwan",
-    text: "La maison d'Erwan... mais il n'est pas là. Je devrais vraiment aller voir cette salle d'arcade.",
+    text: "Appuyer sur Entrée pour voir le CV d'Erwan",
+    textMobile: "Appuyer sur l'icône 💬 pour voir le CV d'Erwan",
+    action: "open_cv",
     radius: 30,
   },
   {
-    spawnPoint: "maisonRandom",
-    text: "C'est fermé... Je pense que je devrais aller dans l'autre direction pour voir cette fameuse salle d'arcade.",
+    spawnPoint: "linkLinkedin",
+    text: "Appuyer sur Entrée pour ouvrir le LinkedIn d'Erwan",
+    textMobile: "Appuyer sur l'icône 💬 pour ouvrir le LinkedIn d'Erwan",
+    action: "open_linkedin",
+    radius: 50,
+  },
+  {
+    spawnPoint: "linkGithub",
+    text: "Appuyer sur Entrée pour ouvrir le GitHub d'Erwan",
+    textMobile: "Appuyer sur l'icône 💬 pour ouvrir le GitHub d'Erwan",
+    action: "open_github",
     radius: 30,
+  },
+  {
+    spawnPoint: "samuraiBall",
+    text: "Cette affiche est celle d'un jeu développé par Erwan avec un ami — rends-toi à la salle d'arcade pour en savoir plus !",
+    radius: 40,
+  },
+  {
+    spawnPoint: "isComming",
+    text: "Rien à voir ici pour le moment… mais ça ne devrait pas tarder à changer !",
+    radius: 40,
   },
   {
     spawnPoint: "notHere",
     text: "Je crois que je suis en train de m'égarer... Je devrais peut-être aller voir cette salle d'arcade.",
+    radius: 30,
+  },
+  {
+    spawnPoint: "doorClose",
+    text: "Ça m'a l'air fermé...",
     radius: 30,
   },
   {

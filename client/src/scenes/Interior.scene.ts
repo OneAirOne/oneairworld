@@ -40,12 +40,13 @@ export class InteriorScene extends Phaser.Scene {
   private _components!: ComponentService;
   private _dialogueManager = new DialogueManager();
   private _dialogueInput!: DialogueInputHandler;
-  private _returnPoint: { x: number; y: number } | null = null;
+  private _returnPoints: { x: number; y: number }[] = [];
   private _inReturnZone = false;
   private _interactivePnjs: InteractivePnj[] = [];
   private _poiZones: PoiZone[] = [];
   private _activePoi: PoiZone | null = null;
   private _pnjCooldown = false;
+  private _onMobileInteractPoi!: () => void;
 
   private get _player(): Player { return this._playerManager?.myPlayer; }
 
@@ -88,16 +89,40 @@ export class InteriorScene extends Phaser.Scene {
     });
 
     // POI zone — mobile interact button
-    const onMobileInteractPoi = () => {
+    this._onMobileInteractPoi = () => {
       if (this._activePoi?.action && !this._dialogueManager.isOpen()) {
         this._handleAction(this._activePoi.action);
       }
     };
-    phaserEvents.on(PhaserEvent.MOBILE_INTERACT, onMobileInteractPoi);
+    phaserEvents.on(PhaserEvent.MOBILE_INTERACT, this._onMobileInteractPoi);
+
+    // Pause / resume — mirrors Road's pattern for nested scene launches (e.g. CV scene)
+    this.events.on(Phaser.Scenes.Events.PAUSE, () => {
+      this._dialogueInput?.unregister();
+      phaserEvents.off(PhaserEvent.MOBILE_INTERACT, this._onMobileInteractPoi);
+      if (this._activePoi) phaserEvents.emit(PhaserEvent.POI_ACTION_LEAVE);
+    });
+    this.events.on(Phaser.Scenes.Events.RESUME, () => {
+      this._dialogueInput?.register(this);
+      phaserEvents.on(PhaserEvent.MOBILE_INTERACT, this._onMobileInteractPoi);
+      this._dialogueManager.leaveZone();
+      this._pnjCooldown = true;
+      this.time.delayedCall(800, () => { this._pnjCooldown = false; });
+      // Restore server zone (we left it for a nested scene like CV)
+      this._network?.setZone(this._zone);
+      // Restore POI hint if still in zone
+      if (this._activePoi) {
+        const isTouch = this.sys.game.device.input.touch;
+        const hint = (isTouch && this._activePoi.textMobile) ? this._activePoi.textMobile : this._activePoi.text;
+        phaserEvents.emit(PhaserEvent.POI_ACTION_ENTER);
+        phaserEvents.emit(PhaserEvent.POI_ENTER, hint);
+      }
+      this.cameras.main.fadeIn(400, 0, 0, 0);
+    });
 
     this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
       this._components.destroy();
-      phaserEvents.off(PhaserEvent.MOBILE_INTERACT, onMobileInteractPoi);
+      phaserEvents.off(PhaserEvent.MOBILE_INTERACT, this._onMobileInteractPoi);
       if (this._activePoi) phaserEvents.emit(PhaserEvent.POI_ACTION_LEAVE);
       // Always clean up global listeners on shutdown regardless of how the scene exits
       this._dialogueInput?.unregister();
@@ -193,13 +218,12 @@ export class InteriorScene extends Phaser.Scene {
     // --- Spawn + return points from "info" layer ---
     const infoLayer = map.getObjectLayer("info");
     const startObj  = infoLayer?.objects.find((o) => o.name === "start");
-    const returnObj = infoLayer?.objects.find((o) => o.name === "return");
     const spawnX = startObj?.x ?? config.playerSpawn.x;
     const spawnY = startObj?.y ?? config.playerSpawn.y;
 
-    if (returnObj) {
-      this._returnPoint = { x: returnObj.x as number, y: returnObj.y as number };
-    }
+    this._returnPoints = (infoLayer?.objects ?? [])
+      .filter((o) => o.name === "return")
+      .map((o) => ({ x: o.x as number, y: o.y as number }));
 
     // --- Local player ---
     const localPlayer = new Player(this, spawnX, spawnY, this._playerTexture, this._network.sessionId);
@@ -252,9 +276,10 @@ export class InteriorScene extends Phaser.Scene {
   update() {
     if (!this._player) return;
 
+    // TODO: make a global function for any scenes that need to block input during dialogue, to avoid repeating this pattern
     // Block inputs while dialogue is open
     const inputs = this._dialogueManager.isOpen()
-      ? { left: false, right: false, up: false, down: false, space: false }
+      ? { left: false, right: false, up: false, down: false, space: false, sprint: false }
       : this._player.handleInput();
     this._network.updatePlayer(inputs);
 
@@ -282,7 +307,7 @@ export class InteriorScene extends Phaser.Scene {
     }
 
     // PNJ proximity check (skipped when in a POI zone to avoid MOBILE_INTERACT conflict)
-    let nearestPnj: typeof this._interactivePnjs[0] | null = null;
+    let nearestPnj: InteractivePnj | null = null;
     for (const pnj of this._interactivePnjs) {
       const dist = Phaser.Math.Distance.Between(this._player.x, this._player.y, pnj.sprite.x, pnj.sprite.y);
       const inZone = !this._pnjCooldown && !nearestPoi && dist <= RETURN_INTERACTION_RADIUS;
@@ -291,21 +316,16 @@ export class InteriorScene extends Phaser.Scene {
     }
 
     // Return-point proximity check — auto-open dialogue on enter, close on leave
-    let inReturnZone = false;
-    if (this._returnPoint) {
-      const dist = Phaser.Math.Distance.Between(
-        this._player.x, this._player.y,
-        this._returnPoint.x, this._returnPoint.y,
-      );
-      inReturnZone = dist <= RETURN_INTERACTION_RADIUS;
-      if (inReturnZone && !this._inReturnZone) {
-        this._inReturnZone = true;
-        this._dialogueManager.enterZone(RETURN_DIALOGUE_ID);
-        this._dialogueManager.open();
-      } else if (!inReturnZone && this._inReturnZone) {
-        this._inReturnZone = false;
-        this._dialogueManager.leaveZone();
-      }
+    const inReturnZone = this._returnPoints.some((pt) =>
+      Phaser.Math.Distance.Between(this._player.x, this._player.y, pt.x, pt.y) <= RETURN_INTERACTION_RADIUS
+    );
+    if (inReturnZone && !this._inReturnZone) {
+      this._inReturnZone = true;
+      this._dialogueManager.enterZone(RETURN_DIALOGUE_ID);
+      this._dialogueManager.open();
+    } else if (!inReturnZone && this._inReturnZone) {
+      this._inReturnZone = false;
+      this._dialogueManager.leaveZone();
     }
 
     // PNJ zone takes priority; return-point manages its own state

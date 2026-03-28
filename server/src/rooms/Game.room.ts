@@ -84,11 +84,15 @@ export class Game extends Room<GameState> {
       this.engine.setPlayerZone(client.sessionId, data.zone);
     });
 
-    // Restore player life to 100 (e.g. after eating at TacoRex)
+    // Restore player life: if alive (e.g. TacoRex), just refill; if dead, full respawn
     this.onMessage(Message.RESTORE_LIFE, (client) => {
       const player = this.state.players.get(client.sessionId);
-      if (!player || player.isDead) return;
-      player.life = 100;
+      if (!player) return;
+      if (player.isDead) {
+        this.engine.respawnPlayer(client.sessionId);
+      } else {
+        player.life = 100;
+      }
     });
 
     // Run update loop at 60 fps

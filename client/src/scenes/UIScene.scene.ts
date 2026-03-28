@@ -8,6 +8,8 @@ import type { DialoguePayload, DialogueNavigatePayload } from "../dialogue/Dialo
 const DIALOGUE_BOX_HEIGHT = 140;    // fixed height on PC
 const DIALOGUE_BOX_MIN_HEIGHT = 80; // minimum height on mobile (dynamic)
 const DIALOGUE_BOX_MARGIN = 12;
+const DIALOGUE_BOX_PC_SIDE_MARGIN = 80;  // side margin on desktop
+const DIALOGUE_BOX_PC_BOTTOM_MARGIN = 28; // bottom margin on desktop
 const DIALOGUE_BOX_PADDING = 14;
 const CHOICES_Y_OFFSET = 62; // choices Y offset from boxY on PC (fixed layout)
 const CHOICES_GAP = 8;       // gap between text and choices on mobile (dynamic)
@@ -34,6 +36,7 @@ export class UIScene extends Phaser.Scene {
   private dialogueText!: Phaser.GameObjects.Text;
   private dialogueHint!: Phaser.GameObjects.Text;
   private choiceTexts: Phaser.GameObjects.Text[] = [];
+  private boxX = 0;
   private boxY = 0;
   private boxW = 0;
   private _boxBottom = 0;   // fixed bottom edge of dialogue box (above controls)
@@ -78,12 +81,15 @@ export class UIScene extends Phaser.Scene {
       // Mobile: box sits above the button row, height is dynamic
       this._boxBottom = H - BTN_Y_FROM_BOTTOM - BTN_RADIUS - DIALOGUE_BOX_MARGIN - this._safeBottom;
       this.boxY = this._boxBottom - DIALOGUE_BOX_MIN_HEIGHT;
+      this.boxX = DIALOGUE_BOX_MARGIN;
+      this.boxW = W - DIALOGUE_BOX_MARGIN * 2;
     } else {
-      // PC: box fixed at the bottom of the screen, constant height
-      this.boxY = H - DIALOGUE_BOX_HEIGHT - DIALOGUE_BOX_MARGIN - this._safeBottom;
+      // PC: box with side and bottom margins
+      this.boxY = H - DIALOGUE_BOX_HEIGHT - DIALOGUE_BOX_PC_BOTTOM_MARGIN - this._safeBottom;
       this._boxBottom = this.boxY + DIALOGUE_BOX_HEIGHT;
+      this.boxX = DIALOGUE_BOX_PC_SIDE_MARGIN;
+      this.boxW = W - DIALOGUE_BOX_PC_SIDE_MARGIN * 2;
     }
-    this.boxW = W - DIALOGUE_BOX_MARGIN * 2;
 
     // --- Zone hint ---
     this.zoneHint = this.add
@@ -106,7 +112,7 @@ export class UIScene extends Phaser.Scene {
 
     // --- Dialogue text ---
     this.dialogueText = this.add
-      .text(DIALOGUE_BOX_MARGIN + DIALOGUE_BOX_PADDING, this.boxY + DIALOGUE_BOX_PADDING, "", {
+      .text(this.boxX + DIALOGUE_BOX_PADDING, this.boxY + DIALOGUE_BOX_PADDING, "", {
         fontSize: "14px",
         color: "#ffffff",
         wordWrap: { width: this.boxW - DIALOGUE_BOX_PADDING * 2 },
@@ -116,7 +122,7 @@ export class UIScene extends Phaser.Scene {
 
     // --- "Enter ▶" hint bottom-right ---
     this.dialogueHint = this.add
-      .text(W - DIALOGUE_BOX_MARGIN - DIALOGUE_BOX_PADDING, 0, "Entrée ▶", {
+      .text(this.boxX + this.boxW - DIALOGUE_BOX_PADDING, 0, "Entrée ▶", {
         fontSize: "11px",
         color: "#888888",
       })
@@ -166,11 +172,11 @@ export class UIScene extends Phaser.Scene {
         this._choicesStartY = this.boxY + CHOICES_Y_OFFSET;
         this.dialogueBg.clear()
           .fillStyle(0x0a0a0a, 0.88)
-          .fillRoundedRect(DIALOGUE_BOX_MARGIN, this.boxY, this.boxW, DIALOGUE_BOX_HEIGHT, 6)
+          .fillRoundedRect(this.boxX, this.boxY, this.boxW, DIALOGUE_BOX_HEIGHT, 6)
           .lineStyle(2, 0xffffff, 1)
-          .strokeRoundedRect(DIALOGUE_BOX_MARGIN, this.boxY, this.boxW, DIALOGUE_BOX_HEIGHT, 6);
+          .strokeRoundedRect(this.boxX, this.boxY, this.boxW, DIALOGUE_BOX_HEIGHT, 6);
         this.dialogueHint.setPosition(
-          W - DIALOGUE_BOX_MARGIN - DIALOGUE_BOX_PADDING,
+          this.boxX + this.boxW - DIALOGUE_BOX_PADDING,
           this.boxY + DIALOGUE_BOX_HEIGHT - DIALOGUE_BOX_PADDING
         );
       }
@@ -237,6 +243,11 @@ export class UIScene extends Phaser.Scene {
       this._killCountSpan.textContent = String(this._killCount);
     };
 
+    const onGameOver = () => {
+      this._killCount = 0;
+      this._killCountSpan.textContent = "0";
+    };
+
     phaserEvents.on(PhaserEvent.DIALOGUE_ZONE_ENTER, onZoneEnter);
     phaserEvents.on(PhaserEvent.DIALOGUE_ZONE_LEAVE, onZoneLeave);
     phaserEvents.on(PhaserEvent.POI_ENTER, onPoiEnter);
@@ -250,6 +261,7 @@ export class UIScene extends Phaser.Scene {
     phaserEvents.on(PhaserEvent.DIALOGUE_CLOSE, onClose);
     phaserEvents.on(PhaserEvent.DIALOGUE_ACTION, onAction);
     phaserEvents.on(PhaserEvent.SLIME_KILLED, onSlimeKilled);
+    phaserEvents.on(PhaserEvent.GAME_OVER, onGameOver);
 
     this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
       phaserEvents.off(PhaserEvent.DIALOGUE_ZONE_ENTER, onZoneEnter);
@@ -265,6 +277,7 @@ export class UIScene extends Phaser.Scene {
       phaserEvents.off(PhaserEvent.DIALOGUE_CLOSE, onClose);
       phaserEvents.off(PhaserEvent.DIALOGUE_ACTION, onAction);
       phaserEvents.off(PhaserEvent.SLIME_KILLED, onSlimeKilled);
+      phaserEvents.off(PhaserEvent.GAME_OVER, onGameOver);
       this._killBadge?.remove();
     });
   }
@@ -529,20 +542,20 @@ export class UIScene extends Phaser.Scene {
 
     // Reposition text (top of box)
     this.dialogueText.setPosition(
-      DIALOGUE_BOX_MARGIN + DIALOGUE_BOX_PADDING,
+      this.boxX + DIALOGUE_BOX_PADDING,
       this.boxY + DIALOGUE_BOX_PADDING
     );
     // Reposition hint (bottom-right of box)
     this.dialogueHint.setPosition(
-      this.scale.width - DIALOGUE_BOX_MARGIN - DIALOGUE_BOX_PADDING,
+      this.boxX + this.boxW - DIALOGUE_BOX_PADDING,
       this.boxY + boxH - DIALOGUE_BOX_PADDING
     );
     // Redraw background
     this.dialogueBg.clear()
       .fillStyle(0x0a0a0a, 0.88)
-      .fillRoundedRect(DIALOGUE_BOX_MARGIN, this.boxY, this.boxW, boxH, 6)
+      .fillRoundedRect(this.boxX, this.boxY, this.boxW, boxH, 6)
       .lineStyle(2, 0xffffff, 1)
-      .strokeRoundedRect(DIALOGUE_BOX_MARGIN, this.boxY, this.boxW, boxH, 6);
+      .strokeRoundedRect(this.boxX, this.boxY, this.boxW, boxH, 6);
   }
 
   private _renderChoices(choices: { label: string }[], selectedIndex: number) {
@@ -551,7 +564,7 @@ export class UIScene extends Phaser.Scene {
       const isSelected = i === selectedIndex;
       const t = this.add
         .text(
-          DIALOGUE_BOX_MARGIN + DIALOGUE_BOX_PADDING,
+          this.boxX + DIALOGUE_BOX_PADDING,
           this._choicesStartY + i * CHOICE_LINE_HEIGHT,
           `${isSelected ? "▶ " : "  "}${choice.label}`,
           { fontSize: "13px", color: isSelected ? "#ffffff" : "#888888" }

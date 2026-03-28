@@ -4,4 +4,5 @@ export interface InputPayload {
   up: boolean;
   down: boolean;
   space: boolean;
+  sprint: boolean;
 }

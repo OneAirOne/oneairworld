@@ -7,7 +7,7 @@ import {
   InputPayload,
   PLAYER_VELOCITY,
 } from "../../../../shared/types";
-import { ARROW_CONFIG } from "../../../../shared/shared.config";
+import { ARROW_CONFIG, PLAYER_CONFIG } from "../../../../shared/shared.config";
 import { Player } from "../../rooms/schema";
 import { SwordMan } from "../bodies";
 
@@ -117,15 +117,16 @@ export function processPlayerAction(
 ) {
   let vx = 0;
   let vy = 0;
+  const speed = input.sprint ? PLAYER_VELOCITY * PLAYER_CONFIG.SPRINT_VELOCITY : PLAYER_VELOCITY;
 
   // MOVES
   if (input.left) {
-    vx = -PLAYER_VELOCITY;
+    vx = -speed;
     vy = 0;
     updateAnim(Anim.LEFT);
     player.direction = DIRECTION.LEFT;
   } else if (input.right) {
-    vx = PLAYER_VELOCITY;
+    vx = speed;
     vy = 0;
     updateAnim(Anim.RIGHT);
     player.direction = DIRECTION.RIGHT;
@@ -133,12 +134,12 @@ export function processPlayerAction(
 
   if (input.up) {
     vx = 0;
-    vy = -PLAYER_VELOCITY;
+    vy = -speed;
     updateAnim(Anim.UP);
     player.direction = DIRECTION.UP;
   } else if (input.down) {
     vx = 0;
-    vy = PLAYER_VELOCITY;
+    vy = speed;
     updateAnim(Anim.DOWN);
     player.direction = DIRECTION.DOWN;
   }

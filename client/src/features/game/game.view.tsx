@@ -1,9 +1,14 @@
-import phaserGame from "Game";
-
 // Components
 import { StartGame } from "./components/startGame.component";
+import { CvPopup } from "./components/CvPopup";
+import { GameOverScreen } from "./components/GameOverScreen";
 
 export default function GameView() {
-  const game = phaserGame.scene.keys.game;
-  return <StartGame />;
+  return (
+    <>
+      <StartGame />
+      <CvPopup />
+      <GameOverScreen />
+    </>
+  );
 }

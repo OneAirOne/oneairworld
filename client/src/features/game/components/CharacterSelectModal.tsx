@@ -15,10 +15,10 @@ export function CharacterSelectModal({ onSelect }: Props) {
       <div className="bg-slate-800 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl border border-slate-700">
 
         <h2 className="text-white text-2xl font-bold text-center mb-2">
-          Choose your character
+          Choisissez votre personnage
         </h2>
         <p className="text-slate-400 text-sm text-center mb-8">
-          Who do you want to play as?
+          Avec qui voulez-vous explorer ?
         </p>
 
         <div className="flex gap-4 justify-center mb-8">

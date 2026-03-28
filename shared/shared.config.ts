@@ -61,6 +61,10 @@ export const SHARED_CONFIG = {
   CAMERA_MAX_HEIGHT: 700,
 };
 
+export const PLAYER_CONFIG = {
+  SPRINT_VELOCITY: 2,  // velocity multiplier when sprinting (S key)
+};
+
 export const COMBAT_CONFIG = {
   // Player attack hitbox (sensor in front of player when attacking)
   HIT_BOX_SIZE: 16,
@@ -70,7 +74,7 @@ export const COMBAT_CONFIG = {
   // Damage dealt to enemy per hit
   ENEMY_HIT_DAMAGE: 50,
   // Damage dealt to player per enemy hit
-  PLAYER_HIT_DAMAGE: 10,
+  PLAYER_HIT_DAMAGE: 25,
   // Enemy knockback on hit
   ENEMY_KNOCKBACK_VELOCITY: 0.5,
   ENEMY_KNOCKBACK_DURATION: 250,
@@ -95,11 +99,10 @@ export interface PnjConfig {
 
 export const PNJ_LIST: PnjConfig[] = [
   { texture: "ghost",  spawnPoint: "pnj1", offsetX:  0, offsetY: 0, visible: true,  dialogueId: "ghost", dialogueIdDesktop: "ghost_pc", bubbleOffsetX: 10, bubbleOffsetY: 5 },
-  { texture: "wizard", spawnPoint: "pnj9", offsetX:   0, offsetY: 0, visible: false },
-  { texture: "wendy",  spawnPoint: "pnj2", offsetX:   0, offsetY: 0, visible: true, dialogueId: "wendy", bubbleOffsetX: 10, bubbleOffsetY: 15 },
-  { texture: "dino",   spawnPoint: "pnj4", offsetX:   0, offsetY: 0, visible: true, dialogueId: "dino", bubbleOffsetX: 14, bubbleOffsetY: 7 },
-  { texture: "john",   spawnPoint: "pnj7", offsetX:   0, offsetY: 0, visible: true,  dialogueId: "john"  },
-  { texture: "robot",  spawnPoint: "pnj3", offsetX:   0, offsetY: 0, visible: true,  dialogueId: "robot", bubbleOffsetX: 14, bubbleOffsetY: 17   },
+  { texture: "wendy",  spawnPoint: "pnj2", offsetX:  0, offsetY: 0, visible: true, dialogueId: "wendy", bubbleOffsetX: 10, bubbleOffsetY: 15 },
+  { texture: "dino",   spawnPoint: "pnj3", offsetX:  0, offsetY: 0, visible: true, dialogueId: "dino", bubbleOffsetX: 14, bubbleOffsetY: 7 },
+  { texture: "john",   spawnPoint: "pnj4", offsetX:  0, offsetY: 0, visible: true,  dialogueId: "john"  },
+  { texture: "robot",  spawnPoint: "pnj5", offsetX:  0, offsetY: 0, visible: true,  dialogueId: "robot", bubbleOffsetX: 14, bubbleOffsetY: 17   },
 ];
 
 export const ARROW_CONFIG = {

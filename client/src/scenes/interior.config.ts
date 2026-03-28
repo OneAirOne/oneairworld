@@ -74,8 +74,8 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
     pnjs: [
       { spawnPoint: "pnj1_arcade", texture: "wendy", animKey: "wendyIdle", dialogueId: "wendy_arcade", bubbleOffsetX: 10, bubbleOffsetY: 15 },
     ],
-    poiZones: PROJECTS.map((p) => ({
-      spawnPoint:  `project${p.id}`,
+    poiZones: PROJECTS.map((p, i) => ({
+      spawnPoint:  `project${i + 1}`,
       text:        p.hintDesktop ?? `Entrée — voir «${p.name}»`,
       textMobile:  p.hintMobile  ?? `Voir «${p.name}»`,
       action:      `open_project:${p.id}`,

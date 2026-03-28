@@ -9,12 +9,12 @@ export interface CharacterChoice {
 export const PLAYABLE_CHARACTERS: CharacterChoice[] = [
   {
     key: Characters.ONEAIR,
-    name: "OneAir",
+    name: "Timothée",
     gif: "assets/oneair.gif",
   },
   {
     key: Characters.LINK,
-    name: "Link",
+    name: "Drake",
     gif: "assets/link.gif",
   },
 ];

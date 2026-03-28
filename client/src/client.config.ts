@@ -70,11 +70,6 @@ const CLIENT_CONFIG = {
       SPRITE_SHEET_ATLAS_PATH: `assets/characters/slime.json`,
       SPRITE_SHEET_TEXTURE_PATH: `assets/characters/slime.png`,
     },
-    WIZARD: {
-      NAME: "wizard",
-      SPRITE_SHEET_ATLAS_PATH: `assets/characters/wizard.json`,
-      SPRITE_SHEET_TEXTURE_PATH: `assets/characters/wizard.png`,
-    },
     ROBOT: {
       NAME: "robot",
       SPRITE_SHEET_ATLAS_PATH: `assets/characters/robot.json`,

@@ -1,16 +1,91 @@
 {
+  "ghost_intro": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Salut voyageur ! Je suis coincé dans cette ville depuis un bon bout de temps… ce qui m'a permis d'en apprendre beaucoup sur Erwan ! Déplace-toi avec le joystick en bas à gauche de l'écran.",
+        "choices": [
+          { "label": "D'accord !", "next": "tip" }
+        ]
+      },
+      "tip": {
+        "text": "Va voir Wendy — elle gère la salle d'arcade juste à côté et elle pourra peut-être te montrer des projets en cours. Bonne visite !",
+        "choices": [
+          { "label": "J'y vais !", "next": "bye" },
+          { "label": "Merci !", "next": "bye" }
+        ]
+      },
+      "bye": {
+        "text": "Et méfie-toi des petits monstres en chemin — tu peux les attaquer avec l'icône épée en bas à droite !",
+        "choices": []
+      }
+    }
+  },
+  "ghost_intro_pc": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Salut voyageur ! Je suis coincé dans cette ville depuis un bon bout de temps… ce qui m'a permis d'en apprendre beaucoup sur Erwan ! Déplace-toi avec les flèches du clavier et valide avec la touche Entrée.",
+        "choices": [
+          { "label": "D'accord !", "next": "tip" }
+        ]
+      },
+      "tip": {
+        "text": "Va voir Wendy — elle gère la salle d'arcade juste à côté et elle pourra peut-être te montrer des projets en cours. Bonne visite !",
+        "choices": [
+          { "label": "J'y vais !", "next": "bye" },
+          { "label": "Merci !", "next": "bye" }
+        ]
+      },
+      "bye": {
+        "text": "Et méfie-toi des petits monstres en chemin — tu peux les attaquer avec la touche Espace !",
+        "choices": []
+      }
+    }
+  },
   "ghost": {
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "Je hante ce lieu depuis le tout début du projet d'Erwan. Si tu veux en savoir plus sur lui, va parler à Wendy — elle gère la salle d'arcade juste à côté. Tu ne le regretteras pas !",
+        "text": "Alors, tu as trouvé ce que tu cherchais sur Erwan ?",
         "choices": [
-          { "label": "J'y vais !", "next": "bye" },
-          { "label": "Merci du conseil.", "next": "bye" }
+          { "label": "Oui, merci !", "next": "bye" },
+          { "label": "Non, je n'ai pas trouvé.", "next": "redirect" },
+          { "label": "Dis-m'en plus sur lui.", "next": "career" },
+          { "label": "Où trouver ses liens ?", "next": "links" }
         ]
       },
+      "redirect": {
+        "text": "Va voir la salle d'arcade en haut à droite — c'est Wendy qui la gère. Elle y a exposé tous les projets d'Erwan, tu trouveras forcément ton bonheur !",
+        "choices": [
+          { "label": "J'y vais !", "next": "bye" }
+        ]
+      },
+      "career": {
+        "text": "Erwan a commencé sa carrière dans la finance, puis il a pivoté vers la data et le développement logiciel. Un sacré virage ! Aujourd'hui il conçoit des apps et des expériences interactives… comme celle-ci !",
+        "choices": [
+          { "label": "Impressionnant ! Et ses liens ?", "next": "links" },
+          { "label": "Merci !", "next": "bye" }
+        ]
+      },
+      "links": {
+        "text": "Son CV est juste devant sa maison. Tu veux que je t'ouvre son LinkedIn ou son GitHub ?",
+        "choices": [
+          { "label": "LinkedIn", "next": "linkedin" },
+          { "label": "GitHub", "next": "github" },
+          { "label": "Non merci.", "next": "bye" }
+        ]
+      },
+      "linkedin": {
+        "text": "Repère le bâtiment avec le logo LinkedIn dans la rue — rapproche-toi et le personnage devant pourra t'y emmener directement !",
+        "choices": []
+      },
+      "github": {
+        "text": "Repère le bâtiment avec le logo GitHub dans la rue — rapproche-toi et le personnage devant pourra t'y emmener directement !",
+        "choices": []
+      },
       "bye": {
-        "text": "Bonne visite... et méfie-toi des slimes.",
+        "text": "Bonne visite... et méfie-toi des petits montres !",
         "choices": []
       }
     }
@@ -19,14 +94,45 @@
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "Je hante ce lieu depuis le tout début du projet d'Erwan. Si tu veux en savoir plus sur lui, va parler à Wendy — elle gère la salle d'arcade juste à côté.",
+        "text": "Alors, tu as trouvé ce que tu cherchais sur Erwan ?",
         "choices": [
-          { "label": "J'y vais !", "next": "bye" },
-          { "label": "Merci du conseil.", "next": "bye" }
+          { "label": "Oui, merci !", "next": "bye" },
+          { "label": "Non, je n'ai pas trouvé.", "next": "redirect" },
+          { "label": "Dis-m'en plus sur lui.", "next": "career" },
+          { "label": "Où trouver ses liens ?", "next": "links" }
         ]
       },
+      "redirect": {
+        "text": "Va voir la salle d'arcade en haut à droite — c'est Wendy qui la gère. Elle y a exposé tous les projets d'Erwan, tu trouveras forcément ton bonheur !",
+        "choices": [
+          { "label": "J'y vais !", "next": "bye" }
+        ]
+      },
+      "career": {
+        "text": "Erwan a commencé sa carrière dans la finance, puis il a pivoté vers la data et le développement logiciel. Un sacré virage ! Aujourd'hui il conçoit des apps et des expériences interactives… comme celle-ci !",
+        "choices": [
+          { "label": "Impressionnant ! Et ses liens ?", "next": "links" },
+          { "label": "Merci !", "next": "bye" }
+        ]
+      },
+      "links": {
+        "text": "Son CV est juste devant sa maison. Tu veux que je t'ouvre son LinkedIn ou son GitHub ?",
+        "choices": [
+          { "label": "LinkedIn", "next": "linkedin" },
+          { "label": "GitHub", "next": "github" },
+          { "label": "Non merci.", "next": "bye" }
+        ]
+      },
+      "linkedin": {
+        "text": "Repère le bâtiment avec le logo LinkedIn dans la rue — rapproche-toi et le personnage devant pourra t'y emmener directement !",
+        "choices": []
+      },
+      "github": {
+        "text": "Repère le bâtiment avec le logo GitHub dans la rue — rapproche-toi et le personnage devant pourra t'y emmener directement !",
+        "choices": []
+      },
       "bye": {
-        "text": "Bonne visite... et méfie-toi des slimes. Tu peux les attaquer avec la touche Espace !",
+        "text": "Bonne visite... et méfie-toi des petits monstres !",
         "choices": []
       }
     }
@@ -86,7 +192,7 @@
     "start": "ask",
     "nodes": {
       "ask": {
-        "text": "Borne : «CV d'Erwan» — Veux-tu consulter son CV ?",
+        "text": "Borne : «Samurai Ball» — Veux-tu découvrir ce jeu développé avec un ami ?",
         "choices": [
           { "label": "Oui !", "next": "open" },
           { "label": "Non merci.", "next": "bye" }
@@ -94,7 +200,7 @@
       },
       "open": {
         "text": "Bonne visite !",
-        "action": "open_project:1",
+        "action": "open_project:samurai-ball",
         "choices": []
       },
       "bye": {
@@ -107,7 +213,7 @@
     "start": "ask",
     "nodes": {
       "ask": {
-        "text": "Borne : «Samurai Ball» — Veux-tu découvrir ce jeu Unity ?",
+        "text": "Borne : «Pepper Atelier Snowboard» — Veux-tu découvrir ce projet e-commerce ?",
         "choices": [
           { "label": "Oui !", "next": "open" },
           { "label": "Non merci.", "next": "bye" }
@@ -115,7 +221,7 @@
       },
       "open": {
         "text": "Bonne visite !",
-        "action": "open_project:2",
+        "action": "open_project:pepper-atelier-snowboard",
         "choices": []
       },
       "bye": {
@@ -128,7 +234,7 @@
     "start": "ask",
     "nodes": {
       "ask": {
-        "text": "Borne : «Projet 3» — Veux-tu consulter ce projet ?",
+        "text": "Borne : «Ancien portfolio» — Veux-tu voir la version précédente du portfolio d'Erwan ?",
         "choices": [
           { "label": "Oui !", "next": "open" },
           { "label": "Non merci.", "next": "bye" }
@@ -136,7 +242,7 @@
       },
       "open": {
         "text": "Bonne visite !",
-        "action": "open_project:3",
+        "action": "open_project:old-portfolio",
         "choices": []
       },
       "bye": {
@@ -149,7 +255,7 @@
     "start": "ask",
     "nodes": {
       "ask": {
-        "text": "Borne : «Projet 4» — Veux-tu consulter ce projet ?",
+        "text": "Borne : «Dessinons» — Veux-tu découvrir cette application de dessin collaboratif ?",
         "choices": [
           { "label": "Oui !", "next": "open" },
           { "label": "Non merci.", "next": "bye" }
@@ -157,28 +263,7 @@
       },
       "open": {
         "text": "Bonne visite !",
-        "action": "open_project:4",
-        "choices": []
-      },
-      "bye": {
-        "text": "",
-        "choices": []
-      }
-    }
-  },
-  "project5": {
-    "start": "ask",
-    "nodes": {
-      "ask": {
-        "text": "Borne : «Projet 5» — Veux-tu consulter ce projet ?",
-        "choices": [
-          { "label": "Oui !", "next": "open" },
-          { "label": "Non merci.", "next": "bye" }
-        ]
-      },
-      "open": {
-        "text": "Bonne visite !",
-        "action": "open_project:5",
+        "action": "open_project:dessinons",
         "choices": []
       },
       "bye": {
@@ -212,19 +297,18 @@
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "Hey ! Je suis John. Sur le GitHub d'Erwan, tu pourras voir le code source de ce projet. Tu veux y jeter un œil ?",
+        "text": "Hey ! Je suis John. Tu sais qu'Erwan a commencé par développer des outils data avant de se lancer dans le développement full-stack ? Il a bossé sur des pipelines ETL, des applications de business intelligence, et maintenant des expériences interactives comme celle-ci !",
         "choices": [
-          { "label": "Oui, montre-moi !", "next": "github_open" },
-          { "label": "Non merci.", "next": "no" }
+          { "label": "Impressionnant !", "next": "more" },
+          { "label": "C'est noté, merci !", "next": "bye" }
         ]
       },
-      "github_open": {
-        "text": "Cool ! Tu trouveras tous ses repos là-bas. Bonne exploration !",
-        "action": "open_github",
+      "more": {
+        "text": "Ouais, il aime bien croiser les domaines. Data, code, jeux — il ne se contente pas d'une seule case. Tu devrais jeter un œil à ses projets dans la salle d'arcade !",
         "choices": []
       },
-      "no": {
-        "text": "Pas de problème ! Dans ce cas, va faire un tour à la salle d'arcade — les projets d'Erwan y sont présentés interactivement.",
+      "bye": {
+        "text": "Bonne visite !",
         "choices": []
       }
     }
@@ -233,19 +317,26 @@
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "Bonjour ! Si tu veux en savoir plus sur le parcours d'Erwan — ses expériences, ses compétences, ses ambitions — son LinkedIn est la meilleure ressource. Tu veux que je t'y emmène ?",
+        "text": "Hé, t'as vu le panneau publicitaire en passant ? C'est le prochain jeu sur lequel bosse Erwan — et franchement, ça s'annonce vraiment bien !",
         "choices": [
-          { "label": "Oui, allons-y !", "next": "linkedin_open" },
-          { "label": "Non merci.", "next": "no" }
+          { "label": "Ah bon ? C'est quoi ?", "next": "details" },
+          { "label": "Non, je l'ai raté.", "next": "details" },
+          { "label": "Pas vraiment mon truc.", "next": "bye" }
         ]
       },
-      "linkedin_open": {
-        "text": "Parfait. Tu y trouveras tout son parcours professionnel. Bonne visite !",
-        "action": "open_linkedin",
+      "details": {
+        "text": "Il y a déjà un trailer — le concept est solide, l'ambiance est vraiment soignée. Le genre de projet qui donne envie de jouer dès la première minute.",
+        "choices": [
+          { "label": "Je veux en savoir plus !", "next": "arcade" },
+          { "label": "Intéressant...", "next": "arcade" }
+        ]
+      },
+      "arcade": {
+        "text": "Tu trouveras tous les détails à la salle d'arcade — il y a une borne dédiée. Vas-y, ça vaut le détour !",
         "choices": []
       },
-      "no": {
-        "text": "Pas de problème. Tu sais où me trouver si tu changes d'avis.",
+      "bye": {
+        "text": "Pas de souci ! Si tu changes d'avis, la salle d'arcade est juste à côté.",
         "choices": []
       }
     }

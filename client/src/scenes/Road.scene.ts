@@ -50,6 +50,7 @@ export class Road extends Phaser.Scene {
   private dialogueManager = new DialogueManager();
   private dialogueInput!: DialogueInputHandler;
   private _pnjCooldown = false;
+  private _introCompleted = false;
   private _poiZones: PoiZone[] = [];
   private _activePoi: PoiZone | null = null;
 
@@ -101,7 +102,7 @@ export class Road extends Phaser.Scene {
       this.network.onArrowUpdated(this.handleArrowUpdated, this);
       this.network.onArrowLeft(this.handleArrowLeft, this);
       this.cameras.main.fadeIn(400, 0, 0, 0);
-      showSceneTitle(this, "Road");
+      showSceneTitle(this, "OneairWorld");
     });
   }
 
@@ -182,7 +183,19 @@ export class Road extends Phaser.Scene {
         // so the very first visible frame is already the correct framing.
         this.setupCamera();
         this.cameras.main.fadeIn(1200, 0, 0, 0);
-        showSceneTitle(this, "Road");
+        showSceneTitle(this, "OneairWorld");
+        // Auto-trigger ghost intro dialogue on the next frame (movement blocked by _introCompleted)
+        this._pnjCooldown = true;
+        this.time.delayedCall(0, () => {
+          const introId = this.sys.game.device.input.touch ? "ghost_intro" : "ghost_intro_pc";
+          this.dialogueManager.enterZone(introId);
+          this.dialogueManager.open();
+          phaserEvents.once(PhaserEvent.DIALOGUE_CLOSE, () => {
+            this.dialogueManager.leaveZone();
+            this._pnjCooldown = false;
+            this._introCompleted = true;
+          });
+        });
       },
       onOtherPlayerCreated: (player) => {
         this.components.addComponent(player, new UiBarComponent());
@@ -209,21 +222,6 @@ export class Road extends Phaser.Scene {
     }
     createAnim(anims.animFluppy, 10, this, CLIENT_CONFIG.CHARACTERS.NAME);
     createAnim(anims.animSlime, 10, this, CLIENT_CONFIG.CHARACTERS.SLIME.NAME);
-
-    // Wizard idle animation (looping)
-    const wizardAnim = anims.animWizard.IDLE;
-    this.anims.create({
-      key: wizardAnim.key,
-      frames: this.anims.generateFrameNames(CLIENT_CONFIG.CHARACTERS.WIZARD.NAME, {
-        start: wizardAnim.start,
-        end: wizardAnim.end,
-        zeroPad: wizardAnim.zeroPad,
-        prefix: wizardAnim.prefix,
-        suffix: wizardAnim.suffix,
-      }),
-      frameRate: 6,
-      repeat: -1,
-    });
 
     // Dino idle animation (looping)
     const dinoAnim = anims.animDino.IDLE;
@@ -303,7 +301,6 @@ export class Road extends Phaser.Scene {
     // ── Resolve PNJ anim keys (client-side only) ──────────────────────────────
     const PNJ_ANIM_KEYS: Record<string, string> = {
       [CLIENT_CONFIG.CHARACTERS.GHOST.NAME]:  ghostAnim.key,
-      [CLIENT_CONFIG.CHARACTERS.WIZARD.NAME]: wizardAnim.key,
       [CLIENT_CONFIG.CHARACTERS.DINO.NAME]:   dinoAnim.key,
       [CLIENT_CONFIG.CHARACTERS.ROBOT.NAME]:  robotAnim.key,
       [CLIENT_CONFIG.CHARACTERS.WENDY.NAME]:  wendyAnim.key,
@@ -374,6 +371,18 @@ export class Road extends Phaser.Scene {
     );
     this.dialogueInput.register(this);
 
+    // POI zones with actions — Enter (desktop) or mobile interact button
+    this.input.keyboard!.on("keydown-ENTER", () => {
+      if (this._activePoi?.action && !this.dialogueManager.isOpen()) {
+        this._handlePoiAction(this._activePoi.action);
+      }
+    });
+    phaserEvents.on(PhaserEvent.MOBILE_INTERACT, () => {
+      if (this._activePoi?.action && !this.dialogueManager.isOpen()) {
+        this._handlePoiAction(this._activePoi.action);
+      }
+    });
+
     phaserEvents.on(PhaserEvent.DIALOGUE_OPEN, () => {
       this.network.setSpeaking(true);
       this.myPlayer?.showSpeakingBubble();
@@ -382,6 +391,15 @@ export class Road extends Phaser.Scene {
     phaserEvents.on(PhaserEvent.DIALOGUE_CLOSE, () => {
       this.network.setSpeaking(false);
       this.myPlayer?.hideSpeakingBubble();
+    });
+
+    phaserEvents.on(PhaserEvent.CV_POPUP_CLOSE, () => {
+      this.network.setSpeaking(false);
+      this.myPlayer?.hideSpeakingBubble();
+    });
+
+    phaserEvents.on(PhaserEvent.GAME_OVER_RESTART, () => {
+      this.network.restoreLife();
     });
 
     // Debug graphics for enemies
@@ -581,6 +599,15 @@ export class Road extends Phaser.Scene {
       }
       return;
     }
+    if (field === SERVER_DATA.IS_DEAD && id === this.network.sessionId) {
+      if (!!value) {
+        this.myPlayer?.setVisible(false);
+        this.myPlayer?.hideSpeakingBubble();
+        phaserEvents.emit(PhaserEvent.GAME_OVER);
+      } else {
+        this.myPlayer?.setVisible(true);
+      }
+    }
     this.playerManager.handleUpdate(field, value, id);
   }
 
@@ -621,9 +648,9 @@ export class Road extends Phaser.Scene {
     // CAMERA
     this.setupCamera();
 
-    // INPUTS — blocked while dialogue is open
-    const inputs = this.dialogueManager.isOpen()
-      ? { left: false, right: false, up: false, down: false, space: false }
+    // INPUTS — blocked while dialogue is open or intro not yet completed
+    const inputs = (this.dialogueManager.isOpen() || !this._introCompleted)
+      ? { left: false, right: false, up: false, down: false, space: false, sprint: false }
       : this.myPlayer.handleInput();
 
     // SEND INPUT TO BACKEND
@@ -651,11 +678,11 @@ export class Road extends Phaser.Scene {
     }
     if (nearestPnj) {
       this.dialogueManager.enterZone(nearestPnj.dialogueId);
-    } else {
+    } else if (!this._pnjCooldown) {
       this.dialogueManager.leaveZone();
     }
 
-    // POI zones — text overlay on proximity, no Enter action
+    // POI zones — text overlay on proximity, optional Enter action
     let nearestPoi: PoiZone | null = null;
     for (const zone of this._poiZones) {
       const dist = Phaser.Math.Distance.Between(this.myPlayer.x, this.myPlayer.y, zone.x, zone.y);
@@ -664,8 +691,12 @@ export class Road extends Phaser.Scene {
     if (nearestPoi !== this._activePoi) {
       this._activePoi = nearestPoi;
       if (nearestPoi) {
-        phaserEvents.emit(PhaserEvent.POI_ENTER, nearestPoi.text);
+        const isTouch = this.sys.game.device.input.touch;
+        const hint = (isTouch && nearestPoi.textMobile) ? nearestPoi.textMobile : nearestPoi.text;
+        if (nearestPoi.action) phaserEvents.emit(PhaserEvent.POI_ACTION_ENTER);
+        phaserEvents.emit(PhaserEvent.POI_ENTER, hint);
       } else {
+        phaserEvents.emit(PhaserEvent.POI_ACTION_LEAVE);
         phaserEvents.emit(PhaserEvent.POI_LEAVE);
       }
     }
@@ -673,6 +704,41 @@ export class Road extends Phaser.Scene {
     // DEBUG: draw enemy bounding boxes
     if (CLIENT_CONFIG.DEBUG) {
       this.drawEnemyDebug();
+    }
+  }
+
+  private _handlePoiAction(action: string) {
+    if (action === "open_cv") {
+      this.network.setSpeaking(true);
+      this.myPlayer?.showSpeakingBubble();
+      phaserEvents.emit(PhaserEvent.CV_POPUP_OPEN);
+      return;
+    }
+
+    const LINK_URLS: Record<string, string> = {
+      open_linkedin: "https://fr.linkedin.com/in/erwan-gilbert-b184241b",
+      open_github:   "https://github.com/OneAirOne",
+    };
+    const url = LINK_URLS[action];
+    if (url) {
+      this.network.setSpeaking(true);
+      this.myPlayer?.showSpeakingBubble();
+
+      // Clear speaking state when player comes back to the tab
+      const onVisible = () => {
+        if (document.visibilityState === "visible") {
+          this.network.setSpeaking(false);
+          this.myPlayer?.hideSpeakingBubble();
+          document.removeEventListener("visibilitychange", onVisible);
+        }
+      };
+      document.addEventListener("visibilitychange", onVisible);
+
+      if (this.sys.game.device.input.touch) {
+        phaserEvents.emit(PhaserEvent.URL_PENDING, url);
+      } else {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
     }
   }
 
