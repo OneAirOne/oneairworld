@@ -4,6 +4,7 @@ import SamuraiBallContent from "../../projects/SamuraiBallContent";
 import OldPortfolioContent from "../../projects/OldPortfolioContent";
 import PepperAtelierContent from "../../projects/PepperAtelierContent";
 import DessinonsContent from "../../projects/DessinonsContent";
+import OneAirWorldContent from "../../projects/OneAirWorldContent";
 
 // TODO: make an enum
 function ProjectContent({ projectId }: { projectId: string }) {
@@ -14,6 +15,8 @@ function ProjectContent({ projectId }: { projectId: string }) {
       return <OldPortfolioContent />;
     case "pepper-atelier-snowboard":
       return <PepperAtelierContent />;
+    case "oneair-world":
+      return <OneAirWorldContent />;
     case "dessinons":
       return <DessinonsContent />;
     default:

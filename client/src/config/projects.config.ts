@@ -36,6 +36,14 @@ export const PROJECTS: ProjectConfig[] = [
     hintMobile:  "Appuyer sur l'icône 💬 pour voir l'ancien portfolio",
   },
   {
+    id: "oneair-world",
+    name: "OneairWorld",
+    url: "/projets/oneair-world",
+    description: "Le making-of de ce monde interactif multijoueur.",
+    hintDesktop: "Appuyer sur Entrée pour voir le projet OneairWorld",
+    hintMobile:  "Appuyer sur l'icône 💬 pour voir le projet OneairWorld",
+  },
+  {
     id: "dessinons",
     name: "Dessinons",
     url: "/projets/dessinons",

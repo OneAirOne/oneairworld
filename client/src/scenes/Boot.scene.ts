@@ -9,6 +9,7 @@ import { SCENES } from "./scene.config";
 
 export class BootScene extends Phaser.Scene {
   private preloadComplete = false;
+  private _pendingLaunch = false;
   private _loadErrors: string[] = [];
   network!: NetworkType;
 
@@ -156,14 +157,12 @@ export class BootScene extends Phaser.Scene {
           if (this._loadErrors.length > 0) {
             console.error("[Boot] Retry failed for:", this._loadErrors.join(", "), "— launching anyway.");
           }
-          this.preloadComplete = true;
-          this.launchBackground();
+          this._onPreloadDone();
         });
         this.load.start();
         return;
       }
-      this.preloadComplete = true;
-      this.launchBackground();
+      this._onPreloadDone();
     });
   }
 
@@ -202,15 +201,20 @@ export class BootScene extends Phaser.Scene {
     console.warn(`[Boot] _reloadByKey: unknown key "${key}", cannot retry.`);
   }
 
-  private launchBackground() {
-    this.scene.start(SCENES.BACKGROUND);
+  private _onPreloadDone() {
+    this.preloadComplete = true;
+    if (this._pendingLaunch) {
+      this.scene.start(SCENES.GAME, { network: this.network });
+    } else {
+      this.scene.start(SCENES.BACKGROUND);
+    }
   }
 
   launchGame() {
-    if (!this.preloadComplete) return;
-
-    this.scene.start(SCENES.GAME, {
-      network: this.network,
-    });
+    if (!this.preloadComplete) {
+      this._pendingLaunch = true;
+      return;
+    }
+    this.scene.start(SCENES.GAME, { network: this.network });
   }
 }

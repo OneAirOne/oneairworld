@@ -46,6 +46,7 @@ export class InteriorScene extends Phaser.Scene {
   private _poiZones: PoiZone[] = [];
   private _activePoi: PoiZone | null = null;
   private _pnjCooldown = false;
+  private _projectOpen = false;
   private _onMobileInteractPoi!: () => void;
 
   private get _player(): Player { return this._playerManager?.myPlayer; }
@@ -80,6 +81,10 @@ export class InteriorScene extends Phaser.Scene {
     this._inReturnZone = false;
     this._activePoi = null;
     this._exiting = false;
+    this._projectOpen = false;
+
+    phaserEvents.on(PhaserEvent.PROJECT_OPEN,  () => { this._projectOpen = true; });
+    phaserEvents.on(PhaserEvent.PROJECT_CLOSE, () => { this._projectOpen = false; });
 
     // POI zone — keyboard Enter
     this.input.keyboard!.on("keydown-ENTER", () => {
@@ -181,7 +186,7 @@ export class InteriorScene extends Phaser.Scene {
     this._dialogueInput = new DialogueInputHandler(
       this._dialogueManager,
       (action) => this._handleAction(action),
-      () => this._exit(),
+      () => { if (!this._projectOpen) this._exit(); },
     );
     this._dialogueInput.register(this);
 
