@@ -105,7 +105,7 @@ export class UIScene extends Phaser.Scene {
       .setVisible(false);
 
     this.zoneHintBg = this.add.graphics().setDepth(0).setVisible(false);
-    this._redrawHintBg(W);
+    this._redrawHintBg();
 
     // --- Dialogue box background (drawn dynamically on each open) ---
     this.dialogueBg = this.add.graphics().setVisible(false);
@@ -416,23 +416,21 @@ export class UIScene extends Phaser.Scene {
     }
   }
 
-  private _redrawHintBg(W: number) {
-    const hW = this.zoneHint.width;
-    const hH = this.zoneHint.height;
-    const hX = W / 2 - hW / 2;
-    const hY = this.boxY - 8 - hH;
+  private _redrawHintBg() {
+    const b = this.zoneHint.getBounds();
     this.zoneHintBg.clear()
-      .fillStyle(0x0a0a0a, 0.88).fillRoundedRect(hX, hY, hW, hH, 6)
-      .lineStyle(2, 0xffffff, 1).strokeRoundedRect(hX, hY, hW, hH, 6);
+      .fillStyle(0x0a0a0a, 0.88).fillRoundedRect(b.x, b.y, b.width, b.height, 6)
+      .lineStyle(2, 0xffffff, 1).strokeRoundedRect(b.x, b.y, b.width, b.height, 6);
   }
 
   private _showHint(text: string) {
     const W = this.scale.width;
     this.zoneHint.setWordWrapWidth(W - DIALOGUE_BOX_MARGIN * 4);
     this.zoneHint.setText(text);
-    this._redrawHintBg(W);
-    this.zoneHintBg.setVisible(true);
+    // Make visible before reading bounds so Phaser returns up-to-date dimensions
     this.zoneHint.setVisible(true);
+    this.zoneHintBg.setVisible(true);
+    this._redrawHintBg();
   }
 
   private _hideHint() {
