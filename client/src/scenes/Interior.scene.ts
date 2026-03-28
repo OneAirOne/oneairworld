@@ -341,11 +341,7 @@ export class InteriorScene extends Phaser.Scene {
     if (action.startsWith("open_project:")) {
       const project = getProject(action.split(":")[1]);
       if (!project) return;
-      if (this.sys.game.device.input.touch) {
-        phaserEvents.emit(PhaserEvent.URL_PENDING, project.url);
-      } else {
-        window.open(project.url, "_blank", "noopener,noreferrer");
-      }
+      phaserEvents.emit(PhaserEvent.PROJECT_OPEN, project.id);
     }
   }
 

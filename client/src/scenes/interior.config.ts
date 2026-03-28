@@ -42,9 +42,9 @@ export const INTERIOR_SCENE_LAYERS: LayerConfig[] = [
 export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
   [Zone.INTERIOR_OLD_HOUSE]: {
     mapKey: "interior-ghost",
-    mapPath: "assets/map/interior-ghost.json",
+    mapPath: "/assets/map/interior-ghost.json",
     tilesets: [
-      { name: "interior-jap", path: "assets/map/interior-jap.png" },
+      { name: "interior-jap", path: "/assets/map/interior-jap.png" },
     ],
     playerSpawn: { x: 128, y: 200 },
     returnSpawn: { x: 0, y: 0 },
@@ -52,9 +52,9 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
   },
   [Zone.INTERIOR_GAME_ROOM]: {
     mapKey: "interior-robot",
-    mapPath: "assets/map/interior-robot.json",
+    mapPath: "/assets/map/interior-robot.json",
     tilesets: [
-      { name: "interior-jap", path: "assets/map/interior-jap.png" },
+      { name: "interior-jap", path: "/assets/map/interior-jap.png" },
     ],
     playerSpawn: { x: 128, y: 200 },
     returnSpawn: { x: 0, y: 0 },
@@ -62,11 +62,11 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
   },
   [Zone.INTERIOR_ARCADE]: {
     mapKey: "interior-arcade",
-    mapPath: "assets/map/interior-arcade.json",
+    mapPath: "/assets/map/interior-arcade.json",
     tilesets: [
-      { name: "arcade",       path: "assets/map/arcade.png" },
-      { name: "interior-jap", path: "assets/map/interior-jap.png" },
-      { name: "logo",         path: "assets/map/logos.png" },
+      { name: "arcade",       path: "/assets/map/arcade.png" },
+      { name: "interior-jap", path: "/assets/map/interior-jap.png" },
+      { name: "logo",         path: "/assets/map/logos.png" },
     ],
     playerSpawn: { x: 128, y: 200 },
     returnSpawn: { x: 0, y: 0 },

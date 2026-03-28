@@ -38,6 +38,9 @@ export enum PhaserEvent {
   // Game over
   GAME_OVER = "game-over",
   GAME_OVER_RESTART = "game-over-restart",
+  // Project overlay
+  PROJECT_OPEN = "project-open",
+  PROJECT_CLOSE = "project-close",
   // Interior transitions
   ENTER_INTERIOR = "enter-interior",
   // Mobile touch actions (mirror keyboard shortcuts)
