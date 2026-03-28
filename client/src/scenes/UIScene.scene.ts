@@ -135,7 +135,7 @@ export class UIScene extends Phaser.Scene {
     this._killBadge.style.cssText =
       "position:fixed;top:12px;right:12px;display:flex;align-items:center;gap:6px;" +
       "background:rgba(0,0,0,0.6);padding:5px 10px;border-radius:8px;" +
-      "border:1px solid rgba(255,255,255,0.3);z-index:100;pointer-events:none;";
+      "border:1px solid rgba(255,255,255,0.3);z-index:10;pointer-events:none;";
 
     const slimeImg = document.createElement("img");
     slimeImg.src = "/assets/slime.gif";
@@ -148,7 +148,7 @@ export class UIScene extends Phaser.Scene {
 
     this._killBadge.appendChild(slimeImg);
     this._killBadge.appendChild(this._killCountSpan);
-    document.body.appendChild(this._killBadge);
+    (document.getElementById("root") ?? document.body).appendChild(this._killBadge);
 
     // --- Mobile controls ---
     if (this._isTouchDevice) {
