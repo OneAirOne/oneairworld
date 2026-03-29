@@ -16,6 +16,7 @@ const FADE_DURATION = 500;
 export function StartGame() {
   const [visible, setVisible] = React.useState(true);
   const [fading, setFading] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
   const mail = "gilberterwan@gmail.com";
 
@@ -25,17 +26,19 @@ export function StartGame() {
 
   const handleCharacterSelect = React.useCallback(async (character: Characters) => {
     setShowModal(false);
-    setFading(true);
+    setLoading(true);
     try {
       const bootScene = phaserGame.scene.keys[SCENES.BOOT] as BootScene;
-      await bootScene.network.joinOrCreatePublic({
-        name: "Erwan",
-        texture: character,
-      });
+      await Promise.all([
+        bootScene.network.joinOrCreatePublic({ name: "Erwan", texture: character }),
+        bootScene.waitForPreload(),
+      ]);
       bootScene.launchGame();
     } catch (error) {
       console.error(error);
     }
+    setLoading(false);
+    setFading(true);
     setTimeout(() => setVisible(false), FADE_DURATION);
   }, []);
 
@@ -90,12 +93,22 @@ export function StartGame() {
           </p>
         </div>
 
-        {/* Button */}
+        {/* Button / loading */}
         <div
           className="flex justify-center opacity-0 animate-fade-in-up"
           style={{ animationDelay: "0.3s" }}
         >
-          <LaunchButton onClick={handleLaunch} />
+          {loading ? (
+            <div className="flex items-center gap-3 text-slate-400 text-sm">
+              <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+              Chargement du monde…
+            </div>
+          ) : (
+            <LaunchButton onClick={handleLaunch} />
+          )}
         </div>
 
       </div>

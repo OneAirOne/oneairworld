@@ -10,6 +10,7 @@ import { SCENES } from "./scene.config";
 export class BootScene extends Phaser.Scene {
   private preloadComplete = false;
   private _pendingLaunch = false;
+  private _preloadResolve?: () => void;
   private _loadErrors: string[] = [];
   network!: NetworkType;
 
@@ -201,8 +202,16 @@ export class BootScene extends Phaser.Scene {
     console.warn(`[Boot] _reloadByKey: unknown key "${key}", cannot retry.`);
   }
 
+  /** Resolves when all assets are loaded. Instant if already done. */
+  waitForPreload(): Promise<void> {
+    if (this.preloadComplete) return Promise.resolve();
+    return new Promise((resolve) => { this._preloadResolve = resolve; });
+  }
+
   private _onPreloadDone() {
     this.preloadComplete = true;
+    this._preloadResolve?.();
+    this._preloadResolve = undefined;
     if (this._pendingLaunch) {
       this.scene.start(SCENES.GAME, { network: this.network });
     } else {
