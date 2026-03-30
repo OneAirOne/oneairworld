@@ -9,7 +9,7 @@
         ]
       },
       "tip": {
-        "text": "Va voir Wendy — elle gère la salle d'arcade juste à côté et elle pourra peut-être te montrer des projets en cours. Bonne visite !",
+        "text": "Va voir Lara — elle gère la salle d'arcade à côté des bureaux LinkedIn et elle pourra peut-être te montrer des projets en cours. Bonne visite !",
         "choices": [
           { "label": "J'y vais !", "next": "bye" },
           { "label": "Merci !", "next": "bye" }
@@ -31,7 +31,7 @@
         ]
       },
       "tip": {
-        "text": "Va voir Wendy — elle gère la salle d'arcade juste à côté et elle pourra peut-être te montrer des projets en cours. Bonne visite !",
+        "text": "Va voir Lara — elle gère la salle d'arcade à côté des bureaux LinkedIn et elle pourra peut-être te montrer des projets en cours. Bonne visite !",
         "choices": [
           { "label": "J'y vais !", "next": "bye" },
           { "label": "Merci !", "next": "bye" }
@@ -56,7 +56,7 @@
         ]
       },
       "redirect": {
-        "text": "Va voir la salle d'arcade en haut à droite — c'est Wendy qui la gère. Elle y a exposé tous les projets d'Erwan, tu trouveras forcément ton bonheur !",
+        "text": "Va voir la salle d'arcade à côté des bureaux LinkedIn — c'est Lara qui la gère. Elle y a exposé tous les projets d'Erwan, tu trouveras forcément ton bonheur !",
         "choices": [
           { "label": "J'y vais !", "next": "bye" }
         ]
@@ -77,11 +77,11 @@
         ]
       },
       "linkedin": {
-        "text": "Repère le bâtiment avec le logo LinkedIn dans la rue — rapproche-toi et le personnage devant pourra t'y emmener directement !",
+        "text": "Repère le bâtiment avec le logo LinkedIn dans la rue — approche-toi du bâtiment pour ouvrir le lien !",
         "choices": []
       },
       "github": {
-        "text": "Repère le bâtiment avec le logo GitHub dans la rue — rapproche-toi et le personnage devant pourra t'y emmener directement !",
+        "text": "Repère le bâtiment avec le logo GitHub dans la rue — approche-toi du bâtiment pour ouvrir le lien !",
         "choices": []
       },
       "bye": {
@@ -103,7 +103,7 @@
         ]
       },
       "redirect": {
-        "text": "Va voir la salle d'arcade en haut à droite — c'est Wendy qui la gère. Elle y a exposé tous les projets d'Erwan, tu trouveras forcément ton bonheur !",
+        "text": "Va voir la salle d'arcade à côté des bureaux LinkedIn — c'est Lara qui la gère. Elle y a exposé tous les projets d'Erwan, tu trouveras forcément ton bonheur !",
         "choices": [
           { "label": "J'y vais !", "next": "bye" }
         ]
@@ -124,11 +124,11 @@
         ]
       },
       "linkedin": {
-        "text": "Repère le bâtiment avec le logo LinkedIn dans la rue — rapproche-toi et le personnage devant pourra t'y emmener directement !",
+        "text": "Repère le bâtiment avec le logo LinkedIn dans la rue — approche-toi du bâtiment pour ouvrir le lien !",
         "choices": []
       },
       "github": {
-        "text": "Repère le bâtiment avec le logo GitHub dans la rue — rapproche-toi et le personnage devant pourra t'y emmener directement !",
+        "text": "Repère le bâtiment avec le logo GitHub dans la rue — approche-toi du bâtiment pour ouvrir le lien !",
         "choices": []
       },
       "bye": {
@@ -171,7 +171,7 @@
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "RAWRRR ! Bienvenue chez TacoRex ! Tu as l'air épuisé... un tacos et tu seras comme neuf. Tu en veux un ?",
+        "text": "RAWRRR ! Moi c'est TacoRex — la mascotte officielle du food truck ! Je suis là pour te redonner des forces. Tu as l'air épuisé... un tacos et tu seras comme neuf. Tu en veux un ?",
         "choices": [
           { "label": "Oui, avec plaisir !", "next": "eat" },
           { "label": "Non merci, je suis pressé.", "next": "bye" }
@@ -317,6 +317,13 @@
     "start": "intro",
     "nodes": {
       "intro": {
+        "text": "BZZZT— Identification : RoboCop. Unité de maintien de l'ordre… enfin, à peu près. En vrai c'est juste un costume mais les gens s'écartent quand même dans la rue, alors je le garde.",
+        "choices": [
+          { "label": "Haha, logique.", "next": "billboard" },
+          { "label": "Tu me fais pas vraiment peur.", "next": "billboard" }
+        ]
+      },
+      "billboard": {
         "text": "Hé, t'as vu le panneau publicitaire en passant ? C'est le prochain jeu sur lequel bosse Erwan — et franchement, ça s'annonce vraiment bien !",
         "choices": [
           { "label": "Ah bon ? C'est quoi ?", "next": "details" },

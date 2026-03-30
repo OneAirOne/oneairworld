@@ -14,7 +14,7 @@ export const PLAYABLE_CHARACTERS: CharacterChoice[] = [
   },
   {
     key: Characters.LINK,
-    name: "Drake",
+    name: "Louis",
     gif: "assets/link.gif",
   },
 ];

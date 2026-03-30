@@ -25,7 +25,7 @@ export default function OldPortfolioContent() {
       <section className="max-w-4xl mx-auto px-6 pb-20">
         <div className="relative w-full rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
           <video
-            src="/assets/old-portfolio/old-portfolio.mov"
+            src="/assets/old-portfolio/old-portfolio.mp4"
             autoPlay
             playsInline
             muted

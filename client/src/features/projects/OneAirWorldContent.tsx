@@ -32,7 +32,7 @@ export default function OneAirWorldContent() {
       <section className="max-w-4xl mx-auto px-6 pb-12">
         <div className="relative w-full rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
           <video
-            src="/assets/oneair-world/making-off.mov"
+            src="/assets/oneair-world/making-off.mp4"
             autoPlay
             playsInline
             muted

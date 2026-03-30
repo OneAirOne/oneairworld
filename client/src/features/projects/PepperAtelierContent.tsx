@@ -24,7 +24,7 @@ export default function PepperAtelierContent() {
       <section className="max-w-4xl mx-auto px-6 pb-20">
         <div className="relative w-full rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
           <video
-            src="/assets/pepper-atelier/trailer.mov"
+            src="/assets/pepper-atelier/trailer.mp4"
             autoPlay
             playsInline
             muted
