@@ -1,7 +1,6 @@
 import { useParams, Link } from "react-router-dom";
-import { Typography, Box, Button } from "@mui/material";
-import Layout from "components/layout.component";
 import { getProject } from "config/projects.config";
+import PageLayout from "components/PageLayout";
 
 export default function ProjectView() {
   const { id } = useParams<{ id: string }>();
@@ -9,30 +8,28 @@ export default function ProjectView() {
 
   if (!project) {
     return (
-      <Layout>
-        <Typography>Projet introuvable.</Typography>
-        <Button component={Link} to="/" sx={{ mt: 2 }}>
-          Retour
-        </Button>
-      </Layout>
+      <PageLayout>
+        <div className="max-w-4xl mx-auto px-6 pt-20">
+          <p className="text-slate-400">Projet introuvable.</p>
+          <Link to="/" className="inline-block mt-4 text-sm text-slate-400 hover:text-white transition-colors">
+            ← Retour au monde
+          </Link>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <Layout>
-      <Box sx={{ maxWidth: 800, mx: "auto", p: 4 }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          {project.name}
-        </Typography>
+    <PageLayout>
+      <div className="max-w-4xl mx-auto px-6 pt-20 pb-16">
+        <h1 className="text-4xl font-bold text-white mb-4">{project.name}</h1>
         {project.description && (
-          <Typography variant="body1" color="text.secondary" gutterBottom>
-            {project.description}
-          </Typography>
+          <p className="text-slate-400 mb-8">{project.description}</p>
         )}
-        <Button component={Link} to="/" sx={{ mt: 4 }}>
-          Retour au monde
-        </Button>
-      </Box>
-    </Layout>
+        <Link to="/" className="text-sm text-slate-400 hover:text-white transition-colors">
+          ← Retour au monde
+        </Link>
+      </div>
+    </PageLayout>
   );
 }

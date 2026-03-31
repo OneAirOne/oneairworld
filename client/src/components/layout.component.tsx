@@ -1,19 +1,9 @@
 import { PropsWithChildren } from "react";
-import Stack from "@mui/material/Stack";
 
-interface Props {}
-
-export default function Layout({ children }: PropsWithChildren<Props>) {
+export default function Layout({ children }: PropsWithChildren) {
   return (
-    <Stack
-      alignItems="center"
-      justifyContent="center"
-      sx={{
-        width: "100vw",
-        height: "100vh",
-      }}
-    >
-      <Stack>{children}</Stack>
-    </Stack>
+    <div className="w-screen h-screen flex items-center justify-center">
+      <div>{children}</div>
+    </div>
   );
 }

@@ -9,11 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.6",
-    "@emotion/styled": "^11.10.6",
     "@fontsource/roboto": "^4.5.8",
-    "@mui/icons-material": "^5.11.16",
-    "@mui/material": "^5.11.16",
     "colyseus.js": "^0.14.13",
     "phaser": "^3.55.2",
     "phaser-animated-tiles": "^2.0.2",
