@@ -118,7 +118,7 @@ export const ENEMY_CONFIG = {
   // Radius (px) within which an enemy detects and follows a player
   AGGRO_RADIUS: 60,
   // Distance (px) at which the enemy starts an attack
-  ATTACK_RANGE: 22,
+  ATTACK_RANGE: 16,
   // Duration (ms) of the attack animation / attack state
   ATTACK_DURATION: 600,
   // Cooldown (ms) before the enemy can attack again
