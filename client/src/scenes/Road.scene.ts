@@ -51,6 +51,7 @@ export class Road extends Phaser.Scene {
   private dialogueInput!: DialogueInputHandler;
   private _pnjCooldown = false;
   private _introCompleted = false;
+  private _wendyAutoOpened = false;
   private _poiZones: PoiZone[] = [];
   private _activePoi: PoiZone | null = null;
 
@@ -678,6 +679,10 @@ export class Road extends Phaser.Scene {
     }
     if (nearestPnj) {
       this.dialogueManager.enterZone(nearestPnj.dialogueId);
+      if (nearestPnj.dialogueId === "wendy" && !this._wendyAutoOpened) {
+        this._wendyAutoOpened = true;
+        this.dialogueManager.open();
+      }
     } else if (!this._pnjCooldown) {
       this.dialogueManager.leaveZone();
     }
