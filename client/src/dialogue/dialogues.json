@@ -9,7 +9,7 @@
         ]
       },
       "tip": {
-        "text": "Va voir Lara — elle gère la salle d'arcade à côté des bureaux LinkedIn et elle pourra peut-être te montrer des projets en cours. Bonne visite !",
+        "text": "Va voir Wendy — elle gère la salle d'arcade à côté des bureaux LinkedIn et elle pourra peut-être te montrer des projets en cours. Bonne visite !",
         "choices": [
           { "label": "J'y vais !", "next": "bye" },
           { "label": "Merci !", "next": "bye" }
@@ -31,7 +31,7 @@
         ]
       },
       "tip": {
-        "text": "Va voir Lara — elle gère la salle d'arcade à côté des bureaux LinkedIn et elle pourra peut-être te montrer des projets en cours. Bonne visite !",
+        "text": "Va voir Wendy — elle gère la salle d'arcade à côté des bureaux LinkedIn et elle pourra peut-être te montrer des projets en cours. Bonne visite !",
         "choices": [
           { "label": "J'y vais !", "next": "bye" },
           { "label": "Merci !", "next": "bye" }
@@ -56,7 +56,7 @@
         ]
       },
       "redirect": {
-        "text": "Va voir la salle d'arcade à côté des bureaux LinkedIn — c'est Lara qui la gère. Elle y a exposé tous les projets d'Erwan, tu trouveras forcément ton bonheur !",
+        "text": "Va voir la salle d'arcade à côté des bureaux LinkedIn — c'est Wendy qui la gère. Elle y a exposé tous les projets d'Erwan, tu trouveras forcément ton bonheur !",
         "choices": [
           { "label": "J'y vais !", "next": "bye" }
         ]
@@ -103,7 +103,7 @@
         ]
       },
       "redirect": {
-        "text": "Va voir la salle d'arcade à côté des bureaux LinkedIn — c'est Lara qui la gère. Elle y a exposé tous les projets d'Erwan, tu trouveras forcément ton bonheur !",
+        "text": "Va voir la salle d'arcade à côté des bureaux LinkedIn — c'est Wendy qui la gère. Elle y a exposé tous les projets d'Erwan, tu trouveras forcément ton bonheur !",
         "choices": [
           { "label": "J'y vais !", "next": "bye" }
         ]
