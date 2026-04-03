@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="47" nextobjectid="81">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="47" nextobjectid="101">
  <editorsettings>
   <export target="road.json" format="json"/>
  </editorsettings>
@@ -261100,6 +261100,11 @@
   <object id="80" name="pnj5" x="887.696" y="210.57">
    <point/>
   </object>
+  <object id="88" name="zone_spawn" x="32.6789" y="352.135" width="502.171" height="98.4665"/>
+  <object id="89" name="zone_spawn" x="532.944" y="298.905" width="438.613" height="117.892"/>
+  <object id="95" name="zone_spawn" x="655.738" y="434.144" width="295.082" height="122.103"/>
+  <object id="98" name="zone_spawn" x="858.112" y="214.811" width="50.8762" height="76.8796"/>
+  <object id="100" name="zone_spawn" x="413.793" y="460.147" width="104.014" height="45.2233"/>
  </objectgroup>
  <objectgroup id="43" name="spawn">
   <object id="51" name="spawn1" x="638.368" y="393.564">

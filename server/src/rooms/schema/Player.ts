@@ -25,6 +25,7 @@ export class Player extends Schema {
   @type("boolean") isCollided = false;
   @type("string") collisionDirection = DIRECTION.DOWN;
   @type("string") zone: string = Zone.ROAD;
+  @type("number") coins: number = 0;
 
   inputQueue: any[] = [];
 

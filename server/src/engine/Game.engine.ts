@@ -3,7 +3,7 @@ import Matter from "matter-js";
 import { GameState } from "../rooms/schema";
 import { processPlayerAction, collisionPlayers, collisionPlayerEnemy, processEnemyAI } from "./actions";
 
-import { SwordMan, createZone, createPnjBodies, Fluppy, PLAYER_CONFIG, ArrowBody } from "./bodies";
+import { SwordMan, createZone, createPnjBodies, Fluppy, PLAYER_CONFIG, ArrowBody, getCoinSpawnZones } from "./bodies";
 import { COLLISION_CATEGORY } from "./engine.config";
 import { SERVER_CONFIG } from "../server.config";
 
@@ -16,7 +16,7 @@ import {
   ZONE_LIST,
 } from "../../../shared/types";
 import { createRectangle, getSpawnPoints, getTiledInfos } from "./bodies";
-import { SHARED_CONFIG, COMBAT_CONFIG, ARROW_CONFIG } from "../../../shared/shared.config";
+import { SHARED_CONFIG, COMBAT_CONFIG, ARROW_CONFIG, COIN_CONFIG } from "../../../shared/shared.config";
 import { DIRECTION } from "../../../shared/types";
 
 interface ZoneContext {
@@ -42,6 +42,11 @@ export class GameEngine {
   private _arrowsToRemove: string[] = [];
   private _logTimer: number = 0;
   private _savedZonePositions: Record<string, { x: number; y: number }> = {};
+
+  // ── Coin system ───────────────────────────────────────────────────────────────
+  private _coinSpawnZones: { x: number; y: number; width: number; height: number }[] = [];
+  private _coinSpawnTimer = 0;
+  private _pendingCoinSpawns: number[] = []; // timers (ms) for each queued respawn
 
   private get roadCtx(): ZoneContext { return this.zoneContexts.get(Zone.ROAD)!; }
 
@@ -263,6 +268,15 @@ export class GameEngine {
 
       this.setupCollisionEvents(engine);
     }
+
+    // Coin spawn zones (road only)
+    this._coinSpawnZones = getCoinSpawnZones(Zone.ROAD);
+    this._coinSpawnTimer = this._randomCoinDelay();
+
+    // Spawn initial coins
+    for (let i = 0; i < COIN_CONFIG.MAX_ACTIVE_COINS; i++) {
+      this._spawnCoin();
+    }
   }
 
   /**
@@ -481,6 +495,60 @@ export class GameEngine {
     delete this.enemies[enemyId];
   }
 
+  // ── Coin helpers ─────────────────────────────────────────────────────────────
+
+  private _randomCoinDelay(): number {
+    return COIN_CONFIG.SPAWN_INTERVAL_MIN +
+      Math.random() * (COIN_CONFIG.SPAWN_INTERVAL_MAX - COIN_CONFIG.SPAWN_INTERVAL_MIN);
+  }
+
+  private _spawnCoin() {
+    if (!this._coinSpawnZones.length) return;
+    const zone = this._coinSpawnZones[Math.floor(Math.random() * this._coinSpawnZones.length)];
+    const px = zone.x + Math.random() * zone.width;
+    const py = zone.y + Math.random() * zone.height;
+    const coinId = `coin_${Date.now()}_${Math.floor(Math.random() * 9999)}`;
+    this.state.createCoin(coinId, px, py);
+  }
+
+  private _removeCoin(coinId: string) {
+    if (this.state.coins.has(coinId)) this.state.coins.delete(coinId);
+  }
+
+  private _updateCoins(dt: number) {
+    const toRemove: string[] = [];
+
+    // Collection check — player walks over a coin
+    this.state.coins.forEach((_coin, coinId) => {
+      const coin = this.state.coins.get(coinId);
+      if (!coin) return;
+      this.state.players.forEach((player) => {
+        if (player.isDead || player.zone !== Zone.ROAD) return;
+        if (toRemove.includes(coinId)) return;
+        const dx = player.x - coin.x;
+        const dy = player.y - coin.y;
+        if (Math.sqrt(dx * dx + dy * dy) <= COIN_CONFIG.COLLECT_RADIUS) {
+          player.coins += 1;
+          toRemove.push(coinId);
+        }
+      });
+    });
+
+    for (const coinId of [...new Set(toRemove)]) {
+      this._removeCoin(coinId);
+      this._pendingCoinSpawns.push(this._randomCoinDelay());
+    }
+
+    // Tick pending respawn timers
+    for (let i = this._pendingCoinSpawns.length - 1; i >= 0; i--) {
+      this._pendingCoinSpawns[i] -= dt;
+      if (this._pendingCoinSpawns[i] <= 0) {
+        this._spawnCoin();
+        this._pendingCoinSpawns.splice(i, 1);
+      }
+    }
+  }
+
   update(deltaTime: number): void {
     this.zoneContexts.forEach(({ engine }) => Matter.Engine.update(engine, deltaTime));
     this.syncPositions();
@@ -496,6 +564,8 @@ export class GameEngine {
       console.log(`[Engine] players=${playerCount} enemies=${enemyCount} arrows=${arrowCount}`);
     }
 
+
+    this._updateCoins(deltaTime);
 
     // Enemy death — delay removal to let death anim play
     const DEATH_ANIM_DURATION = 700;

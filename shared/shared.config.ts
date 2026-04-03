@@ -114,6 +114,13 @@ export const ARROW_CONFIG = {
   KNOCKBACK_DURATION: 350,   // ms
 };
 
+export const COIN_CONFIG = {
+  COLLECT_RADIUS: 14,          // px — distance pour ramasser
+  MAX_ACTIVE_COINS: 5,         // nombre max de pièces simultanées
+  SPAWN_INTERVAL_MIN: 3000,    // ms min entre 2 spawns
+  SPAWN_INTERVAL_MAX: 9000,    // ms max
+};
+
 export const ENEMY_CONFIG = {
   // Radius (px) within which an enemy detects and follows a player
   AGGRO_RADIUS: 60,

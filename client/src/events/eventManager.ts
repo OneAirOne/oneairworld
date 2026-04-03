@@ -30,6 +30,10 @@ export enum PhaserEvent {
   POI_ACTION_LEAVE = "poi-action-leave",
   // URL to open on next user gesture (mobile)
   URL_PENDING = "url-pending",
+  // Coins
+  COIN_JOINED = "coin-joined",
+  COIN_LEFT = "coin-left",
+  COIN_COLLECTED = "coin-collected",
   // Kill counter
   SLIME_KILLED = "slime-killed",
   // CV popup

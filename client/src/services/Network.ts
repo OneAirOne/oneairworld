@@ -12,6 +12,7 @@ import {
   IPlayer,
   IEnemy,
   IArrow,
+  ICoin,
   Message,
   InputPayload,
   LauchOptions,
@@ -145,6 +146,14 @@ export class Network {
       phaserEvents.emit(Event.ARROW_LEFT, id);
     };
 
+    this.room.state.coins.onAdd = (coin: ICoin, id: string) => {
+      phaserEvents.emit(Event.COIN_JOINED, coin, id);
+    };
+
+    this.room.state.coins.onRemove = (_coin: ICoin, id: string) => {
+      phaserEvents.emit(Event.COIN_LEFT, id);
+    };
+
     /**
      * When the server sends room data
      */
@@ -261,6 +270,10 @@ export class Network {
 
   getEnemies(): IGameState["enemies"] | undefined {
     return this.room?.state.enemies;
+  }
+
+  getCoins(): IGameState["coins"] | undefined {
+    return this.room?.state.coins;
   }
 }
 

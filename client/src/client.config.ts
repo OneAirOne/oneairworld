@@ -1,5 +1,16 @@
 import { Characters } from "../../shared/types";
 
+export interface ImageAsset {
+  NAME: string;
+  PATH: string;
+}
+
+export interface AtlasAsset {
+  NAME: string;
+  SPRITE_SHEET_TEXTURE_PATH: string;
+  SPRITE_SHEET_ATLAS_PATH: string;
+}
+
 export enum SERVER_DATA {
   X = "x",
   Y = "y",
@@ -10,6 +21,7 @@ export enum SERVER_DATA {
   IS_DEAD = "isDead",
   IS_SPEAKING = "isSpeaking",
   ZONE = "zone",
+  COINS = "coins",
 }
 
 const CLIENT_CONFIG = {
@@ -109,6 +121,11 @@ const CLIENT_CONFIG = {
     HEART_FILLED: {
       NAME: "heart-filled",
       PATH: "/assets/items/heart-filled.png",
+    },
+    BLUE_COIN: {
+      NAME: "coin",
+      SPRITE_SHEET_TEXTURE_PATH: "/assets/items/coin.png",
+      SPRITE_SHEET_ATLAS_PATH: "/assets/items/coin.json",
     },
   },
   BACKGROUND: {

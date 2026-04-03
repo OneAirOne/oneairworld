@@ -27,7 +27,7 @@ import { DialogueInputHandler } from "../dialogue/DialogueInputHandler";
 import { phaserEvents, PhaserEvent } from "../events/eventManager";
 
 // Shared
-import type { IPlayer, IEnemy, IArrow } from "../../../shared/types";
+import type { IPlayer, IEnemy, IArrow, ICoin } from "../../../shared/types";
 import { Anim, Zone } from "../../../shared/types";
 import { ROAD_SCENE_LAYERS, ROAD_POI_ZONES, TiledLayer, TiledObjectType } from "./road.config";
 import { SHARED_CONFIG, ENEMY_CONFIG, getCharCombatConfig, PNJ_LIST } from "../../../shared/shared.config";
@@ -46,6 +46,7 @@ export class Road extends Phaser.Scene {
   private enemyDebugGraphics!: Phaser.GameObjects.Graphics;
   private enemies = new Map<string, Enemy>();
   private arrows = new Map<string, Arrow>();
+  private coins = new Map<string, Phaser.GameObjects.Sprite>();
   private interactivePnjs: { sprite: Phaser.GameObjects.Sprite; bubble: Phaser.GameObjects.Text; dialogueId: string }[] = [];
   private dialogueManager = new DialogueManager();
   private dialogueInput!: DialogueInputHandler;
@@ -299,6 +300,16 @@ export class Road extends Phaser.Scene {
       repeat: -1,
     });
 
+    // Blue coin animation
+    this.anims.create({
+      key: "coin-spin",
+      frames: this.anims.generateFrameNames(CLIENT_CONFIG.ITEMS.BLUE_COIN.NAME, {
+        start: 0, end: 14, zeroPad: 3, prefix: "tile", suffix: ".png",
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
     // ── Resolve PNJ anim keys (client-side only) ──────────────────────────────
     const PNJ_ANIM_KEYS: Record<string, string> = {
       [CLIENT_CONFIG.CHARACTERS.GHOST.NAME]:  ghostAnim.key,
@@ -419,6 +430,11 @@ export class Road extends Phaser.Scene {
       this.handleEnemyJoin(enemy, id);
     });
 
+    // Sync coins already in state
+    this.network.getCoins()?.forEach((coin: ICoin, id: string) => {
+      this.handleCoinJoin(coin, id);
+    });
+
     // Safety net: in production the initial Colyseus state patch can arrive after create() runs.
     // Retry every 500 ms until the local player is confirmed created (max 10 s).
     const playerRetry = this.time.addEvent({
@@ -445,6 +461,8 @@ export class Road extends Phaser.Scene {
     this.network.onArrowJoin(this.handleArrowJoin, this);
     this.network.onArrowUpdated(this.handleArrowUpdated, this);
     this.network.onArrowLeft(this.handleArrowLeft, this);
+    phaserEvents.on(PhaserEvent.COIN_JOINED, this.handleCoinJoin, this);
+    phaserEvents.on(PhaserEvent.COIN_LEFT, this.handleCoinLeft, this);
   }
 
   handleEnemyJoin(enemy: IEnemy, id: string) {
@@ -487,6 +505,19 @@ export class Road extends Phaser.Scene {
     const arrow = this.arrows.get(id);
     if (arrow) arrow.destroy();
     this.arrows.delete(id);
+  }
+
+  handleCoinJoin(coin: ICoin, id: string) {
+    const sprite = this.add.sprite(coin.x, coin.y, CLIENT_CONFIG.ITEMS.BLUE_COIN.NAME);
+    sprite.setDepth(1);
+    sprite.play("coin-spin");
+    this.coins.set(id, sprite);
+  }
+
+  handleCoinLeft(id: string) {
+    const sprite = this.coins.get(id);
+    if (sprite) sprite.destroy();
+    this.coins.delete(id);
   }
 
   private updateEnemies() {
@@ -599,6 +630,9 @@ export class Road extends Phaser.Scene {
         this.playerManager.handleLeave(id);
       }
       return;
+    }
+    if (field === SERVER_DATA.COINS && id === this.network.sessionId) {
+      phaserEvents.emit(PhaserEvent.COIN_COLLECTED, value as number);
     }
     if (field === SERVER_DATA.IS_DEAD && id === this.network.sessionId) {
       if (!!value) {

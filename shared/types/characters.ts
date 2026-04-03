@@ -49,6 +49,7 @@ export interface IPlayer {
   isCollided: boolean;
   collisionDirection: DIRECTION;
   zone: string;
+  coins: number;
 
   inputQueue: any[];
 
@@ -69,6 +70,12 @@ export interface IEnemy {
   collisionDirection: DIRECTION;
 
   decreaseLife: () => void;
+}
+
+export interface ICoin {
+  id: string;
+  x: number;
+  y: number;
 }
 
 export interface IArrow {

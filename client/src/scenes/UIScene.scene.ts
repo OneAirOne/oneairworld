@@ -30,6 +30,9 @@ export class UIScene extends Phaser.Scene {
   private _killBadge!: HTMLDivElement;
   private _killCountSpan!: HTMLSpanElement;
 
+  private _coinBadge!: HTMLDivElement;
+  private _coinCountSpan!: HTMLSpanElement;
+
   private zoneHint!: Phaser.GameObjects.Text;
   private zoneHintBg!: Phaser.GameObjects.Graphics;
   private dialogueBg!: Phaser.GameObjects.Graphics;
@@ -150,6 +153,26 @@ export class UIScene extends Phaser.Scene {
     this._killBadge.appendChild(this._killCountSpan);
     (document.getElementById("root") ?? document.body).appendChild(this._killBadge);
 
+    // --- Coin counter (DOM overlay, below kill badge) ---
+    this._coinBadge = document.createElement("div");
+    this._coinBadge.style.cssText =
+      "position:fixed;top:66px;right:12px;display:flex;align-items:center;gap:6px;" +
+      "background:rgba(0,0,0,0.6);padding:5px 10px;border-radius:8px;" +
+      "border:1px solid rgba(255,255,255,0.3);z-index:10;pointer-events:none;";
+
+    const coinImg = document.createElement("img");
+    coinImg.src = "/assets/coin.gif";
+    coinImg.style.cssText = "width:28px;height:28px;image-rendering:pixelated;";
+
+    this._coinCountSpan = document.createElement("span");
+    this._coinCountSpan.style.cssText =
+      "color:white;font-size:14px;font-family:monospace;font-weight:bold;";
+    this._coinCountSpan.textContent = "0";
+
+    this._coinBadge.appendChild(coinImg);
+    this._coinBadge.appendChild(this._coinCountSpan);
+    (document.getElementById("root") ?? document.body).appendChild(this._coinBadge);
+
     // --- Mobile controls ---
     if (this._isTouchDevice) {
       this.input.addPointer(2); // support 3 simultaneous touches
@@ -243,6 +266,10 @@ export class UIScene extends Phaser.Scene {
       this._killCountSpan.textContent = String(this._killCount);
     };
 
+    const onCoinCollected = (total: number) => {
+      this._coinCountSpan.textContent = String(total);
+    };
+
     const onGameOver = () => {
       this._killCount = 0;
       this._killCountSpan.textContent = "0";
@@ -261,6 +288,7 @@ export class UIScene extends Phaser.Scene {
     phaserEvents.on(PhaserEvent.DIALOGUE_CLOSE, onClose);
     phaserEvents.on(PhaserEvent.DIALOGUE_ACTION, onAction);
     phaserEvents.on(PhaserEvent.SLIME_KILLED, onSlimeKilled);
+    phaserEvents.on(PhaserEvent.COIN_COLLECTED, onCoinCollected);
     phaserEvents.on(PhaserEvent.GAME_OVER, onGameOver);
 
     this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -277,8 +305,10 @@ export class UIScene extends Phaser.Scene {
       phaserEvents.off(PhaserEvent.DIALOGUE_CLOSE, onClose);
       phaserEvents.off(PhaserEvent.DIALOGUE_ACTION, onAction);
       phaserEvents.off(PhaserEvent.SLIME_KILLED, onSlimeKilled);
+      phaserEvents.off(PhaserEvent.COIN_COLLECTED, onCoinCollected);
       phaserEvents.off(PhaserEvent.GAME_OVER, onGameOver);
       this._killBadge?.remove();
+      this._coinBadge?.remove();
     });
   }
 

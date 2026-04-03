@@ -4,7 +4,7 @@ import Phaser from "phaser";
 import Network, { Network as NetworkType } from "services/Network";
 
 // Others
-import CLIENT_CONFIG from "client.config";
+import CLIENT_CONFIG, { type AtlasAsset, type ImageAsset } from "client.config";
 import { SCENES } from "./scene.config";
 
 export class BootScene extends Phaser.Scene {
@@ -30,6 +30,14 @@ export class BootScene extends Phaser.Scene {
     this.network = Network;
   }
 
+  private loadImage(cfg: ImageAsset) {
+    this.load.image(cfg.NAME, cfg.PATH);
+  }
+
+  private loadAtlas(cfg: AtlasAsset) {
+    this.load.atlas(cfg.NAME, cfg.SPRITE_SHEET_TEXTURE_PATH, cfg.SPRITE_SHEET_ATLAS_PATH);
+  }
+
   loadAssets() {
     // Track any asset that fails to load — on Android Chrome this can happen
     // silently (timeout, WebGL texture limit, cold server) and causes a blank map.
@@ -37,116 +45,26 @@ export class BootScene extends Phaser.Scene {
       console.error(`[Boot] Asset load error: ${file.key} (${file.url})`);
       this._loadErrors.push(file.key);
     });
-    // Load Background
-    this.load.image(
-      CLIENT_CONFIG.BACKGROUND.BACKDROP.NAME,
-      CLIENT_CONFIG.BACKGROUND.BACKDROP.PATH
-    );
-    this.load.atlas(
-      CLIENT_CONFIG.BACKGROUND.CLOUD.NAME,
-      CLIENT_CONFIG.BACKGROUND.CLOUD.SPRITE_SHEET_TEXTURE_PATH,
-      CLIENT_CONFIG.BACKGROUND.CLOUD.SPRITE_SHEET_ATLAS_PATH
-    );
-    // TODO: make fonction for asset loading to avoid repeating code and reduce error (like the one above where PATH is misspelled)
 
-    // Load Items
-    this.load.image(
-      CLIENT_CONFIG.ITEMS.HEART.NAME,
-      CLIENT_CONFIG.ITEMS.HEART.PATH
-    );
-    this.load.image(
-      CLIENT_CONFIG.ITEMS.HEART_FILLED.NAME,
-      CLIENT_CONFIG.ITEMS.HEART_FILLED.PATH
-    );
+    // Background
+    this.loadImage(CLIENT_CONFIG.BACKGROUND.BACKDROP);
+    this.loadAtlas(CLIENT_CONFIG.BACKGROUND.CLOUD);
 
-    // Load Tileset
-    this.load.image(
-      CLIENT_CONFIG.MAP.TILE_SETS.LOGOS.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.LOGOS.PATH
-    );
-    this.load.image(
-      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.MODERN_CITY.PATH
-    );
-    this.load.image(
-      CLIENT_CONFIG.MAP.TILE_SETS.CITY_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.CITY_JAP.PATH
-    );
-    this.load.image(
-      CLIENT_CONFIG.MAP.TILE_SETS.INTERIOR_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.INTERIOR_JAP.PATH
-    );
-    this.load.image(
-      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.RURAL_JAP.PATH
-    );
-    this.load.image(
-      CLIENT_CONFIG.MAP.TILE_SETS.ARCADE.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.ARCADE.PATH
-    );
-    this.load.image(
-      CLIENT_CONFIG.MAP.TILE_SETS.OSAKA.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.OSAKA.PATH
-    );
-    this.load.image(
-      CLIENT_CONFIG.MAP.TILE_SETS.PUNK.NAME,
-      CLIENT_CONFIG.MAP.TILE_SETS.PUNK.PATH
-    );
+    // Items
+    this.loadImage(CLIENT_CONFIG.ITEMS.HEART);
+    this.loadImage(CLIENT_CONFIG.ITEMS.HEART_FILLED);
+    this.loadAtlas(CLIENT_CONFIG.ITEMS.BLUE_COIN);
 
-    // Load Tilemap
-    this.load.tilemapTiledJSON(
-      CLIENT_CONFIG.MAP.TILE_MAP.NAME,
-      CLIENT_CONFIG.MAP.TILE_MAP.PAHT
-    );
+    // Tilesets
+    Object.values(CLIENT_CONFIG.MAP.TILE_SETS).forEach((ts) => this.loadImage(ts));
 
-    // Load characteres sprite-sheets
-    this.load.atlas(
-      CLIENT_CONFIG.CHARACTERS.NAME,
-      CLIENT_CONFIG.CHARACTERS.SPRITE_SHEET_TEXTURE_PATH,
-      CLIENT_CONFIG.CHARACTERS.SPRITE_SHEET_ATLAS_PATH
-    );
+    // Tilemap
+    this.load.tilemapTiledJSON(CLIENT_CONFIG.MAP.TILE_MAP.NAME, CLIENT_CONFIG.MAP.TILE_MAP.PAHT);
 
-    this.load.atlas(
-      CLIENT_CONFIG.CHARACTERS.SLIME.NAME,
-      CLIENT_CONFIG.CHARACTERS.SLIME.SPRITE_SHEET_TEXTURE_PATH,
-      CLIENT_CONFIG.CHARACTERS.SLIME.SPRITE_SHEET_ATLAS_PATH
-    );
-
-    this.load.atlas(
-      CLIENT_CONFIG.CHARACTERS.ROBOT.NAME,
-      CLIENT_CONFIG.CHARACTERS.ROBOT.SPRITE_SHEET_TEXTURE_PATH,
-      CLIENT_CONFIG.CHARACTERS.ROBOT.SPRITE_SHEET_ATLAS_PATH
-    );
-
-    this.load.atlas(
-      CLIENT_CONFIG.CHARACTERS.DINO.NAME,
-      CLIENT_CONFIG.CHARACTERS.DINO.SPRITE_SHEET_TEXTURE_PATH,
-      CLIENT_CONFIG.CHARACTERS.DINO.SPRITE_SHEET_ATLAS_PATH
-    );
-
-    this.load.atlas(
-      CLIENT_CONFIG.CHARACTERS.TIMOTHEE.NAME,
-      CLIENT_CONFIG.CHARACTERS.TIMOTHEE.SPRITE_SHEET_TEXTURE_PATH,
-      CLIENT_CONFIG.CHARACTERS.TIMOTHEE.SPRITE_SHEET_ATLAS_PATH
-    );
-
-    this.load.atlas(
-      CLIENT_CONFIG.CHARACTERS.GHOST.NAME,
-      CLIENT_CONFIG.CHARACTERS.GHOST.SPRITE_SHEET_TEXTURE_PATH,
-      CLIENT_CONFIG.CHARACTERS.GHOST.SPRITE_SHEET_ATLAS_PATH
-    );
-
-    this.load.atlas(
-      CLIENT_CONFIG.CHARACTERS.WENDY.NAME,
-      CLIENT_CONFIG.CHARACTERS.WENDY.SPRITE_SHEET_TEXTURE_PATH,
-      CLIENT_CONFIG.CHARACTERS.WENDY.SPRITE_SHEET_ATLAS_PATH
-    );
-
-    this.load.atlas(
-      CLIENT_CONFIG.CHARACTERS.JOHN.NAME,
-      CLIENT_CONFIG.CHARACTERS.JOHN.SPRITE_SHEET_TEXTURE_PATH,
-      CLIENT_CONFIG.CHARACTERS.JOHN.SPRITE_SHEET_ATLAS_PATH
-    );
+    // Characters
+    this.loadAtlas(CLIENT_CONFIG.CHARACTERS);
+    const { SLIME, ROBOT, DINO, TIMOTHEE, GHOST, WENDY, JOHN } = CLIENT_CONFIG.CHARACTERS;
+    [SLIME, ROBOT, DINO, TIMOTHEE, GHOST, WENDY, JOHN].forEach((c) => this.loadAtlas(c));
 
     this.load.on("complete", () => {
       if (this._loadErrors.length > 0) {
@@ -172,32 +90,29 @@ export class BootScene extends Phaser.Scene {
    * Phaser's loader tracks by key so we re-add the original load call.
    */
   private _reloadByKey(key: string) {
-    const { MAP, CHARACTERS } = CLIENT_CONFIG;
-    const tilesets = [
-      MAP.TILE_SETS.LOGOS, MAP.TILE_SETS.MODERN_CITY, MAP.TILE_SETS.CITY_JAP,
-      MAP.TILE_SETS.INTERIOR_JAP, MAP.TILE_SETS.RURAL_JAP, MAP.TILE_SETS.ARCADE,
-      MAP.TILE_SETS.OSAKA, MAP.TILE_SETS.PUNK,
+    const { MAP, CHARACTERS, BACKGROUND, ITEMS } = CLIENT_CONFIG;
+
+    const images: ImageAsset[] = [
+      ...Object.values(MAP.TILE_SETS),
+      BACKGROUND.BACKDROP,
+      ITEMS.HEART,
+      ITEMS.HEART_FILLED,
     ];
-    const ts = tilesets.find((t) => t.NAME === key);
-    if (ts) { this.load.image(ts.NAME, ts.PATH); return; }
+    const img = images.find((a) => a.NAME === key);
+    if (img) { this.loadImage(img); return; }
 
     if (key === MAP.TILE_MAP.NAME) {
       this.load.tilemapTiledJSON(MAP.TILE_MAP.NAME, MAP.TILE_MAP.PAHT); return;
     }
 
-    const atlases = [
-      [CHARACTERS.NAME,              CHARACTERS.SPRITE_SHEET_TEXTURE_PATH,          CHARACTERS.SPRITE_SHEET_ATLAS_PATH],
-      [CHARACTERS.SLIME.NAME,        CHARACTERS.SLIME.SPRITE_SHEET_TEXTURE_PATH,    CHARACTERS.SLIME.SPRITE_SHEET_ATLAS_PATH],
-      [CHARACTERS.ROBOT.NAME,        CHARACTERS.ROBOT.SPRITE_SHEET_TEXTURE_PATH,    CHARACTERS.ROBOT.SPRITE_SHEET_ATLAS_PATH],
-      [CHARACTERS.DINO.NAME,         CHARACTERS.DINO.SPRITE_SHEET_TEXTURE_PATH,     CHARACTERS.DINO.SPRITE_SHEET_ATLAS_PATH],
-      [CHARACTERS.TIMOTHEE.NAME,     CHARACTERS.TIMOTHEE.SPRITE_SHEET_TEXTURE_PATH, CHARACTERS.TIMOTHEE.SPRITE_SHEET_ATLAS_PATH],
-      [CHARACTERS.GHOST.NAME,        CHARACTERS.GHOST.SPRITE_SHEET_TEXTURE_PATH,    CHARACTERS.GHOST.SPRITE_SHEET_ATLAS_PATH],
-      [CHARACTERS.WENDY.NAME,        CHARACTERS.WENDY.SPRITE_SHEET_TEXTURE_PATH,    CHARACTERS.WENDY.SPRITE_SHEET_ATLAS_PATH],
-      [CHARACTERS.JOHN.NAME,         CHARACTERS.JOHN.SPRITE_SHEET_TEXTURE_PATH,     CHARACTERS.JOHN.SPRITE_SHEET_ATLAS_PATH],
-      [CLIENT_CONFIG.BACKGROUND.CLOUD.NAME, CLIENT_CONFIG.BACKGROUND.CLOUD.SPRITE_SHEET_TEXTURE_PATH, CLIENT_CONFIG.BACKGROUND.CLOUD.SPRITE_SHEET_ATLAS_PATH],
-    ] as const;
-    const atlas = atlases.find(([name]) => name === key);
-    if (atlas) { this.load.atlas(atlas[0], atlas[1], atlas[2]); return; }
+    const { SLIME, ROBOT, DINO, TIMOTHEE, GHOST, WENDY, JOHN } = CHARACTERS;
+    const atlases: AtlasAsset[] = [
+      CHARACTERS, SLIME, ROBOT, DINO, TIMOTHEE, GHOST, WENDY, JOHN,
+      BACKGROUND.CLOUD,
+      ITEMS.BLUE_COIN,
+    ];
+    const atlas = atlases.find((a) => a.NAME === key);
+    if (atlas) { this.loadAtlas(atlas); return; }
 
     console.warn(`[Boot] _reloadByKey: unknown key "${key}", cannot retry.`);
   }

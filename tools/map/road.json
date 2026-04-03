@@ -1173,6 +1173,61 @@
                  "width":0,
                  "x":887.696118909992,
                  "y":210.569777043765
+                }, 
+                {
+                 "height":98.4664621084847,
+                 "id":88,
+                 "name":"zone_spawn",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":502.170978837092,
+                 "x":32.6788965640811,
+                 "y":352.134856951992
+                }, 
+                {
+                 "height":117.891764789563,
+                 "id":89,
+                 "name":"zone_spawn",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":438.613281633739,
+                 "x":532.943997520553,
+                 "y":298.904575677617
+                }, 
+                {
+                 "height":122.102882984737,
+                 "id":95,
+                 "name":"zone_spawn",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":295.081967213115,
+                 "x":655.737704918033,
+                 "y":434.143583945732
+                }, 
+                {
+                 "height":76.8795929903901,
+                 "id":98,
+                 "name":"zone_spawn",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":50.8762012436405,
+                 "x":858.111927642736,
+                 "y":214.810627473149
+                }, 
+                {
+                 "height":45.2232899943471,
+                 "id":100,
+                 "name":"zone_spawn",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":104.013566986998,
+                 "x":413.793103448276,
+                 "y":460.146975692482
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1252,7 +1307,7 @@
          "y":0
         }],
  "nextlayerid":47,
- "nextobjectid":81,
+ "nextobjectid":101,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

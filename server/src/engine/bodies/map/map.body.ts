@@ -164,6 +164,21 @@ export function getSpawnPoints(zone: Zone): { x: number; y: number }[] {
 }
 
 /**
+ * Get all "zone_spawn" rectangles from the "info" layer of the given zone's map.
+ */
+export function getCoinSpawnZones(zone: Zone): { x: number; y: number; width: number; height: number }[] {
+  const map = readMap(zone);
+  if (!map) return [];
+
+  const infoLayer = map.layers.find((l: TiledData) => l.name === "info");
+  if (!infoLayer?.objects) return [];
+
+  return (infoLayer.objects as TiledObject[])
+    .filter((o) => o.name === "zone_spawn")
+    .map((o) => ({ x: o.x, y: o.y, width: o.width, height: o.height }));
+}
+
+/**
  * Get the "start" object from the "info" layer of the given zone's map.
  */
 export function getTiledInfos(zone: Zone): { start: { x: number; y: number } } {
