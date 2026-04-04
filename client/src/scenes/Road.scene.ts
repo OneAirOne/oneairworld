@@ -411,6 +411,7 @@ export class Road extends Phaser.Scene {
     });
 
     phaserEvents.on(PhaserEvent.GAME_OVER_RESTART, () => {
+      this.cameras.main.fadeOut(0, 0, 0, 0);
       this.network.restoreLife();
     });
 
@@ -640,7 +641,15 @@ export class Road extends Phaser.Scene {
         this.myPlayer?.hideSpeakingBubble();
         phaserEvents.emit(PhaserEvent.GAME_OVER);
       } else {
+        // Snap to server position before revealing to avoid lerp slide
+        const sx = this.myPlayer?.getData(SERVER_DATA.X);
+        const sy = this.myPlayer?.getData(SERVER_DATA.Y);
+        if (this.myPlayer && sx && sy) {
+          this.myPlayer.x = sx;
+          this.myPlayer.y = sy;
+        }
         this.myPlayer?.setVisible(true);
+        this.cameras.main.fadeIn(1200, 0, 0, 0);
       }
     }
     this.playerManager.handleUpdate(field, value, id);

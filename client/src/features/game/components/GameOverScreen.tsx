@@ -17,11 +17,11 @@ export function GameOverScreen() {
   const restart = React.useCallback(() => {
     if (fading) return;
     setFading(true);
+    phaserEvents.emit(PhaserEvent.GAME_OVER_RESTART);
     setTimeout(() => {
       setVisible(false);
       setFading(false);
-      phaserEvents.emit(PhaserEvent.GAME_OVER_RESTART);
-    }, 600);
+    }, 1200);
   }, [fading]);
 
   React.useEffect(() => {
@@ -35,7 +35,7 @@ export function GameOverScreen() {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black pointer-events-auto transition-opacity duration-500"
+      className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black pointer-events-auto transition-opacity duration-1000"
       style={{ opacity: fading ? 0 : 1 }}
       onClick={restart}
     >
