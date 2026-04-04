@@ -261106,21 +261106,5 @@
   <object id="98" name="zone_spawn" x="858.112" y="214.811" width="50.8762" height="76.8796"/>
   <object id="100" name="zone_spawn" x="413.793" y="460.147" width="104.014" height="45.2233"/>
  </objectgroup>
- <objectgroup id="43" name="spawn">
-  <object id="51" name="spawn1" x="638.368" y="393.564">
-   <point/>
-  </object>
-  <object id="52" name="spawn2" x="251.673" y="420.348">
-   <point/>
-  </object>
-  <object id="53" name="spawn3" x="66.9344" y="136.546">
-   <point/>
-  </object>
-  <object id="54" name="spawn4" x="928.237" y="340.291">
-   <point/>
-  </object>
-  <object id="55" name="spawn5" x="966.533" y="207.497">
-   <point/>
-  </object>
- </objectgroup>
+ <objectgroup id="43" name="spawn"/>
 </map>

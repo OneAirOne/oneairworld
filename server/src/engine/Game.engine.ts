@@ -324,13 +324,16 @@ export class GameEngine {
     }
   }
 
-  private getRandomSpawnPosition(zone: Zone = Zone.ROAD) {
-    const pts = this.zoneContexts.get(zone)?.spawnPoints ?? [];
-    if (pts.length === 0) {
-      console.warn(`[GameEngine] No spawn points for zone "${zone}", spawning at origin`);
+  private getRandomSpawnPosition(_zone: Zone = Zone.ROAD) {
+    if (!this._coinSpawnZones.length) {
+      console.warn(`[GameEngine] No spawn zones, spawning at origin`);
       return { x: 0, y: 0 };
     }
-    return pts[Math.floor(Math.random() * pts.length)];
+    const zone = this._coinSpawnZones[Math.floor(Math.random() * this._coinSpawnZones.length)];
+    return {
+      x: zone.x + Math.random() * zone.width,
+      y: zone.y + Math.random() * zone.height,
+    };
   }
 
   /**
