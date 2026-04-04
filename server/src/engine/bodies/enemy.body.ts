@@ -4,10 +4,10 @@ import { Enemy as EnemyState } from "../../rooms/schema/Enemy";
 import { COLLISION_CATEGORY } from "../engine.config";
 
 import { SHARED_CONFIG } from "../../../../shared/shared.config";
-import { DIRECTION } from "../../../../shared/types";
+import { DIRECTION, Zone } from "../../../../shared/types";
 import { getTiledInfos } from "./map/map.body";
 
-const { start } = getTiledInfos();
+const { start } = getTiledInfos(Zone.ROAD);
 
 export interface BodyConfig {
   label: string;
@@ -43,6 +43,7 @@ export class Enemy {
   hitAnimTimer: number = 0;
   loseAggroTimer: number = 0;
   deathAnimTimer: number = -1;
+  attackPrepTimer: number = 0;
   attackTimer: number = 0;
   attackCooldown: number = 0;
   attackDamageDealt: boolean = false;

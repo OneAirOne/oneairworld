@@ -126,7 +126,9 @@ export const ENEMY_CONFIG = {
   AGGRO_RADIUS: 60,
   // Distance (px) at which the enemy starts an attack
   ATTACK_RANGE: 16,
-  // Duration (ms) of the attack animation / attack state
+  // Duration (ms) the enemy freezes and "charges up" before jumping
+  ATTACK_PREP_DURATION: 500,
+  // Duration (ms) of the attack jump / lunge
   ATTACK_DURATION: 600,
   // Cooldown (ms) before the enemy can attack again
   ATTACK_COOLDOWN: 2000,

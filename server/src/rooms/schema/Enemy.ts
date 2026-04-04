@@ -5,14 +5,14 @@ import { COMBAT_CONFIG } from "../../../../shared/shared.config";
 import {
   Characters,
   DIRECTION,
-  EnemyTextures,
+  Zone,
 } from "../../../../shared/types";
 
 import { ANIM_START } from "../../constants";
 import { SERVER_CONFIG } from "../../server.config";
 import { getTiledInfos } from "../../engine/bodies";
 
-const { start } = getTiledInfos();
+const { start } = getTiledInfos(Zone.ROAD);
 
 export class Enemy extends Schema {
   @type("string") id = "";
@@ -22,6 +22,7 @@ export class Enemy extends Schema {
   @type("string") anim = ANIM_START;
   @type("string") texture = Characters.SLIME;
   @type("string") direction = DIRECTION.DOWN;
+  @type("boolean") isPreparing = false;
   @type("boolean") isAttacking = false;
   @type("number") life = 100;
   @type("boolean") isDead = false;

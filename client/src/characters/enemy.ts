@@ -12,6 +12,7 @@ export class Enemy extends Phaser.GameObjects.Sprite {
   private _enemyTexture: string;
   private _canUpdateAnim: boolean = true;
   private _isDead: boolean = false;
+  private _prepTween: Phaser.Tweens.Tween | null = null;
   id: string;
 
   constructor(
@@ -82,6 +83,29 @@ export class Enemy extends Phaser.GameObjects.Sprite {
       case SERVER_DATA.IS_DEAD:
         if (value === true) this.playDeathAnim();
         break;
+      case SERVER_DATA.IS_PREPARING:
+        if (value === true) this._startPrepBlink();
+        else this._stopPrepBlink();
+        break;
     }
+  }
+
+  private _startPrepBlink() {
+    if (this._prepTween) return;
+    this._prepTween = this.scene.tweens.add({
+      targets: this,
+      alpha: { from: 1, to: 0.25 },
+      duration: 120,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
+    });
+  }
+
+  private _stopPrepBlink() {
+    if (!this._prepTween) return;
+    this._prepTween.stop();
+    this._prepTween = null;
+    this.setAlpha(1);
   }
 }

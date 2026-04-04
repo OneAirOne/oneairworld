@@ -69,15 +69,41 @@ export function processEnemyAI(
     }
   }
 
-  // --- Knockback: freeze AI, let the velocity persist ---
+  // --- Knockback: freeze AI, reset attack prep ---
   if (body.knockbackTimer > 0) {
     body.knockbackTimer = Math.max(0, body.knockbackTimer - deltaTime);
+    if (enemyState.isPreparing) {
+      enemyState.isPreparing = false;
+      body.attackPrepTimer = 0;
+    }
     return;
   }
 
   // --- Attack cooldown tick ---
   if (body.attackCooldown > 0) {
     body.attackCooldown = Math.max(0, body.attackCooldown - deltaTime);
+  }
+
+  // --- Attack preparation: enemy freezes and charges up before jumping ---
+  if (enemyState.isPreparing) {
+    body.attackPrepTimer -= deltaTime;
+    Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
+    if (body.attackPrepTimer <= 0) {
+      // Commit target at launch time and start the lunge
+      enemyState.isPreparing = false;
+      enemyState.isAttacking = true;
+      body.attackTimer = ENEMY_CONFIG.ATTACK_DURATION;
+      body.attackCooldown = ENEMY_CONFIG.ATTACK_COOLDOWN;
+      body.attackDamageDealt = false;
+      body.attackOriginX = body.getBody().position.x;
+      body.attackOriginY = body.getBody().position.y;
+      const prepTarget = body.targetPlayerId ? gameState.players.get(body.targetPlayerId) : null;
+      body.attackTargetX = prepTarget ? prepTarget.x : body.attackOriginX;
+      body.attackTargetY = prepTarget ? prepTarget.y : body.attackOriginY;
+      if (!isHitAnim) enemyState.anim = directionToAttackAnim(enemyState.direction as DIRECTION);
+      Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
+    }
+    return;
   }
 
   // --- Ongoing attack: ease-in jump to landing point, then freeze ---
@@ -173,18 +199,11 @@ export function processEnemyAI(
 
         enemyState.direction = dir;
 
-        // --- Attack if in range and cooldown ready ---
+        // --- Enter prep phase if in range and cooldown ready ---
         if (dist <= ENEMY_CONFIG.ATTACK_RANGE && body.attackCooldown <= 0) {
-          enemyState.isAttacking = true;
-          enemyState.anim = directionToAttackAnim(dir);
-          body.attackTimer = ENEMY_CONFIG.ATTACK_DURATION;
-          body.attackCooldown = ENEMY_CONFIG.ATTACK_COOLDOWN;
-          body.attackDamageDealt = false;
-          // Commit origin + landing point — fixed even if the player moves.
-          body.attackOriginX = body.getBody().position.x;
-          body.attackOriginY = body.getBody().position.y;
-          body.attackTargetX = target.x;
-          body.attackTargetY = target.y;
+          enemyState.isPreparing = true;
+          body.attackPrepTimer = ENEMY_CONFIG.ATTACK_PREP_DURATION;
+          enemyState.anim = directionToAnim(dir);
           Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
           return;
         } else {

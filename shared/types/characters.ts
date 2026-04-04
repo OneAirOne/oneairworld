@@ -63,6 +63,7 @@ export interface IEnemy {
   anim: string;
   texture: Characters;
   direction: DIRECTION;
+  isPreparing: boolean;
   isAttacking: boolean;
   life: number;
   isDead: boolean;

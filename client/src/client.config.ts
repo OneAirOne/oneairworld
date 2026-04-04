@@ -19,6 +19,7 @@ export enum SERVER_DATA {
   IS_COLLIDED = "isCollided",
   IS_ATTACKING = "isAttacking",
   IS_DEAD = "isDead",
+  IS_PREPARING = "isPreparing",
   IS_SPEAKING = "isSpeaking",
   ZONE = "zone",
   COINS = "coins",

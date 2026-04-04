@@ -8,7 +8,7 @@ import { ANIM_START } from "../../constants";
 import { SERVER_CONFIG } from "../../server.config";
 import { getTiledInfos } from "../../engine/bodies";
 
-const { start } = getTiledInfos();
+const { start } = getTiledInfos(Zone.ROAD);
 
 export class Player extends Schema {
   @type("string") name = "";

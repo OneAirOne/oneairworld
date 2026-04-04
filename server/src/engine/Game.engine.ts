@@ -79,7 +79,11 @@ export class GameEngine {
               enemy.targetPlayerId = hit.playerId;
               enemy.hitAnimTimer = 600;
 
-              // Cancel ongoing attack — mark damage as dealt to block same-tick enemy→player hit
+              // Cancel prep or ongoing attack on hit
+              if (enemyState.isPreparing) {
+                enemyState.isPreparing = false;
+                enemy.attackPrepTimer = 0;
+              }
               if (enemyState.isAttacking && !enemy.attackDamageDealt) {
                 enemyState.isAttacking = false;
                 enemy.attackTimer = 0;
