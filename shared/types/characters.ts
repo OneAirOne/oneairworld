@@ -50,6 +50,7 @@ export interface IPlayer {
   collisionDirection: DIRECTION;
   zone: string;
   coins: number;
+  hasSpeedBoost: boolean;
 
   inputQueue: any[];
 
@@ -74,6 +75,12 @@ export interface IEnemy {
 }
 
 export interface ICoin {
+  id: string;
+  x: number;
+  y: number;
+}
+
+export interface IPotion {
   id: string;
   x: number;
   y: number;

@@ -4,6 +4,7 @@ import { SCENES } from "./scene.config";
 import { phaserEvents, PhaserEvent } from "../events/eventManager";
 import { mobileInput } from "../input/mobileInput";
 import type { DialoguePayload, DialogueNavigatePayload } from "../dialogue/DialogueManager";
+import { POTION_CONFIG } from "../../../shared/shared.config";
 
 const DIALOGUE_BOX_HEIGHT = 140;    // fixed height on PC
 const DIALOGUE_BOX_MIN_HEIGHT = 80; // minimum height on mobile (dynamic)
@@ -32,6 +33,10 @@ export class UIScene extends Phaser.Scene {
 
   private _coinBadge!: HTMLDivElement;
   private _coinCountSpan!: HTMLSpanElement;
+
+  private _boostBadge!: HTMLDivElement;
+  private _boostTimerSpan!: HTMLSpanElement;
+  private _boostRemaining = 0;
 
   private zoneHint!: Phaser.GameObjects.Text;
   private zoneHintBg!: Phaser.GameObjects.Graphics;
@@ -173,6 +178,26 @@ export class UIScene extends Phaser.Scene {
     this._coinBadge.appendChild(this._coinCountSpan);
     (document.getElementById("root") ?? document.body).appendChild(this._coinBadge);
 
+    // --- Speed boost timer (DOM overlay, below coin badge) ---
+    this._boostBadge = document.createElement("div");
+    this._boostBadge.style.cssText =
+      "position:fixed;top:120px;right:12px;display:flex;align-items:center;gap:6px;" +
+      "background:rgba(0,0,0,0.6);padding:5px 10px;border-radius:8px;" +
+      "border:1px solid rgba(100,180,255,0.6);z-index:10;pointer-events:none;display:none;";
+
+    const potionImg = document.createElement("img");
+    potionImg.src = "/assets/items/blue_potion.png";
+    potionImg.style.cssText = "width:24px;height:24px;image-rendering:pixelated;";
+
+    this._boostTimerSpan = document.createElement("span");
+    this._boostTimerSpan.style.cssText =
+      "color:#64b4ff;font-size:14px;font-family:monospace;font-weight:bold;";
+    this._boostTimerSpan.textContent = "0s";
+
+    this._boostBadge.appendChild(potionImg);
+    this._boostBadge.appendChild(this._boostTimerSpan);
+    (document.getElementById("root") ?? document.body).appendChild(this._boostBadge);
+
     // --- Mobile controls ---
     if (this._isTouchDevice) {
       this.input.addPointer(2); // support 3 simultaneous touches
@@ -275,6 +300,16 @@ export class UIScene extends Phaser.Scene {
       this._killCountSpan.textContent = "0";
     };
 
+    const onSpeedBoostStart = () => {
+      this._boostRemaining = POTION_CONFIG.EFFECT_DURATION;
+      this._boostBadge.style.display = "flex";
+    };
+
+    const onSpeedBoostEnd = () => {
+      this._boostRemaining = 0;
+      this._boostBadge.style.display = "none";
+    };
+
     phaserEvents.on(PhaserEvent.DIALOGUE_ZONE_ENTER, onZoneEnter);
     phaserEvents.on(PhaserEvent.DIALOGUE_ZONE_LEAVE, onZoneLeave);
     phaserEvents.on(PhaserEvent.POI_ENTER, onPoiEnter);
@@ -290,6 +325,8 @@ export class UIScene extends Phaser.Scene {
     phaserEvents.on(PhaserEvent.SLIME_KILLED, onSlimeKilled);
     phaserEvents.on(PhaserEvent.COIN_COLLECTED, onCoinCollected);
     phaserEvents.on(PhaserEvent.GAME_OVER, onGameOver);
+    phaserEvents.on(PhaserEvent.SPEED_BOOST_START, onSpeedBoostStart);
+    phaserEvents.on(PhaserEvent.SPEED_BOOST_END, onSpeedBoostEnd);
 
     this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
       phaserEvents.off(PhaserEvent.DIALOGUE_ZONE_ENTER, onZoneEnter);
@@ -307,8 +344,11 @@ export class UIScene extends Phaser.Scene {
       phaserEvents.off(PhaserEvent.SLIME_KILLED, onSlimeKilled);
       phaserEvents.off(PhaserEvent.COIN_COLLECTED, onCoinCollected);
       phaserEvents.off(PhaserEvent.GAME_OVER, onGameOver);
+      phaserEvents.off(PhaserEvent.SPEED_BOOST_START, onSpeedBoostStart);
+      phaserEvents.off(PhaserEvent.SPEED_BOOST_END, onSpeedBoostEnd);
       this._killBadge?.remove();
       this._coinBadge?.remove();
+      this._boostBadge?.remove();
     });
   }
 
@@ -584,6 +624,17 @@ export class UIScene extends Phaser.Scene {
       .fillRoundedRect(this.boxX, this.boxY, this.boxW, boxH, 6)
       .lineStyle(2, 0xffffff, 1)
       .strokeRoundedRect(this.boxX, this.boxY, this.boxW, boxH, 6);
+  }
+
+  update(_time: number, delta: number) {
+    if (this._boostRemaining > 0) {
+      this._boostRemaining = Math.max(0, this._boostRemaining - delta);
+      const secs = Math.ceil(this._boostRemaining / 1000);
+      this._boostTimerSpan.textContent = `${secs}s`;
+      if (this._boostRemaining === 0) {
+        this._boostBadge.style.display = "none";
+      }
+    }
   }
 
   private _renderChoices(choices: { label: string }[], selectedIndex: number) {

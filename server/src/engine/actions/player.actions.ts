@@ -7,7 +7,7 @@ import {
   InputPayload,
   PLAYER_VELOCITY,
 } from "../../../../shared/types";
-import { ARROW_CONFIG, PLAYER_CONFIG } from "../../../../shared/shared.config";
+import { ARROW_CONFIG, PLAYER_CONFIG, POTION_CONFIG } from "../../../../shared/shared.config";
 import { Player } from "../../rooms/schema";
 import { SwordMan } from "../bodies";
 
@@ -117,7 +117,8 @@ export function processPlayerAction(
 ) {
   let vx = 0;
   let vy = 0;
-  const speed = input.sprint ? PLAYER_VELOCITY * PLAYER_CONFIG.SPRINT_VELOCITY : PLAYER_VELOCITY;
+  const baseSpeed = input.sprint ? PLAYER_VELOCITY * PLAYER_CONFIG.SPRINT_VELOCITY : PLAYER_VELOCITY;
+  const speed = player.hasSpeedBoost ? baseSpeed * POTION_CONFIG.SPEED_MULTIPLIER : baseSpeed;
 
   // MOVES
   if (input.left) {

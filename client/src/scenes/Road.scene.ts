@@ -27,10 +27,10 @@ import { DialogueInputHandler } from "../dialogue/DialogueInputHandler";
 import { phaserEvents, PhaserEvent } from "../events/eventManager";
 
 // Shared
-import type { IPlayer, IEnemy, IArrow, ICoin } from "../../../shared/types";
+import type { IPlayer, IEnemy, IArrow, ICoin, IPotion } from "../../../shared/types";
 import { Anim, Zone } from "../../../shared/types";
 import { ROAD_SCENE_LAYERS, ROAD_POI_ZONES, TiledLayer, TiledObjectType } from "./road.config";
-import { SHARED_CONFIG, ENEMY_CONFIG, getCharCombatConfig, PNJ_LIST } from "../../../shared/shared.config";
+import { SHARED_CONFIG, ENEMY_CONFIG, POTION_CONFIG, getCharCombatConfig, PNJ_LIST } from "../../../shared/shared.config";
 import { INTERIORS } from "./interior.config";
 import { PlayerManager } from "./playerManager";
 
@@ -47,11 +47,13 @@ export class Road extends Phaser.Scene {
   private enemies = new Map<string, Enemy>();
   private arrows = new Map<string, Arrow>();
   private coins = new Map<string, Phaser.GameObjects.Sprite>();
+  private potions = new Map<string, Phaser.GameObjects.Sprite>();
   private interactivePnjs: { sprite: Phaser.GameObjects.Sprite; bubble: Phaser.GameObjects.Text; dialogueId: string }[] = [];
   private dialogueManager = new DialogueManager();
   private dialogueInput!: DialogueInputHandler;
   private _pnjCooldown = false;
   private _introCompleted = false;
+  private _myCoins = 0;
   private _wendyAutoOpened = false;
   private _poiZones: PoiZone[] = [];
   private _activePoi: PoiZone | null = null;
@@ -361,6 +363,10 @@ export class Road extends Phaser.Scene {
           this.network.restoreLife();
         }
 
+        if (action === "buy_boost") {
+          this.network.buyBoost();
+        }
+
         // enter_interior:<zone>
         if (action.startsWith("enter_interior:")) {
           const zone = action.split(":")[1] as Zone;
@@ -436,6 +442,11 @@ export class Road extends Phaser.Scene {
       this.handleCoinJoin(coin, id);
     });
 
+    // Sync potions already in state
+    this.network.getPotions()?.forEach((potion: IPotion, id: string) => {
+      this.handlePotionJoin(potion, id);
+    });
+
     // Safety net: in production the initial Colyseus state patch can arrive after create() runs.
     // Retry every 500 ms until the local player is confirmed created (max 10 s).
     const playerRetry = this.time.addEvent({
@@ -464,6 +475,8 @@ export class Road extends Phaser.Scene {
     this.network.onArrowLeft(this.handleArrowLeft, this);
     phaserEvents.on(PhaserEvent.COIN_JOINED, this.handleCoinJoin, this);
     phaserEvents.on(PhaserEvent.COIN_LEFT, this.handleCoinLeft, this);
+    phaserEvents.on(PhaserEvent.POTION_JOINED, this.handlePotionJoin, this);
+    phaserEvents.on(PhaserEvent.POTION_LEFT, this.handlePotionLeft, this);
   }
 
   handleEnemyJoin(enemy: IEnemy, id: string) {
@@ -519,6 +532,19 @@ export class Road extends Phaser.Scene {
     const sprite = this.coins.get(id);
     if (sprite) sprite.destroy();
     this.coins.delete(id);
+  }
+
+  handlePotionJoin(potion: IPotion, id: string) {
+    const sprite = this.add.sprite(potion.x, potion.y, CLIENT_CONFIG.ITEMS.POTION.NAME);
+    sprite.setScale(0.9);
+    sprite.setDepth(1);
+    this.potions.set(id, sprite);
+  }
+
+  handlePotionLeft(id: string) {
+    const sprite = this.potions.get(id);
+    if (sprite) sprite.destroy();
+    this.potions.delete(id);
   }
 
   private updateEnemies() {
@@ -633,6 +659,7 @@ export class Road extends Phaser.Scene {
       return;
     }
     if (field === SERVER_DATA.COINS && id === this.network.sessionId) {
+      this._myCoins = value as number;
       phaserEvents.emit(PhaserEvent.COIN_COLLECTED, value as number);
     }
     if (field === SERVER_DATA.IS_DEAD && id === this.network.sessionId) {
@@ -721,7 +748,10 @@ export class Road extends Phaser.Scene {
       if (inZone) nearestPnj = pnj;
     }
     if (nearestPnj) {
-      this.dialogueManager.enterZone(nearestPnj.dialogueId);
+      const dialogueId = nearestPnj.dialogueId === "dino"
+        ? (this._myCoins >= POTION_CONFIG.BOOST_PRICE ? "dino" : "dino_broke")
+        : nearestPnj.dialogueId;
+      this.dialogueManager.enterZone(dialogueId);
       if (nearestPnj.dialogueId === "wendy" && !this._wendyAutoOpened) {
         this._wendyAutoOpened = true;
         this.dialogueManager.open();

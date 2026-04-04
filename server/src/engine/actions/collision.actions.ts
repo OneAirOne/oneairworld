@@ -57,7 +57,7 @@ export function collisionPlayerEnemy(
   if (!playerState || !enemyState) return null;
   if (!playerState.isAttacking || enemyState.isDead) return null;
 
-  enemyState.decreaseLife();
+  enemyState.decreaseLife(playerState.hasSpeedBoost ? enemyState.life : undefined);
 
   // Knockback: push enemy in the opposite direction of the attack
   const knockbackDirection: Record<DIRECTION, DIRECTION> = {

@@ -26,6 +26,7 @@ export class Player extends Schema {
   @type("string") collisionDirection = DIRECTION.DOWN;
   @type("string") zone: string = Zone.ROAD;
   @type("number") coins: number = 0;
+  @type("boolean") hasSpeedBoost: boolean = false;
 
   inputQueue: any[] = [];
 

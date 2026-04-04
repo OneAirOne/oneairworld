@@ -27,11 +27,11 @@ export default function SamuraiBallContent() {
         </p>
       </section>
 
-      {/* ── Video ── */}
-      <section className="max-w-4xl mx-auto px-6 pb-20">
+      {/* ── Fight video ── */}
+      <section className="max-w-4xl mx-auto px-6 pb-8">
         <div className="relative w-full rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
           <video
-            src="/assets/samurail-ball/make-in-off-samurai-ball.mp4"
+            src="/assets/samurail-ball/fight-ex.mp4"
             autoPlay
             playsInline
             muted
@@ -67,6 +67,23 @@ export default function SamuraiBallContent() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Making-off ── */}
+      <section className="max-w-4xl mx-auto px-6 pb-24">
+        <div className="border-t border-slate-800 pt-16">
+          <h2 className="text-2xl font-semibold mb-8">Making-off</h2>
+          <div className="relative w-full rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
+            <video
+              src="/assets/samurail-ball/make-in-off-samurai-ball.mp4"
+              autoPlay
+              playsInline
+              loop
+              controls
+              className="w-full"
+            />
           </div>
         </div>
       </section>

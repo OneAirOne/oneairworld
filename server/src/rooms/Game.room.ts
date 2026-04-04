@@ -18,6 +18,7 @@ import {
   InputPayload,
   LauchOptions,
 } from "../../../shared/types";
+import { POTION_CONFIG } from "../../../shared/shared.config";
 
 /**
  * Game room
@@ -93,6 +94,14 @@ export class Game extends Room<GameState> {
       } else {
         player.life = 100;
       }
+    });
+
+    // Buy speed boost from TacoRex for 10 coins
+    this.onMessage(Message.BUY_BOOST, (client) => {
+      const player = this.state.players.get(client.sessionId);
+      if (!player || player.coins < POTION_CONFIG.BOOST_PRICE) return;
+      player.coins -= POTION_CONFIG.BOOST_PRICE;
+      this.engine.applySpeedBoost(client.sessionId);
     });
 
     // Run update loop at 60 fps

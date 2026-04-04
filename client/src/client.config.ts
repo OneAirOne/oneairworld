@@ -20,6 +20,7 @@ export enum SERVER_DATA {
   IS_ATTACKING = "isAttacking",
   IS_DEAD = "isDead",
   IS_PREPARING = "isPreparing",
+  HAS_SPEED_BOOST = "hasSpeedBoost",
   IS_SPEAKING = "isSpeaking",
   ZONE = "zone",
   COINS = "coins",
@@ -127,6 +128,10 @@ const CLIENT_CONFIG = {
       NAME: "coin",
       SPRITE_SHEET_TEXTURE_PATH: "/assets/items/coin.png",
       SPRITE_SHEET_ATLAS_PATH: "/assets/items/coin.json",
+    },
+    POTION: {
+      NAME: "potion",
+      PATH: "/assets/items/blue_potion.png",
     },
   },
   BACKGROUND: {

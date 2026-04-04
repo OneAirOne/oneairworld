@@ -164,6 +164,19 @@ export function getSpawnPoints(zone: Zone): { x: number; y: number }[] {
 }
 
 /**
+ * Get all "potion" point objects from the "info" layer of the given zone's map.
+ */
+export function getPotionSpawnPoints(zone: Zone): { x: number; y: number }[] {
+  const map = readMap(zone);
+  if (!map) return [];
+  const infoLayer = map.layers.find((l: TiledData) => l.name === "info");
+  if (!infoLayer?.objects) return [];
+  return (infoLayer.objects as TiledObject[])
+    .filter((o) => o.name === "potion")
+    .map((o) => ({ x: o.x, y: o.y }));
+}
+
+/**
  * Get all "zone_spawn" rectangles from the "info" layer of the given zone's map.
  */
 export function getCoinSpawnZones(zone: Zone): { x: number; y: number; width: number; height: number }[] {

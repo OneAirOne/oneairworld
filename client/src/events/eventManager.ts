@@ -34,6 +34,11 @@ export enum PhaserEvent {
   COIN_JOINED = "coin-joined",
   COIN_LEFT = "coin-left",
   COIN_COLLECTED = "coin-collected",
+  // Potions
+  POTION_JOINED = "potion-joined",
+  POTION_LEFT = "potion-left",
+  SPEED_BOOST_START = "speed-boost-start",
+  SPEED_BOOST_END = "speed-boost-end",
   // Kill counter
   SLIME_KILLED = "slime-killed",
   // CV popup

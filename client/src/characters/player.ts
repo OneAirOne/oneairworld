@@ -49,6 +49,8 @@ export class Player extends Phaser.GameObjects.Sprite {
   private _speakingBubble: Phaser.GameObjects.Text | null = null;
   private _bubbleOffsetX = 10;
   private _bubbleOffsetY = 18;
+  private _halo: Phaser.GameObjects.Graphics | null = null;
+  private _haloTween: Phaser.Tweens.Tween | null = null;
 
   constructor(
     scene: Phaser.Scene,
@@ -202,6 +204,41 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.scene.cameras.main.shake(150, 0.0008);
   }
 
+  private _startHalo() {
+    if (this._halo) return;
+    this._halo = this.scene.add.graphics();
+    this._halo.setDepth(this.depth + 1);
+    this._halo.setPosition(this.x, this.y);
+    // Concentric circles for a soft glow
+    const color = 0xffff88;
+    for (const { r, a } of [{ r: 20, a: 0.12 }, { r: 14, a: 0.22 }, { r: 9, a: 0.35 }]) {
+      this._halo.fillStyle(color, a);
+      this._halo.fillCircle(0, 0, r);
+    }
+    this._haloTween = this.scene.tweens.add({
+      targets: this._halo,
+      alpha: { from: 1, to: 0.35 },
+      duration: 500,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
+    });
+    this.scene.events.on(Phaser.Scenes.Events.POST_UPDATE, this._updateHaloPos, this);
+  }
+
+  private _stopHalo() {
+    if (!this._halo) return;
+    this._haloTween?.stop();
+    this._haloTween = null;
+    this._halo.destroy();
+    this._halo = null;
+    this.scene.events.off(Phaser.Scenes.Events.POST_UPDATE, this._updateHaloPos, this);
+  }
+
+  private _updateHaloPos() {
+    if (this._halo) this._halo.setPosition(this.x, this.y);
+  }
+
   updateIsCollided(isCollided: boolean) {
     this.isCollided = isCollided;
   }
@@ -288,6 +325,10 @@ export class Player extends Phaser.GameObjects.Sprite {
         } else {
           this.hideSpeakingBubble();
         }
+        break;
+      case SERVER_DATA.HAS_SPEED_BOOST:
+        if (value) this._startHalo();
+        else this._stopHalo();
         break;
     }
   }

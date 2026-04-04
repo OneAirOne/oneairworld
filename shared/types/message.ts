@@ -5,4 +5,5 @@ export enum Message {
   UPDATE_PLAYER_SPEAKING,
   UPDATE_PLAYER_ZONE,
   RESTORE_LIFE,
+  BUY_BOOST,
 }

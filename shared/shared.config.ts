@@ -62,7 +62,7 @@ export const SHARED_CONFIG = {
 };
 
 export const PLAYER_CONFIG = {
-  SPRINT_VELOCITY: 2,  // velocity multiplier when sprinting (S key)
+  SPRINT_VELOCITY: 1.5,  // velocity multiplier when sprinting (S key)
 };
 
 export const COMBAT_CONFIG = {
@@ -121,13 +121,21 @@ export const COIN_CONFIG = {
   SPAWN_INTERVAL_MAX: 9000,    // ms max
 };
 
+export const POTION_CONFIG = {
+  COLLECT_RADIUS: 14,        // px — distance to pick up
+  SPEED_MULTIPLIER: 2.5,       // multiplier applied to PLAYER_VELOCITY
+  EFFECT_DURATION: 30000,  // ms — how long the speed boost lasts (2 min)
+  RESPAWN_DELAY:   30000,  // ms — how long before potion reappears (2 min)
+  BOOST_PRICE: 5,          // coins required to buy boost from TacoRex
+};
+
 export const ENEMY_CONFIG = {
   // Radius (px) within which an enemy detects and follows a player
   AGGRO_RADIUS: 60,
   // Distance (px) at which the enemy starts an attack
-  ATTACK_RANGE: 16,
+  ATTACK_RANGE: 38,
   // Duration (ms) the enemy freezes and "charges up" before jumping
-  ATTACK_PREP_DURATION: 500,
+  ATTACK_PREP_DURATION: 300,
   // Duration (ms) of the attack jump / lunge
   ATTACK_DURATION: 600,
   // Cooldown (ms) before the enemy can attack again

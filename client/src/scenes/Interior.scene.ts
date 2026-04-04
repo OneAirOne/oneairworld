@@ -232,6 +232,12 @@ export class InteriorScene extends Phaser.Scene {
 
     // --- Local player ---
     const localPlayer = new Player(this, spawnX, spawnY, this._playerTexture, this._network.sessionId);
+    // Sync life from server state so the bar reflects the actual HP on entry
+    const serverPlayer = this._network.getPlayers()?.get(this._network.sessionId);
+    if (serverPlayer) {
+      localPlayer.setData(SERVER_DATA.LIFE, serverPlayer.life);
+      localPlayer.updateLife(serverPlayer.life);
+    }
     this._playerManager.setMyPlayer(localPlayer);
     this._components.addComponent(localPlayer, new UiBarComponent());
     // Fade in now: player is already at correct spawn position

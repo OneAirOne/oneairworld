@@ -3,7 +3,7 @@ import Matter from "matter-js";
 import { GameState } from "../rooms/schema";
 import { processPlayerAction, collisionPlayers, collisionPlayerEnemy, processEnemyAI } from "./actions";
 
-import { SwordMan, createZone, createPnjBodies, Fluppy, PLAYER_CONFIG, ArrowBody, getCoinSpawnZones } from "./bodies";
+import { SwordMan, createZone, createPnjBodies, Fluppy, PLAYER_CONFIG, ArrowBody, getCoinSpawnZones, getPotionSpawnPoints } from "./bodies";
 import { COLLISION_CATEGORY } from "./engine.config";
 import { SERVER_CONFIG } from "../server.config";
 
@@ -16,7 +16,7 @@ import {
   ZONE_LIST,
 } from "../../../shared/types";
 import { createRectangle, getSpawnPoints, getTiledInfos } from "./bodies";
-import { SHARED_CONFIG, COMBAT_CONFIG, ARROW_CONFIG, COIN_CONFIG } from "../../../shared/shared.config";
+import { SHARED_CONFIG, COMBAT_CONFIG, ARROW_CONFIG, COIN_CONFIG, POTION_CONFIG } from "../../../shared/shared.config";
 import { DIRECTION } from "../../../shared/types";
 
 interface ZoneContext {
@@ -47,6 +47,11 @@ export class GameEngine {
   private _coinSpawnZones: { x: number; y: number; width: number; height: number }[] = [];
   private _coinSpawnTimer = 0;
   private _pendingCoinSpawns: number[] = []; // timers (ms) for each queued respawn
+
+  // ── Potion system ─────────────────────────────────────────────────────────────
+  private _potionSpawnPoints: { x: number; y: number }[] = [];
+  private _potionRespawnTimers: { remaining: number; x: number; y: number; collectedBy?: string }[] = [];
+  private _playerSpeedBoostTimers: Record<string, number> = {}; // sessionId → ms remaining
 
   private get roadCtx(): ZoneContext { return this.zoneContexts.get(Zone.ROAD)!; }
 
@@ -125,7 +130,9 @@ export class GameEngine {
           const enemy      = this.enemies[hurtBody.label];
 
           if (arrow && enemy && enemyState && !enemyState.isDead) {
-            enemyState.decreaseLife(COMBAT_CONFIG.ENEMY_HIT_DAMAGE);
+            const archer = arrow.ownerId ? this.state.players.get(arrow.ownerId) : null;
+            const arrowDamage = archer?.hasSpeedBoost ? enemyState.life : COMBAT_CONFIG.ENEMY_HIT_DAMAGE;
+            enemyState.decreaseLife(arrowDamage);
             enemy.hitAnimTimer = 600;
             this._arrowsToRemove.push(arrow.id);
 
@@ -280,6 +287,12 @@ export class GameEngine {
     // Spawn initial coins
     for (let i = 0; i < COIN_CONFIG.MAX_ACTIVE_COINS; i++) {
       this._spawnCoin();
+    }
+
+    // Potion spawn points (road only) — spawn one potion per point at start
+    this._potionSpawnPoints = getPotionSpawnPoints(Zone.ROAD);
+    for (const pt of this._potionSpawnPoints) {
+      this._spawnPotion(pt.x, pt.y);
     }
   }
 
@@ -476,6 +489,7 @@ export class GameEngine {
 
     player.removePlayer();
     delete this._savedZonePositions[sessionId];
+    delete this._playerSpeedBoostTimers[sessionId];
 
     if (this.state.players.has(sessionId)) {
       this.state.players.delete(sessionId);
@@ -556,6 +570,84 @@ export class GameEngine {
     }
   }
 
+  applySpeedBoost(sessionId: string) {
+    const playerState = this.state.players.get(sessionId);
+    if (!playerState) return;
+    playerState.hasSpeedBoost = true;
+    this._playerSpeedBoostTimers[sessionId] = POTION_CONFIG.EFFECT_DURATION;
+  }
+
+  // ── Potion helpers ────────────────────────────────────────────────────────────
+
+  private _spawnPotion(x: number, y: number) {
+    const id = `potion_${x}_${y}`;
+    this.state.createPotion(id, x, y);
+  }
+
+  private _updatePotions(dt: number) {
+    const toCollect: { potionId: string; playerId: string; x: number; y: number }[] = [];
+
+    this.state.potions.forEach((potion, potionId) => {
+      this.state.players.forEach((player, playerId) => {
+        if (player.isDead || player.zone !== Zone.ROAD) return;
+        if (toCollect.some((c) => c.potionId === potionId)) return;
+        const dx = player.x - potion.x;
+        const dy = player.y - potion.y;
+        if (Math.sqrt(dx * dx + dy * dy) <= POTION_CONFIG.COLLECT_RADIUS) {
+          toCollect.push({ potionId, playerId, x: potion.x, y: potion.y });
+        }
+      });
+    });
+
+    for (const { potionId, playerId, x, y } of toCollect) {
+      this.state.potions.delete(potionId);
+      // Apply speed boost to collector
+      const playerState = this.state.players.get(playerId);
+      if (playerState) {
+        playerState.hasSpeedBoost = true;
+        this._playerSpeedBoostTimers[playerId] = POTION_CONFIG.EFFECT_DURATION;
+      }
+      // Schedule respawn
+      this._potionRespawnTimers.push({ remaining: POTION_CONFIG.RESPAWN_DELAY, x, y, collectedBy: playerId });
+    }
+
+    // Tick respawn timers
+    for (let i = this._potionRespawnTimers.length - 1; i >= 0; i--) {
+      this._potionRespawnTimers[i].remaining -= dt;
+      if (this._potionRespawnTimers[i].remaining <= 0) {
+        const { x, y } = this._potionRespawnTimers[i];
+        this._spawnPotion(x, y);
+        this._potionRespawnTimers.splice(i, 1);
+      }
+    }
+  }
+
+  private _updateSpeedBoosts(dt: number) {
+    for (const playerId of Object.keys(this._playerSpeedBoostTimers)) {
+      const playerState = this.state.players.get(playerId);
+
+      // Player died while boosted: remove boost and respawn potion immediately
+      if (playerState?.isDead) {
+        delete this._playerSpeedBoostTimers[playerId];
+        playerState.hasSpeedBoost = false;
+        for (let i = this._potionRespawnTimers.length - 1; i >= 0; i--) {
+          if (this._potionRespawnTimers[i].collectedBy === playerId) {
+            const { x, y } = this._potionRespawnTimers[i];
+            this._spawnPotion(x, y);
+            this._potionRespawnTimers.splice(i, 1);
+          }
+        }
+        continue;
+      }
+
+      this._playerSpeedBoostTimers[playerId] -= dt;
+      if (this._playerSpeedBoostTimers[playerId] <= 0) {
+        delete this._playerSpeedBoostTimers[playerId];
+        if (playerState) playerState.hasSpeedBoost = false;
+      }
+    }
+  }
+
   update(deltaTime: number): void {
     this.zoneContexts.forEach(({ engine }) => Matter.Engine.update(engine, deltaTime));
     this.syncPositions();
@@ -573,6 +665,8 @@ export class GameEngine {
 
 
     this._updateCoins(deltaTime);
+    this._updatePotions(deltaTime);
+    this._updateSpeedBoosts(deltaTime);
 
     // Enemy death — delay removal to let death anim play
     const DEATH_ANIM_DURATION = 700;

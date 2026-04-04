@@ -13,6 +13,7 @@ import { Player } from "./Player";
 import { Enemy } from "./Enemy";
 import { Arrow } from "./Arrow";
 import { Coin } from "./Coin";
+import { Potion } from "./Potion";
 
 export class GameState extends Schema {
   @type("number") worldWidth = SHARED_CONFIG.WORLD_WIDTH;
@@ -22,6 +23,7 @@ export class GameState extends Schema {
   @type({ map: Enemy }) enemies = new MapSchema<Enemy>();
   @type({ map: Arrow }) arrows = new MapSchema<Arrow>();
   @type({ map: Coin }) coins = new MapSchema<Coin>();
+  @type({ map: Potion }) potions = new MapSchema<Potion>();
 
   createPlayer(sessionId: string, lauchOptions: LauchOptions) {
     const newPlayer = new Player();
@@ -50,6 +52,15 @@ export class GameState extends Schema {
     coin.y = y;
     this.coins.set(id, coin);
     return coin;
+  }
+
+  createPotion(id: string, x: number, y: number) {
+    const potion = new Potion();
+    potion.id = id;
+    potion.x = x;
+    potion.y = y;
+    this.potions.set(id, potion);
+    return potion;
   }
 
   createEnemy(texture: EnemyTextures, position: { x: number; y: number }) {

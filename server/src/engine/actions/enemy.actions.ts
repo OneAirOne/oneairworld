@@ -88,8 +88,22 @@ export function processEnemyAI(
   if (enemyState.isPreparing) {
     body.attackPrepTimer -= deltaTime;
     Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
+
+    // Update target while player is still in range, freeze when they leave
+    if (body.targetPlayerId) {
+      const prepTarget = gameState.players.get(body.targetPlayerId);
+      if (prepTarget) {
+        const dx = prepTarget.x - body.getBody().position.x;
+        const dy = prepTarget.y - body.getBody().position.y;
+        if (Math.sqrt(dx * dx + dy * dy) <= ENEMY_CONFIG.ATTACK_RANGE) {
+          body.attackTargetX = prepTarget.x;
+          body.attackTargetY = prepTarget.y;
+        }
+      }
+    }
+
     if (body.attackPrepTimer <= 0) {
-      // Commit target at launch time and start the lunge
+      // Target was locked at prep start — launch the lunge
       enemyState.isPreparing = false;
       enemyState.isAttacking = true;
       body.attackTimer = ENEMY_CONFIG.ATTACK_DURATION;
@@ -97,9 +111,6 @@ export function processEnemyAI(
       body.attackDamageDealt = false;
       body.attackOriginX = body.getBody().position.x;
       body.attackOriginY = body.getBody().position.y;
-      const prepTarget = body.targetPlayerId ? gameState.players.get(body.targetPlayerId) : null;
-      body.attackTargetX = prepTarget ? prepTarget.x : body.attackOriginX;
-      body.attackTargetY = prepTarget ? prepTarget.y : body.attackOriginY;
       if (!isHitAnim) enemyState.anim = directionToAttackAnim(enemyState.direction as DIRECTION);
       Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
     }
@@ -203,6 +214,8 @@ export function processEnemyAI(
         if (dist <= ENEMY_CONFIG.ATTACK_RANGE && body.attackCooldown <= 0) {
           enemyState.isPreparing = true;
           body.attackPrepTimer = ENEMY_CONFIG.ATTACK_PREP_DURATION;
+          body.attackTargetX = target.x;
+          body.attackTargetY = target.y;
           enemyState.anim = directionToAnim(dir);
           Matter.Body.setVelocity(body.getBody(), { x: 0, y: 0 });
           return;

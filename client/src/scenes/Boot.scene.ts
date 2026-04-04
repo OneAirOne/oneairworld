@@ -53,6 +53,7 @@ export class BootScene extends Phaser.Scene {
     // Items
     this.loadImage(CLIENT_CONFIG.ITEMS.HEART);
     this.loadImage(CLIENT_CONFIG.ITEMS.HEART_FILLED);
+    this.loadImage(CLIENT_CONFIG.ITEMS.POTION);
     this.loadAtlas(CLIENT_CONFIG.ITEMS.BLUE_COIN);
 
     // Tilesets
@@ -97,6 +98,7 @@ export class BootScene extends Phaser.Scene {
       BACKGROUND.BACKDROP,
       ITEMS.HEART,
       ITEMS.HEART_FILLED,
+      ITEMS.POTION,
     ];
     const img = images.find((a) => a.NAME === key);
     if (img) { this.loadImage(img); return; }

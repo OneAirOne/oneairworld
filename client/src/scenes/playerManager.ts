@@ -3,6 +3,7 @@ import { Player } from "../characters/player";
 import { SERVER_DATA } from "client.config";
 import type { IPlayer } from "../../../shared/types";
 import { Anim } from "../../../shared/types";
+import { phaserEvents, PhaserEvent } from "../events/eventManager";
 
 export interface PlayerManagerOptions {
   /** Called when local player is created via handleJoin */
@@ -69,6 +70,9 @@ export class PlayerManager {
 
   handleUpdate(field: string, value: number | string | boolean, id: string) {
     if (id === this._getSessionId() && this._myPlayer) {
+      if (field === SERVER_DATA.HAS_SPEED_BOOST) {
+        phaserEvents.emit(value ? PhaserEvent.SPEED_BOOST_START : PhaserEvent.SPEED_BOOST_END);
+      }
       this._myPlayer.update(field, value);
       return;
     }

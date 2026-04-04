@@ -1228,6 +1228,18 @@
                  "width":104.013566986998,
                  "x":413.793103448276,
                  "y":460.146975692482
+                }, 
+                {
+                 "height":0,
+                 "id":101,
+                 "name":"potion",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":350.647874516936,
+                 "y":151.73903159809
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1247,7 +1259,7 @@
          "y":0
         }],
  "nextlayerid":47,
- "nextobjectid":101,
+ "nextobjectid":102,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

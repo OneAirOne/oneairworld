@@ -171,19 +171,46 @@
     "start": "intro",
     "nodes": {
       "intro": {
-        "text": "RAWRRR ! Moi c'est TacoRex — la mascotte officielle du food truck ! Je suis là pour te redonner des forces. Tu as l'air épuisé... un tacos et tu seras comme neuf. Tu en veux un ?",
+        "text": "RAWRRR ! Moi c'est TacoRex ! Je peux te redonner des forces avec un tacos... ou te vendre le boost vitesse pour 10 pièces. Qu'est-ce que tu veux ?",
         "choices": [
-          { "label": "Oui, avec plaisir !", "next": "eat" },
-          { "label": "Non merci, je suis pressé.", "next": "bye" }
+          { "label": "Le boost vitesse (5 🪙)", "next": "boost_confirm" },
+          { "label": "Un tacos !", "next": "eat" },
+          { "label": "Non merci.", "next": "bye" }
         ]
       },
+      "boost_confirm": {
+        "text": "Marché conclu ! Profite bien du boost — et méfie-toi des slimes !",
+        "action": "buy_boost",
+        "choices": []
+      },
       "eat": {
-        "text": "Voilà ! Plein d'énergie maintenant. Au fait, tu cherches à en savoir plus sur Erwan ? Va faire un tour dans la salle d'arcade, juste à côté !",
+        "text": "Voilà ! Plein d'énergie. Au fait, tu cherches à en savoir plus sur Erwan ? Va faire un tour dans la salle d'arcade !",
         "action": "restore_life",
         "choices": []
       },
       "bye": {
-        "text": "Pas de souci ! Si tu changes d'avis, TacoRex est toujours là. Et si tu cherches Erwan, jette un œil à la salle d'arcade !",
+        "text": "Pas de souci ! TacoRex est toujours là.",
+        "choices": []
+      }
+    }
+  },
+  "dino_broke": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "RAWRRR ! Je vends le boost vitesse pour 5 pièces... mais t'en as pas assez pour l'instant ! Reviens quand t'auras 5 pièces. En attendant, un tacos ?",
+        "choices": [
+          { "label": "Un tacos !", "next": "eat" },
+          { "label": "Je reviendrai !", "next": "bye" }
+        ]
+      },
+      "eat": {
+        "text": "Voilà ! Plein d'énergie. Ramasse des pièces et reviens me voir !",
+        "action": "restore_life",
+        "choices": []
+      },
+      "bye": {
+        "text": "À bientôt ! Les pièces t'attendent dans la rue.",
         "choices": []
       }
     }

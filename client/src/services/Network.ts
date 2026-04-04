@@ -13,6 +13,7 @@ import {
   IEnemy,
   IArrow,
   ICoin,
+  IPotion,
   Message,
   InputPayload,
   LauchOptions,
@@ -154,6 +155,14 @@ export class Network {
       phaserEvents.emit(Event.COIN_LEFT, id);
     };
 
+    this.room.state.potions.onAdd = (potion: IPotion, id: string) => {
+      phaserEvents.emit(Event.POTION_JOINED, potion, id);
+    };
+
+    this.room.state.potions.onRemove = (_potion: IPotion, id: string) => {
+      phaserEvents.emit(Event.POTION_LEFT, id);
+    };
+
     /**
      * When the server sends room data
      */
@@ -190,6 +199,10 @@ export class Network {
 
   restoreLife() {
     this.room?.send(Message.RESTORE_LIFE);
+  }
+
+  buyBoost() {
+    this.room?.send(Message.BUY_BOOST);
   }
 
   /**
@@ -274,6 +287,10 @@ export class Network {
 
   getCoins(): IGameState["coins"] | undefined {
     return this.room?.state.coins;
+  }
+
+  getPotions(): IGameState["potions"] | undefined {
+    return this.room?.state.potions;
   }
 }
 
