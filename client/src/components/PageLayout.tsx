@@ -1,11 +1,20 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { BurgerMenu } from "../features/game/components/BurgerMenu";
 
 interface Props {
   children: React.ReactNode;
 }
 
 export default function PageLayout({ children }: Props) {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    document.getElementById("root")?.scrollTo(0, 0);
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   React.useEffect(() => {
     const root = document.getElementById("root");
     const prev = root?.style.position ?? "";
@@ -31,15 +40,16 @@ export default function PageLayout({ children }: Props) {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white font-sans">
-      <header className="px-6 py-4 border-b border-slate-800">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-slate-400 text-sm hover:text-white transition-colors"
+      <header className="fixed top-0 left-0 right-0 z-10 px-6 py-4 border-b border-slate-800 bg-slate-900/95 backdrop-blur">
+        <button
+          onClick={() => navigate(-1)}
+          className="text-slate-400 text-sm hover:text-white transition-colors"
         >
-          ← Retour au monde
-        </Link>
+          ← Retour
+        </button>
+        <BurgerMenu centered />
       </header>
-      <main>{children}</main>
+      <main className="pt-[53px]">{children}</main>
     </div>
   );
 }

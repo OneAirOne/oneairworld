@@ -206,6 +206,14 @@ export class Network {
   }
 
   /**
+   * Gracefully disconnect from the game room so the server removes the player.
+   */
+  async leaveRoom() {
+    await this.room?.leave(true);
+    this.room = undefined;
+  }
+
+  /**
    * Register event listener and call back function when a player updated
    */
   onPlayerUpdated(

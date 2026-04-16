@@ -1,6 +1,9 @@
+export type ProjectCategory = "personnel" | "professionnel";
+
 export interface ProjectConfig {
   id: string;
   name: string;
+  category: ProjectCategory;
   /** URL opened in new tab when the player interacts with the arcade machine */
   url: string;
   description?: string;
@@ -12,8 +15,30 @@ export interface ProjectConfig {
 
 export const PROJECTS: ProjectConfig[] = [
   {
+    id: "everflow",
+    name: "Everflow",
+    category: "professionnel",
+    url: "/projets/everflow",
+    description: "Réalisation professionnelle — Everflow.",
+  },
+  {
+    id: "actimicro",
+    name: "Actimicro",
+    category: "professionnel",
+    url: "/projets/actimicro",
+    description: "Réalisation professionnelle — Actimicro.",
+  },
+  {
+    id: "smartdriver",
+    name: "Smartdriver",
+    category: "professionnel",
+    url: "/projets/smartdriver",
+    description: "Réalisation professionnelle — Smartdriver.",
+  },
+  {
     id: "samurai-ball",
     name: "Samurai Ball",
+    category: "personnel",
     url: "/projets/samurai-ball",
     description: "Un jeu d'action développé avec un ami — incarne un samouraï et maîtrise la balle pour vaincre tes ennemis.",
     hintDesktop: "Appuyer sur Entrée pour voir le projet Samurai Ball",
@@ -22,6 +47,7 @@ export const PROJECTS: ProjectConfig[] = [
   {
     id: "pepper-atelier-snowboard",
     name: "Pepper Atelier Snowboard",
+    category: "personnel",
     url: "/projets/pepper-atelier-snowboard",
     description: "Projet e-commerce autour d'un atelier de snowboard artisanal.",
     hintDesktop: "Appuyer sur Entrée pour voir le projet Pepper Atelier Snowboard",
@@ -30,6 +56,7 @@ export const PROJECTS: ProjectConfig[] = [
   {
     id: "old-portfolio",
     name: "Ancien portfolio",
+    category: "personnel",
     url: "/projets/old-portfolio",
     description: "Mon premier portfolio — une version précédente de ma présentation en ligne.",
     hintDesktop: "Appuyer sur Entrée pour voir l'ancien portfolio",
@@ -38,6 +65,7 @@ export const PROJECTS: ProjectConfig[] = [
   {
     id: "oneair-world",
     name: "OneairWorld",
+    category: "personnel",
     url: "/projets/oneair-world",
     description: "Le making-of de ce monde interactif multijoueur.",
     hintDesktop: "Appuyer sur Entrée pour voir le projet OneairWorld",
@@ -46,6 +74,7 @@ export const PROJECTS: ProjectConfig[] = [
   {
     id: "dessinons",
     name: "Dessinons",
+    category: "personnel",
     url: "/projets/dessinons",
     description: "Application collaborative de dessin en ligne.",
     hintDesktop: "Appuyer sur Entrée pour voir le projet Dessinons",

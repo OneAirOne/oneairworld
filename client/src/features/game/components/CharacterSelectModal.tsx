@@ -5,14 +5,21 @@ import PushButton from "./PushButton";
 
 interface Props {
   onSelect: (character: Characters) => void;
+  onClose: () => void;
 }
 
-export function CharacterSelectModal({ onSelect }: Props) {
+export function CharacterSelectModal({ onSelect, onClose }: Props) {
   const [selected, setSelected] = React.useState<Characters | null>(null);
 
   return (
-    <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/70 pointer-events-auto">
-      <div className="bg-slate-800 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl border border-slate-700">
+    <div
+      className="fixed inset-0 z-20 flex items-center justify-center bg-black/70 pointer-events-auto"
+      onClick={onClose}
+    >
+      <div
+        className="bg-slate-800 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl border border-slate-700"
+        onClick={(e) => e.stopPropagation()}
+      >
 
         <h2 className="text-white text-2xl font-bold text-center mb-2">
           Choisissez votre personnage

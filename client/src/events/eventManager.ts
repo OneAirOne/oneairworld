@@ -44,6 +44,8 @@ export enum PhaserEvent {
   // CV popup
   CV_POPUP_OPEN = "cv-popup-open",
   CV_POPUP_CLOSE = "cv-popup-close",
+  // Game lifecycle
+  GAME_STARTED = "game-started",
   // Game over
   GAME_OVER = "game-over",
   GAME_OVER_RESTART = "game-over-restart",

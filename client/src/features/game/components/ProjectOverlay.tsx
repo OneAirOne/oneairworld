@@ -61,9 +61,9 @@ export function ProjectOverlay() {
       <header className="sticky top-0 z-10 px-6 py-4 border-b border-slate-800 bg-slate-900/95 backdrop-blur">
         <button
           onClick={close}
-          className="inline-flex items-center gap-2 text-slate-400 text-sm hover:text-white transition-colors"
+          className="text-slate-400 text-sm hover:text-white transition-colors"
         >
-          ← Retour au monde
+          ← Retour
         </button>
       </header>
       <main>

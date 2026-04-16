@@ -3,10 +3,12 @@ import * as React from "react";
 // Components
 import LaunchButton from "./lauchButton";
 import { CharacterSelectModal } from "./CharacterSelectModal";
+import { BurgerMenu } from "./BurgerMenu";
 
 // Others
 import phaserGame from "Game";
 import { BootScene, SCENES } from "scenes";
+import { phaserEvents, PhaserEvent } from "../../../events/eventManager";
 
 // Shared
 import { Characters } from "../../../../../shared/types";
@@ -39,16 +41,20 @@ export function StartGame() {
     }
     setLoading(false);
     setFading(true);
-    setTimeout(() => setVisible(false), FADE_DURATION);
+    setTimeout(() => {
+      setVisible(false);
+      phaserEvents.emit(PhaserEvent.GAME_STARTED);
+    }, FADE_DURATION);
   }, []);
 
   if (!visible) return null;
 
   return (
     <div
-        className="absolute inset-0 z-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center pointer-events-auto"
+        className="absolute inset-0 z-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center pointer-events-auto overflow-hidden"
         style={{ transition: `opacity ${FADE_DURATION}ms ease`, opacity: fading ? 0 : 1 }}
       >
+      <BurgerMenu />
       <div className="max-w-lg w-full px-8">
 
         {/* Avatar */}
@@ -113,7 +119,7 @@ export function StartGame() {
 
       </div>
 
-      {showModal && <CharacterSelectModal onSelect={handleCharacterSelect} />}
+      {showModal && <CharacterSelectModal onSelect={handleCharacterSelect} onClose={() => setShowModal(false)} />}
     </div>
   );
 }

@@ -4,6 +4,8 @@ import { TiledLayer } from "./road.config";
 import type { PnjSpawnConfig, PoiZoneConfig } from "./game.helpers";
 import { PROJECTS } from "../config/projects.config";
 
+const ARCADE_PROJECTS = PROJECTS.filter((p) => p.category === "personnel");
+
 export interface InteriorTileset {
   name: string;
   path: string;
@@ -74,7 +76,7 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
     pnjs: [
       { spawnPoint: "pnj1_arcade", texture: "wendy", animKey: "wendyIdle", dialogueId: "wendy_arcade", bubbleOffsetX: 10, bubbleOffsetY: 15 },
     ],
-    poiZones: PROJECTS.map((p, i) => ({
+    poiZones: ARCADE_PROJECTS.map((p, i) => ({
       spawnPoint:  `project${i + 1}`,
       text:        p.hintDesktop ?? `Entrée — voir «${p.name}»`,
       textMobile:  p.hintMobile  ?? `Voir «${p.name}»`,
