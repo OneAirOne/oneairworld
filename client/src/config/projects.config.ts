@@ -7,6 +7,8 @@ export interface ProjectConfig {
   /** URL opened in new tab when the player interacts with the arcade machine */
   url: string;
   description?: string;
+  /** Whether this project has a dedicated arcade machine in the game room */
+  isOnArcade?: boolean;
   /** Hint shown on desktop (keyboard) */
   hintDesktop?: string;
   /** Hint shown on mobile (touch) */
@@ -39,6 +41,7 @@ export const PROJECTS: ProjectConfig[] = [
     id: "samurai-ball",
     name: "Samurai Ball",
     category: "personnel",
+    isOnArcade: true,
     url: "/projets/samurai-ball",
     description: "Un jeu d'action développé avec un ami — incarne un samouraï et maîtrise la balle pour vaincre tes ennemis.",
     hintDesktop: "Appuyer sur Entrée pour voir le projet Samurai Ball",
@@ -47,9 +50,10 @@ export const PROJECTS: ProjectConfig[] = [
   {
     id: "pepper-atelier-snowboard",
     name: "Pepper Atelier Snowboard",
-    category: "personnel",
+    category: "professionnel",
+    isOnArcade: true,
     url: "/projets/pepper-atelier-snowboard",
-    description: "Projet e-commerce autour d'un atelier de snowboard artisanal.",
+    description: "Réalisation professionnelle — Pepper Atelier Snowboard.",
     hintDesktop: "Appuyer sur Entrée pour voir le projet Pepper Atelier Snowboard",
     hintMobile:  "Appuyer sur l'icône 💬 pour voir le projet Pepper Atelier Snowboard",
   },
@@ -57,6 +61,7 @@ export const PROJECTS: ProjectConfig[] = [
     id: "old-portfolio",
     name: "Ancien portfolio",
     category: "personnel",
+    isOnArcade: true,
     url: "/projets/old-portfolio",
     description: "Mon premier portfolio — une version précédente de ma présentation en ligne.",
     hintDesktop: "Appuyer sur Entrée pour voir l'ancien portfolio",
@@ -66,6 +71,7 @@ export const PROJECTS: ProjectConfig[] = [
     id: "oneair-world",
     name: "OneairWorld",
     category: "personnel",
+    isOnArcade: true,
     url: "/projets/oneair-world",
     description: "Le making-of de ce monde interactif multijoueur.",
     hintDesktop: "Appuyer sur Entrée pour voir le projet OneairWorld",
@@ -75,6 +81,7 @@ export const PROJECTS: ProjectConfig[] = [
     id: "dessinons",
     name: "Dessinons",
     category: "personnel",
+    isOnArcade: true,
     url: "/projets/dessinons",
     description: "Application collaborative de dessin en ligne.",
     hintDesktop: "Appuyer sur Entrée pour voir le projet Dessinons",

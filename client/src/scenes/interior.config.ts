@@ -4,7 +4,7 @@ import { TiledLayer } from "./road.config";
 import type { PnjSpawnConfig, PoiZoneConfig } from "./game.helpers";
 import { PROJECTS } from "../config/projects.config";
 
-const ARCADE_PROJECTS = PROJECTS.filter((p) => p.category === "personnel");
+const ARCADE_PROJECTS = PROJECTS.filter((p) => p.isOnArcade);
 
 export interface InteriorTileset {
   name: string;
