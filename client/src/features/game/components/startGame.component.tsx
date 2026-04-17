@@ -43,7 +43,7 @@ export function StartGame() {
     setFading(true);
     setTimeout(() => {
       setVisible(false);
-      phaserEvents.emit(PhaserEvent.GAME_STARTED);
+phaserEvents.emit(PhaserEvent.GAME_STARTED);
     }, FADE_DURATION);
   }, []);
 
@@ -51,7 +51,7 @@ export function StartGame() {
 
   return (
     <div
-        className="absolute inset-0 z-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center pointer-events-auto overflow-hidden"
+        className="absolute inset-0 z-10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center pointer-events-auto overflow-hidden"
         style={{ transition: `opacity ${FADE_DURATION}ms ease`, opacity: fading ? 0 : 1 }}
       >
       <BurgerMenu />
@@ -61,7 +61,7 @@ export function StartGame() {
         <div className="flex justify-center mb-8 animate-float">
           <img
             src="assets/avatar.jpg"
-            className="w-24 h-24 rounded-full ring-2 ring-brand-primary/30"
+            className="w-24 h-24 rounded-full ring-2 ring-white/20 shadow-[0_0_30px_8px_rgba(255,255,255,0.25)]"
           />
         </div>
 
@@ -70,32 +70,36 @@ export function StartGame() {
           className="mb-10 opacity-0 animate-fade-in-up"
           style={{ animationDelay: "0.1s" }}
         >
-          <h1 className="text-4xl font-bold text-white mb-5 tracking-tight">
-            Bonjour,
+          <h1 className="text-4xl font-bold text-white tracking-tight mb-4">
+            Hey,
           </h1>
-
+       
           <p className="text-slate-400 text-base leading-relaxed mb-4">
-            Je m'appelle Erwan, développeur logiciel basé en France. J'aime
-            concevoir des projets digitaux, en particulier les expériences
-            immersives comme le jeu vidéo.
+            moi c'est <span className="text-white font-semibold">Erwan</span> — Software engineer. J'aime créer des expériences digitales interactives.
           </p>
 
           <p className="text-slate-400 text-base leading-relaxed mb-4">
-            Pour toute demande ou collaboration, n'hésitez pas à me contacter
-            à{" "}
-            <a
-              href={`mailto:${mail}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-brand-primary hover:text-brand-primary/70 transition-colors duration-200 underline underline-offset-4"
-            >
-              {mail}
-            </a>
+            Bienvenue dans mon <span className="text-white font-semibold">CV jouable</span>.
           </p>
 
           <p className="text-slate-400 text-base leading-relaxed">
-            Explorez mon showroom interactif pour découvrir mes projets, mon
-            parcours… et peut-être croiser quelques monstres en chemin.
+            Curieux de savoir comment c'est fait ? Jetez un œil au projet{" "}
+            <a
+              href="/projets/oneair-world"
+              className="text-white font-semibold hover:text-slate-300 transition-colors duration-200"
+            >
+              OneairWorld
+            </a>.
+          </p>
+
+          <p className="text-slate-400 text-base leading-relaxed mt-4">
+            Une question, une collaboration ?{" "}
+            <a
+              href="mailto:gilberterwan@gmail.com"
+              className="text-white font-semibold hover:text-slate-300 transition-colors duration-200"
+            >
+              gilberterwan@gmail.com
+            </a>
           </p>
         </div>
 

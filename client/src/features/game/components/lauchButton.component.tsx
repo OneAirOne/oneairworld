@@ -5,5 +5,5 @@ interface Props {
 }
 
 export default function LaunchButton({ onClick }: Props) {
-  return <PushButton onClick={onClick}>GO</PushButton>;
+  return <PushButton onClick={onClick}>Entrer</PushButton>;
 }

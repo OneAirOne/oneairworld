@@ -4,6 +4,7 @@ const STACK = [
   { label: "Phaser 3",  desc: "Moteur de jeu frontend — rendu de la scène, animations, inputs" },
   { label: "React",     desc: "Interface utilisateur — overlays, dialogues, écrans hors-jeu" },
   { label: "Tailwind",  desc: "Styles des composants React" },
+  { label: "Docker",    desc: "Conteneurisation et déploiement du serveur Colyseus" },
 ];
 
 export default function OneAirWorldContent() {
@@ -85,12 +86,12 @@ export default function OneAirWorldContent() {
       {/* ── CTA ── */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
         <div className="border-t border-brand-surface pt-16 flex flex-col items-center text-center gap-4">
-          <p className="text-slate-400 text-sm">Vous y êtes déjà — retournez explorer le monde.</p>
+          <p className="text-slate-400 text-sm">Voulez vous explorer le monde ?</p>
           <a
             href="/"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-500 text-slate-300 text-sm hover:border-white hover:text-white transition-colors"
           >
-            Retourner sur l'accueil →
+            Retour à l'accueil →
           </a>
         </div>
       </section>

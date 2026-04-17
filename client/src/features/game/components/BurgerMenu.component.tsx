@@ -89,6 +89,22 @@ export function BurgerMenu({ centered = false, side = "left", inline = false }: 
             <MenuSection label="Projets personnels" projects={perso} />
           )}
         </div>
+
+        <div className="border-t border-slate-800 mt-2 pt-6">
+          <p className="text-xs uppercase tracking-widest text-slate-500 mb-2 font-medium px-1">
+            CV
+          </p>
+          <a
+            href="/assets/cv-erwan-gilbert.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200"
+            onClick={close}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-primary/60 group-hover:bg-brand-primary transition-colors duration-200 shrink-0" />
+            <span className="text-sm font-medium">Voir mon CV</span>
+          </a>
+        </div>
       </div>
     </>
   );
