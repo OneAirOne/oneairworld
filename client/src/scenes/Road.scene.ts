@@ -10,7 +10,7 @@ import { Arrow, ARROW_ANIM_KEYS } from "../characters/Arrow";
 
 // Others
 import { SCENES } from "./scene.config";
-import { createSpeakingBubble, buildTilesets, showSceneTitle, renderCollisionDebug, renderDebugZones, loadPoiZones, type PoiZone } from "./game.helpers";
+import { createSpeakingBubble, buildTilesets, showSceneTitle, renderCollisionDebug, renderDebugZones, loadPoiZones, type PoiZone, type InteractivePnj } from "./game.helpers";
 import { ROAD_MAP_CONFIG } from "./road.config";
 import CLIENT_CONFIG, { SERVER_DATA } from "client.config";
 
@@ -48,7 +48,7 @@ export class Road extends Phaser.Scene {
   private arrows = new Map<string, Arrow>();
   private coins = new Map<string, Phaser.GameObjects.Sprite>();
   private potions = new Map<string, Phaser.GameObjects.Sprite>();
-  private interactivePnjs: { sprite: Phaser.GameObjects.Sprite; bubble: Phaser.GameObjects.Text; dialogueId: string }[] = [];
+  private interactivePnjs: InteractivePnj[] = [];
   private dialogueManager = new DialogueManager();
   private dialogueInput!: DialogueInputHandler;
   private _pnjCooldown = false;
