@@ -16,10 +16,9 @@ function MenuSection({ label, projects }: { label: string; projects: typeof PROJ
           <Link
             key={project.id}
             to={project.url}
-            state={{ from: "game" }}
             className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-brand/60 group-hover:bg-brand transition-colors duration-200 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-primary/60 group-hover:bg-brand-primary transition-colors duration-200 shrink-0" />
             <span className="text-sm font-medium">{project.name}</span>
           </Link>
         ))}
@@ -28,10 +27,12 @@ function MenuSection({ label, projects }: { label: string; projects: typeof PROJ
   );
 }
 
-export function BurgerMenu({ centered = false }: { centered?: boolean }) {
+export function BurgerMenu({ centered = false, side = "left", inline = false }: { centered?: boolean; side?: "left" | "right"; inline?: boolean }) {
   const [open, setOpen] = React.useState(false);
 
   const close = () => setOpen(false);
+
+  const isLeft = side === "left";
 
   return (
     <>
@@ -39,16 +40,16 @@ export function BurgerMenu({ centered = false }: { centered?: boolean }) {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Menu projets"
-        className={`absolute ${centered ? "top-1/2 -translate-y-1/2" : "top-5"} right-5 z-20 flex flex-col gap-1.5 p-2 rounded-md text-slate-400 hover:text-white transition-colors pointer-events-auto`}
+        className={`${inline ? "relative" : `absolute ${centered ? "top-1/2 -translate-y-1/2" : "top-5"} ${isLeft ? "left-5" : "right-5"}`} z-20 flex flex-col gap-1.5 p-2 rounded-md transition-colors pointer-events-auto`}
       >
         <span
-          className={`block h-0.5 w-6 bg-current transition-all duration-300 origin-center ${open ? "rotate-45 translate-y-2" : ""}`}
+          className={`block h-0.5 w-6 bg-brand-primary transition-all duration-300 origin-center ${open ? "rotate-45 translate-y-2" : ""}`}
         />
         <span
-          className={`block h-0.5 w-6 bg-current transition-all duration-300 ${open ? "opacity-0" : ""}`}
+          className={`block h-0.5 w-6 bg-brand-primary transition-all duration-300 ${open ? "opacity-0" : ""}`}
         />
         <span
-          className={`block h-0.5 w-6 bg-current transition-all duration-300 origin-center ${open ? "-rotate-45 -translate-y-2" : ""}`}
+          className={`block h-0.5 w-6 bg-brand-primary transition-all duration-300 origin-center ${open ? "-rotate-45 -translate-y-2" : ""}`}
         />
       </button>
 
@@ -62,7 +63,7 @@ export function BurgerMenu({ centered = false }: { centered?: boolean }) {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-screen w-72 z-20 bg-slate-900/95 backdrop-blur-sm border-l border-slate-700/50 flex flex-col pt-16 pb-8 px-6 pointer-events-auto transition-transform duration-300 ease-in-out overflow-y-auto ${open ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed top-0 h-screen w-72 z-20 bg-slate-900/95 backdrop-blur-sm flex flex-col pt-16 pb-8 px-6 pointer-events-auto transition-transform duration-300 ease-in-out overflow-y-auto ${isLeft ? "left-0 border-r border-slate-700/50" : "right-0 border-l border-slate-700/50"} ${open ? "translate-x-0" : isLeft ? "-translate-x-full" : "translate-x-full"}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 pb-4 border-b border-slate-700/50" onClick={close}>
@@ -70,7 +71,7 @@ export function BurgerMenu({ centered = false }: { centered?: boolean }) {
             to="/"
             className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-brand/60 group-hover:bg-brand transition-colors duration-200 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-primary/60 group-hover:bg-brand-primary transition-colors duration-200 shrink-0" />
             <span className="text-sm font-medium">Accueil</span>
           </Link>
         </div>

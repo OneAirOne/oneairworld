@@ -1,9 +1,9 @@
 // Components
 import { StartGame } from "./components/startGame.component";
-import { CvPopup } from "./components/CvPopup";
-import { GameOverScreen } from "./components/GameOverScreen";
-import { ProjectOverlay } from "./components/ProjectOverlay";
-import { ExitButton } from "./components/ExitButton";
+import { CvPopup } from "./components/CvPopup.component";
+import { GameOverScreen } from "./components/GameOverScreen.component";
+import { ProjectOverlay } from "./components/ProjectOverlay.component";
+import { ExitButton } from "./components/ExitButton.component";
 
 export default function GameView() {
   return (

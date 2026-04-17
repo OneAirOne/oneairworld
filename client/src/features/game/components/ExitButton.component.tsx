@@ -34,7 +34,7 @@ export function ExitButton() {
         onClick={handleExit}
         className="group rounded-xl border-0 p-0 cursor-pointer outline-offset-4 bg-brand-shadow"
       >
-        <span className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand -translate-y-1 will-change-transform transition-transform duration-[250ms] group-hover:-translate-y-[6px] group-active:-translate-y-0.5">
+        <span className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand-primary -translate-y-1 will-change-transform transition-transform duration-[250ms] group-hover:-translate-y-[6px] group-active:-translate-y-0.5">
           ← Sortir
         </span>
       </button>

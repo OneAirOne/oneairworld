@@ -26,7 +26,7 @@ export default function PushButton({ onClick, disabled = false, children }: Prop
       onClick={onClick}
       className="group rounded-xl border-0 p-0 cursor-pointer outline-offset-4 bg-brand-shadow"
     >
-      <span className="flex items-center gap-3 px-[42px] py-3 rounded-xl text-xl font-semibold text-white bg-brand -translate-y-1 will-change-transform transition-transform duration-[250ms] group-hover:-translate-y-[6px] group-active:-translate-y-0.5">
+      <span className="flex items-center gap-3 px-[42px] py-3 rounded-xl text-xl font-semibold text-white bg-brand-primary -translate-y-1 will-change-transform transition-transform duration-[250ms] group-hover:-translate-y-[6px] group-active:-translate-y-0.5">
         {children}
       </span>
     </button>

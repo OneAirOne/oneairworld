@@ -1,14 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { getProject } from "config/projects.config";
 import PageLayout from "components/PageLayout";
-import SamuraiBallContent from "./SamuraiBallContent";
-import OldPortfolioContent from "./OldPortfolioContent";
-import PepperAtelierContent from "./PepperAtelierContent";
-import DessinonsContent from "./DessinonsContent";
-import OneAirWorldContent from "./OneAirWorldContent";
-import EverflowContent from "./EverflowContent";
-import ActimicroContent from "./ActimicroContent";
-import SmartdriverContent from "./SmartdriverContent";
+import SamuraiBallContent from "./components/SamuraiBallContent.component";
+import OldPortfolioContent from "./components/OldPortfolioContent.component";
+import PepperAtelierContent from "./components/PepperAtelierContent.component";
+import DessinonsContent from "./components/DessinonsContent.component";
+import OneAirWorldContent from "./components/OneAirWorldContent.component";
+import EverflowContent from "./components/EverflowContent.component";
+import ActimicroContent from "./components/ActimicroContent.component";
+import SmartdriverContent from "./components/SmartdriverContent.component";
 
 function BackButton() {
   const navigate = useNavigate();

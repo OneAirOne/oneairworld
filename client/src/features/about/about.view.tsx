@@ -1,9 +1,9 @@
-import Layout from "components/layout.component";
+import PageLayout from "components/PageLayout";
 
 export default function AboutView() {
   return (
-    <Layout>
+    <PageLayout>
       <p className="text-white">About</p>
-    </Layout>
+    </PageLayout>
   );
 }

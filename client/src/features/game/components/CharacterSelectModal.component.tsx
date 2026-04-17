@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Characters } from "../../../../../shared/types";
 import { PLAYABLE_CHARACTERS, CharacterChoice } from "../config/characters.config";
-import PushButton from "./PushButton";
+import PushButton from "./PushButton.component";
 
 interface Props {
   onSelect: (character: Characters) => void;
@@ -36,7 +36,7 @@ export function CharacterSelectModal({ onSelect, onClose }: Props) {
               className={[
                 "flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer bg-transparent",
                 selected === c.key
-                  ? "border-brand bg-brand/10 scale-105"
+                  ? "border-brand bg-brand-primary/10 scale-105"
                   : "border-slate-600 hover:border-slate-400",
               ].join(" ")}
             >

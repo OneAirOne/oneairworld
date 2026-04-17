@@ -1,13 +1,12 @@
 import * as React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { BurgerMenu } from "../features/game/components/BurgerMenu";
+import { useLocation } from "react-router-dom";
+import { BurgerMenu } from "../features/game/components/BurgerMenu.component";
 
 interface Props {
   children: React.ReactNode;
 }
 
 export default function PageLayout({ children }: Props) {
-  const navigate = useNavigate();
   const { pathname } = useLocation();
 
   React.useEffect(() => {
@@ -39,15 +38,9 @@ export default function PageLayout({ children }: Props) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white font-sans">
-      <header className="fixed top-0 left-0 right-0 z-10 px-6 py-4 border-b border-slate-800 bg-slate-900/95 backdrop-blur">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-slate-400 text-sm hover:text-white transition-colors"
-        >
-          ← Retour
-        </button>
-        <BurgerMenu centered />
+    <div className="min-h-screen bg-brand-bg text-white font-sans">
+      <header className="fixed top-0 left-0 right-0 z-10 px-6 py-4 border-b border-brand-surface bg-brand-bg/95 backdrop-blur flex items-center">
+        <BurgerMenu inline />
       </header>
       <main className="pt-[53px]">{children}</main>
     </div>

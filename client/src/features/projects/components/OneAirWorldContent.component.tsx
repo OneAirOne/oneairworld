@@ -11,7 +11,7 @@ export default function OneAirWorldContent() {
     <>
       {/* ── Hero ── */}
       <section className="max-w-4xl mx-auto px-6 pt-20 pb-16">
-        <p className="text-brand text-xs font-semibold tracking-widest uppercase mb-4">
+        <p className="text-brand-primary text-xs font-semibold tracking-widest uppercase mb-4">
           Projet — Making-of
         </p>
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
@@ -23,14 +23,21 @@ export default function OneAirWorldContent() {
           en temps réel aux côtés des autres. Les positions, actions et états des
           joueurs sont synchronisés via WebSocket à chaque frame.
         </p>
-        <p className="text-slate-500 text-sm">
-          Colyseus · Matter.js · Phaser 3 · React · Tailwind
+        <p className="text-slate-500 text-sm mb-4">
+          Projet initié il y a 4 ans — plusieurs cycles de tests et de recherches de technologies.
         </p>
+        <div className="flex flex-wrap gap-2">
+          {STACK.map(({ label }) => (
+            <span key={label} className="inline-block bg-brand-primary/10 border border-brand-primary/20 text-brand-primary/80 text-xs font-medium px-2.5 py-0.5 rounded-full whitespace-nowrap">
+              {label}
+            </span>
+          ))}
+        </div>
       </section>
 
       {/* ── Video ── */}
       <section className="max-w-4xl mx-auto px-6 pb-12">
-        <div className="relative w-full rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
+        <div className="relative w-full rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
           <video
             src="/assets/oneair-world/making-off.mp4"
             autoPlay
@@ -52,11 +59,11 @@ export default function OneAirWorldContent() {
 
       {/* ── Stack ── */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
-        <div className="border-t border-slate-800 pt-16">
+        <div className="border-t border-brand-surface pt-16">
           <h2 className="text-2xl font-semibold mb-8">Stack technique</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16">
             {STACK.map(({ label, desc }) => (
-              <div key={label} className="rounded-lg border border-slate-700 bg-slate-800/50 px-5 py-4">
+              <div key={label} className="rounded-lg border border-slate-700 bg-brand-surface/50 px-5 py-4">
                 <p className="text-white font-semibold text-sm mb-1">{label}</p>
                 <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
               </div>
@@ -65,7 +72,7 @@ export default function OneAirWorldContent() {
 
           {/* Architecture schema */}
           <h3 className="text-lg font-semibold mb-4">Schéma d'architecture</h3>
-          <div className="rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
+          <div className="rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
             <img
               src="/assets/oneair-world/architecture.png"
               alt="Schéma d'architecture OneairWorld"
@@ -77,7 +84,7 @@ export default function OneAirWorldContent() {
 
       {/* ── CTA ── */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
-        <div className="border-t border-slate-800 pt-16 flex flex-col items-center text-center gap-4">
+        <div className="border-t border-brand-surface pt-16 flex flex-col items-center text-center gap-4">
           <p className="text-slate-400 text-sm">Vous y êtes déjà — retournez explorer le monde.</p>
           <a
             href="/"

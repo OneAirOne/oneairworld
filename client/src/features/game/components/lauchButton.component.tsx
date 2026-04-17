@@ -1,4 +1,4 @@
-import PushButton from "./PushButton";
+import PushButton from "./PushButton.component";
 
 interface Props {
   onClick: () => void;

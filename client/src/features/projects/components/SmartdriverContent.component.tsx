@@ -2,7 +2,7 @@ const TECH = ["React", "Electron", "Communication série"];
 
 function TechChip({ label }: { label: string }) {
   return (
-    <span className="inline-block bg-brand/10 border border-brand/20 text-brand/80 text-xs font-medium px-2.5 py-0.5 rounded-full whitespace-nowrap">
+    <span className="inline-block bg-brand-primary/10 border border-brand-primary/20 text-brand-primary/80 text-xs font-medium px-2.5 py-0.5 rounded-full whitespace-nowrap">
       {label}
     </span>
   );
@@ -13,7 +13,7 @@ export default function SmartdriverContent() {
     <>
       {/* ── Hero ── */}
       <section className="max-w-4xl mx-auto px-6 pt-20">
-        <p className="text-brand text-xs font-semibold tracking-widest uppercase mb-4">
+        <p className="text-brand-primary text-xs font-semibold tracking-widest uppercase mb-4">
           Réalisation professionnelle · Everblix · 2019 – 2026
         </p>
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
@@ -31,7 +31,7 @@ export default function SmartdriverContent() {
 
         {/* Objet connecté */}
         <div className="flex flex-col items-center gap-2 my-8">
-          <div className="w-80 rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
+          <div className="w-80 rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
             <img
               src="/assets/smartdriver/smartdriver-objet.jpeg"
               alt="Smartdriver — boîtier de pilotage moteur"
@@ -44,7 +44,7 @@ export default function SmartdriverContent() {
 
       {/* ── Application desktop ── */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
-        <div className="border-t border-slate-800 pt-16">
+        <div className="border-t border-brand-surface pt-16">
           <h2 className="text-2xl font-semibold mb-2">Application de configuration</h2>
           <p className="text-slate-400 text-sm leading-relaxed mb-4 max-w-xl">
             Application desktop développée avec Electron permettant de configurer
@@ -58,7 +58,7 @@ export default function SmartdriverContent() {
               <TechChip key={t} label={t} />
             ))}
           </div>
-          <div className="rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
+          <div className="rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
             <img
               src="/assets/smartdriver/smartdriver-web.webp"
               alt="Smartdriver — application de configuration"

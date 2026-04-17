@@ -5,9 +5,11 @@ export default {
     extend: {
       colors: {
         brand: {
-          DEFAULT: "#f0003c", // hsl(345, 100%, 47%) — rouge face
+          primary: "#f0003c", // hsl(345, 100%, 47%) — rouge face
           shadow:  "#b2b8b2", // hsl(120, 4%, 71%)   — gris shadow
           muted:   "#c44466", // rouge désaturé disabled
+          bg:      "#0f172a", // fond des pages (slate-900)
+          surface: "#1e293b", // surface / cartes (slate-800)
         },
       },
       fontFamily: {

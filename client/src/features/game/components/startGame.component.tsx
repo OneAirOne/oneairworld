@@ -1,9 +1,9 @@
 import * as React from "react";
 
 // Components
-import LaunchButton from "./lauchButton";
-import { CharacterSelectModal } from "./CharacterSelectModal";
-import { BurgerMenu } from "./BurgerMenu";
+import LaunchButton from "./lauchButton.component";
+import { CharacterSelectModal } from "./CharacterSelectModal.component";
+import { BurgerMenu } from "./BurgerMenu.component";
 
 // Others
 import phaserGame from "Game";
@@ -61,7 +61,7 @@ export function StartGame() {
         <div className="flex justify-center mb-8 animate-float">
           <img
             src="assets/avatar.jpg"
-            className="w-24 h-24 rounded-full ring-2 ring-brand/30"
+            className="w-24 h-24 rounded-full ring-2 ring-brand-primary/30"
           />
         </div>
 
@@ -87,7 +87,7 @@ export function StartGame() {
               href={`mailto:${mail}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand hover:text-brand/70 transition-colors duration-200 underline underline-offset-4"
+              className="text-brand-primary hover:text-brand-primary/70 transition-colors duration-200 underline underline-offset-4"
             >
               {mail}
             </a>

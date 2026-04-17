@@ -1,4 +1,12 @@
-import PageLayout from "components/PageLayout";
+const TECH = ["Unity", "C#"];
+
+function TechChip({ label }: { label: string }) {
+  return (
+    <span className="inline-block bg-brand-primary/10 border border-brand-primary/20 text-brand-primary/80 text-xs font-medium px-2.5 py-0.5 rounded-full whitespace-nowrap">
+      {label}
+    </span>
+  );
+}
 
 const GIFS = [
   { src: "/assets/samurail-ball/fire.gif",        label: "Boule de feu" },
@@ -6,12 +14,12 @@ const GIFS = [
   { src: "/assets/samurail-ball/front_hit.gif",   label: "Impact frontal" },
 ];
 
-export default function SamuraiBallView() {
+export default function SamuraiBallContent() {
   return (
-    <PageLayout>
+    <>
       {/* ── Hero ── */}
       <section className="max-w-4xl mx-auto px-6 pt-20 pb-16">
-        <p className="text-brand text-xs font-semibold tracking-widest uppercase mb-4">
+        <p className="text-brand-primary text-xs font-semibold tracking-widest uppercase mb-4">
           Projet — Jeu vidéo
         </p>
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
@@ -24,16 +32,19 @@ export default function SamuraiBallView() {
           ouvrant la voie à des échanges aériens aussi imprévisibles que
           spectaculaires.
         </p>
-        <p className="text-slate-500 text-sm">
-          Développé en collaboration avec un ami · Unity · C#
+        <p className="text-slate-500 text-sm mb-4">
+          Développé en collaboration avec un ami Animateur / Motion designer
         </p>
+        <div className="flex flex-wrap gap-2">
+          {TECH.map((t) => <TechChip key={t} label={t} />)}
+        </div>
       </section>
 
-      {/* ── Video ── */}
-      <section className="max-w-4xl mx-auto px-6 pb-20">
-        <div className="relative w-full rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
+      {/* ── Fight video ── */}
+      <section className="max-w-4xl mx-auto px-6 pb-8">
+        <div className="relative w-full rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
           <video
-            src="/assets/samurail-ball/make-in-off-samurai-ball.mp4"
+            src="/assets/samurail-ball/fight-ex.mp4"
             autoPlay
             playsInline
             muted
@@ -46,19 +57,18 @@ export default function SamuraiBallView() {
 
       {/* ── 3D Modeling ── */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
-        <div className="border-t border-slate-800 pt-16">
+        <div className="border-t border-brand-surface pt-16">
           <h2 className="text-2xl font-semibold mb-2">Modélisation 3D</h2>
           <p className="text-slate-400 text-sm leading-relaxed mb-10 max-w-xl">
             Les personnages et environnements ont été modélisés et animés
             entièrement from scratch. Voici quelques aperçus des animations en
             action.
           </p>
-
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {GIFS.map(({ src, label }) => (
               <div
                 key={src}
-                className="rounded-lg overflow-hidden border border-slate-700 bg-slate-800 group"
+                className="rounded-lg overflow-hidden border border-slate-700 bg-brand-surface group"
               >
                 <img
                   src={src}
@@ -74,9 +84,26 @@ export default function SamuraiBallView() {
         </div>
       </section>
 
+      {/* ── Making-off ── */}
+      <section className="max-w-4xl mx-auto px-6 pb-24">
+        <div className="border-t border-brand-surface pt-16">
+          <h2 className="text-2xl font-semibold mb-8">Making-off</h2>
+          <div className="relative w-full rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
+            <video
+              src="/assets/samurail-ball/make-in-off-samurai-ball.mp4"
+              autoPlay
+              playsInline
+              loop
+              controls
+              className="w-full"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* ── Steam CTA ── */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
-        <div className="border-t border-slate-800 pt-16 flex flex-col items-center text-center gap-4">
+        <div className="border-t border-brand-surface pt-16 flex flex-col items-center text-center gap-4">
           <p className="text-slate-400 text-sm">Le jeu arrive bientôt sur Steam.</p>
           <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-600 text-slate-400 text-sm cursor-not-allowed select-none">
             <svg className="w-5 h-5 opacity-50" viewBox="0 0 24 24" fill="currentColor">
@@ -86,6 +113,6 @@ export default function SamuraiBallView() {
           </span>
         </div>
       </section>
-    </PageLayout>
+    </>
   );
 }
