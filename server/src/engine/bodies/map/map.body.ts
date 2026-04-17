@@ -4,7 +4,7 @@ const fs = require("fs");
 import { COLLISION_CATEGORY } from "../../engine.config";
 import { TiledInfoObject } from "../../../../../shared/map.config";
 import { Zone } from "../../../../../shared/types";
-import { PNJ_LIST } from "../../../../../shared/shared.config";
+import { PNJ_LIST, INTERIOR_PNJ_MAP } from "../../../../../shared/shared.config";
 
 // ── Zone configuration ────────────────────────────────────────────────────────
 
@@ -113,14 +113,13 @@ export function createZone(zone: Zone, world: Matter.World): void {
   });
 }
 
-const PNJ_BODY_SIZE = 14; // px — collision box width & height for each NPC
+const PNJ_BODY_SIZE = 20; // px — collision box width & height for each NPC
 
 /**
  * Add static collision bodies for every visible PNJ in the zone.
  * Bodies are static (won't move on contact) and block players, enemies, and arrows.
  */
 export function createPnjBodies(zone: Zone, world: Matter.World): void {
-  if (zone !== Zone.ROAD) return; // PNJs only live on the road map
   const map = readMap(zone);
   if (!map) return;
 
@@ -132,22 +131,47 @@ export function createPnjBodies(zone: Zone, world: Matter.World): void {
     spawnByName[obj.name] = { x: obj.x, y: obj.y };
   }
 
-  for (const pnj of PNJ_LIST) {
-    if (!pnj.visible) continue;
-    const pos = spawnByName[pnj.spawnPoint];
-    if (!pos) continue;
+  const entries =
+    zone === Zone.ROAD
+      ? PNJ_LIST.filter((p) => p.visible).map((p) => ({
+          spawnPoint:  p.spawnPoint,
+          bodyOffsetX: p.bodyOffsetX ?? p.offsetX,
+          bodyOffsetY: p.bodyOffsetY ?? p.offsetY,
+          label:       `pnj_${p.texture}`,
+        }))
+      : (INTERIOR_PNJ_MAP[zone] ?? []).map((p) => ({
+          spawnPoint:  p.spawnPoint,
+          bodyOffsetX: p.bodyOffsetX ?? 0,
+          bodyOffsetY: p.bodyOffsetY ?? 0,
+          label:       `pnj_interior_${p.spawnPoint}`,
+        }));
 
-    Matter.World.addBody(
-      world,
-      Matter.Bodies.rectangle(
-        pos.x + pnj.offsetX,
-        pos.y + pnj.offsetY,
-        PNJ_BODY_SIZE,
-        PNJ_BODY_SIZE,
-        { ...WALL_CONFIG, label: `pnj_${pnj.texture}` }
-      )
+  let created = 0;
+  for (const entry of entries) {
+    const pos = spawnByName[entry.spawnPoint];
+    if (!pos) {
+      console.warn(`[createPnjBodies] spawn point "${entry.spawnPoint}" not found in zone "${zone}"`);
+      continue;
+    }
+    const body = Matter.Bodies.rectangle(
+      pos.x + entry.bodyOffsetX,
+      pos.y + entry.bodyOffsetY,
+      PNJ_BODY_SIZE,
+      PNJ_BODY_SIZE,
+      {
+        isStatic: true,
+        isSensor: false,
+        label: entry.label,
+        collisionFilter: {
+          category: COLLISION_CATEGORY.WALL,
+          mask: COLLISION_CATEGORY.PLAYER | COLLISION_CATEGORY.ENEMY | COLLISION_CATEGORY.ARROW_HIT_BOX,
+        },
+      }
     );
+    Matter.Composite.add(world, body);
+    created++;
   }
+  if (created > 0) console.log(`[createPnjBodies] zone="${zone}" — ${created} PNJ collision bodies created`);
 }
 
 /**

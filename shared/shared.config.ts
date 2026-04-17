@@ -1,3 +1,5 @@
+import { Zone } from "./types/zone";
+
 // ── Per-character combat / hitbox configuration ───────────────────────────────
 // bodyW/H      : physics collision body (walls, other players)
 // hurtBoxW/H   : damage-receiving box (centered on body)
@@ -84,8 +86,12 @@ export const COMBAT_CONFIG = {
 export interface PnjConfig {
   texture: string;
   spawnPoint: string;
+  /** Sprite offset relative to spawn point */
   offsetX: number;
   offsetY: number;
+  /** Physics body offset relative to spawn point (independent from sprite) */
+  bodyOffsetX?: number;
+  bodyOffsetY?: number;
   visible: boolean;
   atlasKey?: string;
   /** If set, player can interact with this PNJ (dialogue key in dialogues.json) */
@@ -99,11 +105,24 @@ export interface PnjConfig {
 
 export const PNJ_LIST: PnjConfig[] = [
   { texture: "ghost",  spawnPoint: "pnj1", offsetX:  0, offsetY: 0, visible: true,  dialogueId: "ghost", dialogueIdDesktop: "ghost_pc", bubbleOffsetX: 10, bubbleOffsetY: 5 },
-  { texture: "wendy",  spawnPoint: "pnj2", offsetX:  0, offsetY: 0, visible: true, dialogueId: "wendy", bubbleOffsetX: 10, bubbleOffsetY: 15 },
+  { texture: "wendy",  spawnPoint: "pnj2", offsetX:  0, offsetY: 0, bodyOffsetY: 8, visible: true, dialogueId: "wendy", bubbleOffsetX: 10, bubbleOffsetY: 15 },
   { texture: "dino",   spawnPoint: "pnj3", offsetX:  0, offsetY: 0, visible: true, dialogueId: "dino", bubbleOffsetX: 14, bubbleOffsetY: 7 },
-  { texture: "john",   spawnPoint: "pnj4", offsetX:  0, offsetY: 0, visible: true,  dialogueId: "john"  },
-  { texture: "robot",  spawnPoint: "pnj5", offsetX:  0, offsetY: 0, visible: true,  dialogueId: "robot", bubbleOffsetX: 14, bubbleOffsetY: 17   },
+  { texture: "john",   spawnPoint: "pnj4", offsetX:  0, offsetY: 0, bodyOffsetY: 8,visible: true,  dialogueId: "john"  },
+  { texture: "robot",  spawnPoint: "pnj5", offsetX:  0, offsetY: 0, bodyOffsetY: 8, visible: true,  dialogueId: "robot", bubbleOffsetX: 14, bubbleOffsetY: 17   },
 ];
+
+export interface InteriorPnjEntry {
+  spawnPoint: string;
+  bodyOffsetX?: number;
+  bodyOffsetY?: number;
+}
+
+/** Physics collision bodies for NPCs inside interior zones (server-side only). */
+export const INTERIOR_PNJ_MAP: Partial<Record<Zone, InteriorPnjEntry[]>> = {
+  [Zone.INTERIOR_ARCADE]: [
+    { spawnPoint: "pnj1_arcade" },
+  ],
+};
 
 export const ARROW_CONFIG = {
   SPEED: 5,                  // px per physics tick (at 60 fps)

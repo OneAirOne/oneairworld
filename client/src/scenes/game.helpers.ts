@@ -154,6 +154,8 @@ export interface InteractivePnj {
   sprite: Phaser.GameObjects.Sprite;
   bubble: Phaser.GameObjects.Text;
   dialogueId: string;
+  bodyOffsetX?: number;
+  bodyOffsetY?: number;
 }
 
 /**
@@ -306,10 +308,22 @@ export function renderDebugZones(
 
   const g = scene.add.graphics().setDepth(99998);
 
-  // PNJ zones — cyan
+  // PNJ interaction zones — cyan
   g.lineStyle(1, 0x00ffff, 0.7);
   for (const pnj of pnjs) {
     g.strokeCircle(pnj.sprite.x, pnj.sprite.y, pnjRadius);
+  }
+
+  // PNJ physics collision bodies — magenta (20×20 px, matches server PNJ_BODY_SIZE)
+  const PNJ_BODY_SIZE = 20;
+  g.lineStyle(2, 0xff00ff, 1);
+  for (const pnj of pnjs) {
+    g.strokeRect(
+      pnj.sprite.x + (pnj.bodyOffsetX ?? 0) - PNJ_BODY_SIZE / 2,
+      pnj.sprite.y + (pnj.bodyOffsetY ?? 0) - PNJ_BODY_SIZE / 2,
+      PNJ_BODY_SIZE,
+      PNJ_BODY_SIZE
+    );
   }
 
   // Interaction zones — orange
