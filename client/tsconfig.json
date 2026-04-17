@@ -11,7 +11,7 @@
       "events":       ["./src/events"],
       "Game":         ["./src/Game"],
       "client.config":["./src/client.config"],
-      "colyseus.js":  ["./node_modules/colyseus.js/lib/index.d.ts"]
+      "colyseus.js/lib/index": ["./node_modules/colyseus.js/lib/index"]
     },
     "target": "ESNext",
     "useDefineForClassFields": true,
