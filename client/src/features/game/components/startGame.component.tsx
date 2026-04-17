@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 
 // Components
 import LaunchButton from "./lauchButton.component";
@@ -84,12 +85,12 @@ phaserEvents.emit(PhaserEvent.GAME_STARTED);
 
           <p className="text-slate-400 text-base leading-relaxed">
             Curieux de savoir comment c'est fait ? Jetez un œil au projet{" "}
-            <a
-              href="/projets/oneair-world"
+            <Link
+              to="/projets/oneair-world"
               className="text-white font-semibold hover:text-slate-300 transition-colors duration-200"
             >
               OneairWorld
-            </a>.
+            </Link>.
           </p>
 
           <p className="text-slate-400 text-base leading-relaxed mt-4">
