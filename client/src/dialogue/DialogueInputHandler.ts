@@ -44,6 +44,20 @@ export class DialogueInputHandler {
       else this._onEsc?.();
     });
 
+    // Gamepad: East button (Circle / B) → interact / confirm
+    scene.input.gamepad?.on("down", (_pad: Phaser.Input.Gamepad.Gamepad, button: Phaser.Input.Gamepad.Button) => {
+      if (button.index === 1) { // index 1 = East (Circle / B)
+        if (this._manager.isOpen()) this._manager.confirm();
+        else if (this._manager.isInZone()) this._manager.open();
+      }
+      if (button.index === 13) { // D-pad up
+        if (this._manager.isOpen()) this._manager.navigateUp();
+      }
+      if (button.index === 14) { // D-pad down
+        if (this._manager.isOpen()) this._manager.navigateDown();
+      }
+    });
+
     phaserEvents.on(PhaserEvent.MOBILE_INTERACT,  this._onMobileInteract);
     phaserEvents.on(PhaserEvent.MOBILE_NAV_UP,    this._onMobileNavUp);
     phaserEvents.on(PhaserEvent.MOBILE_NAV_DOWN,  this._onMobileNavDown);

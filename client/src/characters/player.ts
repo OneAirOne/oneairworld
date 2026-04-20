@@ -125,12 +125,24 @@ export class Player extends Phaser.GameObjects.Sprite {
       return { left: false, right: false, up: false, down: false, space: false, sprint: false };
     }
 
-    this._inputPayload.left   = this._cursors.left.isDown  || mobileInput.left;
-    this._inputPayload.right  = this._cursors.right.isDown || mobileInput.right;
-    this._inputPayload.up     = this._cursors.up.isDown    || mobileInput.up;
-    this._inputPayload.down   = this._cursors.down.isDown  || mobileInput.down;
-    this._inputPayload.space  = this._cursors.space.isDown || mobileInput.space;
-    this._inputPayload.sprint = this._sprintKey?.isDown ?? false;
+    const pad = this.scene.input.gamepad?.getPad(0);
+    const axisX   = pad?.leftStick.x ?? 0;
+    const axisY   = pad?.leftStick.y ?? 0;
+    const DEAD    = 0.4; // dead zone
+
+    const gpLeft   = axisX < -DEAD || (pad?.left  ?? false);
+    const gpRight  = axisX >  DEAD || (pad?.right ?? false);
+    const gpUp     = axisY < -DEAD || (pad?.up    ?? false);
+    const gpDown   = axisY >  DEAD || (pad?.down  ?? false);
+    const gpAttack = pad?.A ?? false;   // A / Croix → attaque
+    const gpSprint = ((pad?.R2 ?? 0) as number) > 0.5 || !!(pad?.R1 ?? false); // R2 ou R1 → sprint
+
+    this._inputPayload.left   = this._cursors.left.isDown  || mobileInput.left  || gpLeft;
+    this._inputPayload.right  = this._cursors.right.isDown || mobileInput.right || gpRight;
+    this._inputPayload.up     = this._cursors.up.isDown    || mobileInput.up    || gpUp;
+    this._inputPayload.down   = this._cursors.down.isDown  || mobileInput.down  || gpDown;
+    this._inputPayload.space  = this._cursors.space.isDown || mobileInput.space || gpAttack;
+    this._inputPayload.sprint = (this._sprintKey?.isDown ?? false)               || gpSprint;
 
     return this._inputPayload;
   }

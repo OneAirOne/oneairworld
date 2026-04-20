@@ -23,5 +23,8 @@ export const PHASER_CONFIG: Phaser.Types.Core.GameConfig = {
       },
     ],
   },
+  input: {
+    gamepad: true,
+  },
   scene: [BootScene, BackgroundScene, Road, UIScene, InteriorScene],
 };
