@@ -9,12 +9,16 @@ import type { DialogueManager } from "./DialogueManager";
  * @param onAction  Called for every DIALOGUE_ACTION emitted while registered.
  * @param onEsc     Called when ESC is pressed and no dialogue is open (optional).
  */
+const STICK_NAV_COOLDOWN = 300; // ms between stick-triggered nav events
+const STICK_DEAD = 0.5;
+
 export class DialogueInputHandler {
   private _onMobileInteract: () => void;
   private _onMobileNavUp: () => void;
   private _onMobileNavDown: () => void;
   private _onMobileClose: () => void;
   private _onDialogueAction: (action: string) => void;
+  private _lastStickNav = 0;
 
   constructor(
     private readonly _manager: DialogueManager,
@@ -63,6 +67,25 @@ export class DialogueInputHandler {
     phaserEvents.on(PhaserEvent.MOBILE_NAV_DOWN,  this._onMobileNavDown);
     phaserEvents.on(PhaserEvent.MOBILE_CLOSE,     this._onMobileClose);
     phaserEvents.on(PhaserEvent.DIALOGUE_ACTION,  this._onDialogueAction);
+  }
+
+  /** Poll gamepad stick for dialogue navigation. Call every frame from scene.update(). */
+  update(scene: Phaser.Scene) {
+    if (!this._manager.isOpen()) return;
+    const pad = scene.input.gamepad?.getPad(0);
+    if (!pad) return;
+
+    const y = pad.leftStick.y;
+    const now = Date.now();
+    if (now - this._lastStickNav < STICK_NAV_COOLDOWN) return;
+
+    if (y < -STICK_DEAD) {
+      this._manager.navigateUp();
+      this._lastStickNav = now;
+    } else if (y > STICK_DEAD) {
+      this._manager.navigateDown();
+      this._lastStickNav = now;
+    }
   }
 
   /** Remove global mobile listeners. Call when leaving the scene. */

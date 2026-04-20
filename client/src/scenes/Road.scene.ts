@@ -719,6 +719,9 @@ export class Road extends Phaser.Scene {
     // CAMERA
     this.setupCamera();
 
+    // GAMEPAD — dialogue navigation via stick
+    this.dialogueInput.update(this);
+
     // INPUTS — blocked while dialogue is open or intro not yet completed
     const inputs = (this.dialogueManager.isOpen() || !this._introCompleted)
       ? { left: false, right: false, up: false, down: false, space: false, sprint: false }
