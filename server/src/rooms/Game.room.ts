@@ -30,6 +30,7 @@ export class Game extends Room<GameState> {
   private dispatcher = new Dispatcher(this);
   private name: string;
   private password: string | null = null;
+  private readonly createdAt = Date.now();
 
   private engine: GameEngine = null;
 
@@ -44,6 +45,15 @@ export class Game extends Room<GameState> {
     this.name = name;
     this.password = password;
     this.autoDispose = autoDispose;
+
+    // Bound room capacity: once full, Colyseus' joinOrCreate() transparently
+    // spins up a new Game room instead of piling everyone into this one.
+    this.maxClients = SERVER_CONFIG.room.maxClients;
+
+    // Bound room lifetime: retire this room after N days so long-running
+    // state (players, enemies, coins...) can't grow unbounded. Existing
+    // clients get gracefully disconnected and future joins land in a fresh room.
+    this.clock.setInterval(() => this.checkRoomLifetime(), SERVER_CONFIG.room.lifetimeCheckIntervalMs);
 
     let hasPassword = false;
 
@@ -145,6 +155,19 @@ export class Game extends Room<GameState> {
    */
   onLeave(client: Client, consented: boolean) {
     this.engine.removePLayer(client.sessionId);
+  }
+
+  /**
+   * Retire the room once it exceeds its configured max lifetime, so its
+   * state doesn't grow unbounded. Clients are gracefully disconnected and
+   * will land in a freshly created room on their next joinOrCreate() call.
+   */
+  private checkRoomLifetime() {
+    const maxLifetimeMs = SERVER_CONFIG.room.maxLifetimeDays * 24 * 60 * 60 * 1000;
+    if (Date.now() - this.createdAt < maxLifetimeMs) return;
+
+    console.log(`[GAME] Room ${this.roomId} reached its max lifetime (${SERVER_CONFIG.room.maxLifetimeDays} day(s)), disconnecting clients`);
+    this.disconnect();
   }
 
   /**
