@@ -10,7 +10,7 @@ export const SERVER_CONFIG = {
     // Max simultaneous players per room. Once reached, Colyseus'
     // `joinOrCreate` automatically spins up a new room instead of
     // overloading this one (see https://docs.colyseus.io/server/room/#maxclients-number).
-    maxClients: 2,
+    maxClients: 5,
     // Max lifetime of a room, in days. Past this, the room is gracefully
     // disconnected/disposed so a fresh one is created for future players —
     // keeps long-lived state (players, enemies, coins...) from growing
