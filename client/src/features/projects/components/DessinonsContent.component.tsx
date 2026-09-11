@@ -1,12 +1,15 @@
+import { useTranslation } from "react-i18next";
+
 export default function DessinonsContent() {
+  const { t } = useTranslation("projects");
   return (
     <>
       <section className="max-w-4xl mx-auto px-6 pt-20 pb-16">
         <p className="text-brand-primary text-xs font-semibold tracking-widest uppercase mb-4">
-          Projet — Application collaborative
+          {t("dessinons.page.kicker")}
         </p>
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-          Dessinons.io
+          {t("dessinons.page.title")}
         </h1>
       </section>
 
@@ -104,9 +107,9 @@ export default function DessinonsContent() {
         </svg>
 
         <div className="text-center">
-          <p className="text-2xl font-semibold text-white mb-3">En cours de développement</p>
+          <p className="text-2xl font-semibold text-white mb-3">{t("dessinons.page.inProgress")}</p>
           <p className="text-slate-500 text-sm max-w-xs leading-relaxed">
-            POC réalisé pour tester les possibilités de collaboration en temps réel sur un canvas partagé, avec synchronisation des traits et des outils de dessin.
+            {t("dessinons.page.description")}
           </p>
         </div>
       </section>

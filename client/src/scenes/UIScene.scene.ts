@@ -5,6 +5,7 @@ import { phaserEvents, PhaserEvent } from "../events/eventManager";
 import { mobileInput } from "../input/mobileInput";
 import type { DialoguePayload, DialogueNavigatePayload } from "../dialogue/DialogueManager";
 import { POTION_CONFIG } from "../../../shared/shared.config";
+import i18n from "../i18n/i18n";
 
 const DIALOGUE_BOX_HEIGHT = 140;    // fixed height on PC
 const DIALOGUE_BOX_MIN_HEIGHT = 80; // minimum height on mobile (dynamic)
@@ -101,7 +102,7 @@ export class UIScene extends Phaser.Scene {
 
     // --- Zone hint ---
     this.zoneHint = this.add
-      .text(W / 2, this.boxY - 8, "Appuyer sur Entrée pour parler", {
+      .text(W / 2, this.boxY - 8, i18n.t("ui.talkHint", { ns: "game" }), {
         fontSize: "13px",
         color: "#ffffff",
         padding: { x: 10, y: 5 },
@@ -130,7 +131,7 @@ export class UIScene extends Phaser.Scene {
 
     // --- "Enter ▶" hint bottom-right ---
     this.dialogueHint = this.add
-      .text(this.boxX + this.boxW - DIALOGUE_BOX_PADDING, 0, "Entrée ▶", {
+      .text(this.boxX + this.boxW - DIALOGUE_BOX_PADDING, 0, i18n.t("ui.enterNext", { ns: "game" }), {
         fontSize: "11px",
         color: "#888888",
       })
@@ -141,7 +142,8 @@ export class UIScene extends Phaser.Scene {
     this._killCount = 0;
     this._killBadge = document.createElement("div");
     this._killBadge.style.cssText =
-      "position:fixed;top:12px;right:12px;display:flex;align-items:center;gap:6px;" +
+      // top offset leaves room for the language switcher pill fixed top-right
+      "position:fixed;top:64px;right:12px;display:flex;align-items:center;gap:6px;" +
       "background:rgba(0,0,0,0.6);padding:5px 10px;border-radius:8px;" +
       "border:1px solid rgba(255,255,255,0.3);z-index:10;pointer-events:none;";
 
@@ -161,7 +163,7 @@ export class UIScene extends Phaser.Scene {
     // --- Coin counter (DOM overlay, below kill badge) ---
     this._coinBadge = document.createElement("div");
     this._coinBadge.style.cssText =
-      "position:fixed;top:66px;right:12px;display:flex;align-items:center;gap:6px;" +
+      "position:fixed;top:118px;right:12px;display:flex;align-items:center;gap:6px;" +
       "background:rgba(0,0,0,0.6);padding:5px 10px;border-radius:8px;" +
       "border:1px solid rgba(255,255,255,0.3);z-index:10;pointer-events:none;";
 
@@ -181,7 +183,7 @@ export class UIScene extends Phaser.Scene {
     // --- Speed boost timer (DOM overlay, below coin badge) ---
     this._boostBadge = document.createElement("div");
     this._boostBadge.style.cssText =
-      "position:fixed;top:120px;right:12px;display:flex;align-items:center;gap:6px;" +
+      "position:fixed;top:172px;right:12px;display:flex;align-items:center;gap:6px;" +
       "background:rgba(0,0,0,0.6);padding:5px 10px;border-radius:8px;" +
       "border:1px solid rgba(100,180,255,0.6);z-index:10;pointer-events:none;display:none;";
 
@@ -229,7 +231,7 @@ export class UIScene extends Phaser.Scene {
         );
       }
       this.dialogueBg.setVisible(true);
-      this.dialogueHint.setText(choices.length === 0 ? "Fermer ✕" : "Entrée ▶").setVisible(true);
+      this.dialogueHint.setText(choices.length === 0 ? i18n.t("ui.close", { ns: "game" }) : i18n.t("ui.enterNext", { ns: "game" })).setVisible(true);
       this._renderChoices(choices, 0);
       this._syncMobileButtons();
       // Always render UI on top of every other scene
@@ -269,7 +271,7 @@ export class UIScene extends Phaser.Scene {
       this._inZone = true;
       // On mobile the interact button replaces the text hint
       if (!this._isTouchDevice) {
-        this._showHint("Appuyer sur Entrée pour parler");
+        this._showHint(i18n.t("ui.talkHint", { ns: "game" }));
       }
       this._syncMobileButtons();
     };

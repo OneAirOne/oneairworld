@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 const TECH = ["Vue", "Vuex", "Node.js", "Express"];
 
 function TechChip({ label }: { label: string }) {
@@ -9,27 +11,25 @@ function TechChip({ label }: { label: string }) {
 }
 
 export default function PepperAtelierContent() {
+  const { t } = useTranslation("projects");
   return (
     <>
       {/* ── Hero ── */}
       <section className="max-w-4xl mx-auto px-6 pt-20 pb-16">
         <p className="text-brand-primary text-xs font-semibold tracking-widest uppercase mb-4">
-          Projet — Site vitrine e-commerce
+          {t("pepper-atelier-snowboard.page.kicker")}
         </p>
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-          Pepper Atelier
+          {t("pepper-atelier-snowboard.page.title")}
         </h1>
         <p className="text-slate-400 text-lg leading-relaxed max-w-2xl mb-4">
-          Site vitrine pour un artisan shaper de snowboards en bois. Pepper Atelier
-          présente sa collection faite main, détaille le processus de fabrication
-          planche par planche, et met en avant le savoir-faire artisanal derrière
-          chaque modèle.
+          {t("pepper-atelier-snowboard.page.hero")}
         </p>
         <p className="text-slate-500 text-sm mb-4">
-          Développé pour un ami artisan shaper
+          {t("pepper-atelier-snowboard.page.subCaption")}
         </p>
         <div className="flex flex-wrap gap-2">
-          {TECH.map((t) => <TechChip key={t} label={t} />)}
+          {TECH.map((tech) => <TechChip key={tech} label={tech} />)}
         </div>
       </section>
 
@@ -51,28 +51,26 @@ export default function PepperAtelierContent() {
       {/* ── Architecture ── */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
         <div className="border-t border-brand-surface pt-16">
-          <h2 className="text-2xl font-semibold mb-2">Architecture</h2>
+          <h2 className="text-2xl font-semibold mb-2">{t("pepper-atelier-snowboard.page.archTitle")}</h2>
           <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-xl">
-            Le projet intègre un back-office permettant à l'artisan de gérer sa
-            collection en autonomie — ajout, modification et suppression de planches
-            sans toucher au code. L'accès est sécurisé par authentification.
+            {t("pepper-atelier-snowboard.page.archText")}
           </p>
 
           {/* Admin screenshot */}
           <div className="rounded-xl overflow-hidden border border-slate-700 bg-brand-surface mb-12">
             <img
               src="/assets/pepper-atelier/admin.png"
-              alt="Interface d'administration Pepper Atelier"
+              alt={t("pepper-atelier-snowboard.page.adminAlt")}
               className="w-full object-contain"
             />
           </div>
 
           {/* Schema */}
-          <h3 className="text-lg font-semibold mb-4">Schéma d'architecture</h3>
+          <h3 className="text-lg font-semibold mb-4">{t("pepper-atelier-snowboard.page.schemaTitle")}</h3>
           <div className="rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
             <img
               src="/assets/pepper-atelier/schema-architecture.png"
-              alt="Schéma d'architecture Pepper Atelier"
+              alt={t("pepper-atelier-snowboard.page.schemaAlt")}
               className="w-full object-contain"
             />
           </div>
@@ -82,14 +80,14 @@ export default function PepperAtelierContent() {
       {/* ── Visit CTA ── */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
         <div className="border-t border-brand-surface pt-16 flex flex-col items-center text-center gap-4">
-          <p className="text-slate-400 text-sm">Envie de voir les planches ?</p>
+          <p className="text-slate-400 text-sm">{t("pepper-atelier-snowboard.page.ctaText")}</p>
           <a
             href="https://www.pepperatelier.com/home"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-500 text-slate-300 text-sm hover:border-white hover:text-white transition-colors"
           >
-            Visiter Pepper Atelier →
+            {t("pepper-atelier-snowboard.page.ctaLink")}
           </a>
         </div>
       </section>

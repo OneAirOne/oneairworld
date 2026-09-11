@@ -1,8 +1,12 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { phaserEvents, PhaserEvent } from "../../../events/eventManager";
+import { getCvUrl, getCvFilename } from "../../../config/cv.config";
 
 export function CvPopup() {
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
+  const cvUrl = getCvUrl();
 
   React.useEffect(() => {
     const onOpen = () => setOpen(true);
@@ -34,12 +38,12 @@ export function CvPopup() {
       >
         <div className="flex items-center justify-between px-3 py-2 bg-gray-900">
           <a
-            href="/assets/cv-erwan-gilbert.pdf"
-            download="cv-erwan-gilbert.pdf"
+            href={cvUrl}
+            download={getCvFilename()}
             className="text-white text-sm hover:underline"
             onClick={(e) => e.stopPropagation()}
           >
-            ⬇ Télécharger
+            {t("cvPopup.download")}
           </a>
           <button
             className="bg-black/60 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm hover:bg-black/90"
@@ -49,9 +53,9 @@ export function CvPopup() {
           </button>
         </div>
         <iframe
-          src="/assets/cv-erwan-gilbert.pdf"
+          src={cvUrl}
           className="flex-1 w-full border-0"
-          title="CV d'Erwan Gilbert"
+          title={t("cvPopup.title")}
         />
       </div>
     </div>

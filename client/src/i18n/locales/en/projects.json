@@ -1,0 +1,134 @@
+{
+  "everflow": {
+    "name": "Everflow",
+    "description": "Professional work — Everflow.",
+    "page": {
+      "kicker": "Professional work · Everblix · 2019 – 2026",
+      "hero": "Non-invasive ultrasonic energy and flow meter. The device clips onto an existing pipe without interrupting the circuit, and reports its readings to a real-time web supervision app.",
+      "heroImageAlt": "Everflow — non-invasive ultrasonic meter",
+      "heroCaption": "Meter clipped onto a pipe",
+      "section2Title": "Supervision app",
+      "section2Text": "The web app serves as an IoT fleet management platform. It centralizes and monitors every deployed meter: streaming real-time readings, sending commands to devices (firmware updates, reconfiguration), and viewing device information — connection status, version, identifiers, event history.",
+      "section2ImageAlt": "Everflow — web supervision app",
+      "section2Caption": "Everflow supervision dashboard"
+    }
+  },
+  "actimicro": {
+    "name": "Actimicro",
+    "description": "Professional work — Actimicro.",
+    "page": {
+      "kicker": "Professional work · Everblix · 2019 – 2026",
+      "hero": "Sensor measuring soil microbiological activity. Deployed directly in the field, the measuring bell automatically records three key indicators every four hours — CO₂ concentration, temperature and soil moisture — helping farmers adapt their practices and optimize yields.",
+      "heroImageAlt": "Actimicro — field measuring sensor",
+      "heroCaption": "Measuring bell deployed in the field",
+      "section2Title": "Supervision app",
+      "section2Text": "The web app centralizes management of the deployed sensor fleet. It lets you view readings from each device in real time, access historical data across multiple seasons, receive alerts on notable events, and consult regular reports on soil vitality indicators. Commands can be sent to sensors to update or reconfigure them remotely.",
+      "section2ImageAlt": "Actimicro — web supervision app",
+      "section2Caption": "Actimicro supervision dashboard"
+    }
+  },
+  "smartdriver": {
+    "name": "Smartdriver",
+    "description": "Professional work — Smartdriver.",
+    "page": {
+      "kicker": "Professional work · Everblix · 2019 – 2026",
+      "hero": "Universal motor control solution. The Smartdriver acts as a protocol translator — it converts incoming commands into the specific language required by each motor or actuator, allowing obsolete equipment to be replaced without changing the existing installation. With up to 6 driver modules per unit, it targets industrial robotics, CNC machines, lab automation and scientific instrumentation.",
+      "heroImageAlt": "Smartdriver — motor driver unit",
+      "heroCaption": "Smartdriver unit — up to 6 driver modules",
+      "section2Title": "Configuration app",
+      "section2Text": "Desktop app built with Electron for configuring and tuning Smartdriver modules over a USB connection. It offers an intuitive interface to set up motors, send direct commands via a serial terminal, perform firmware updates and monitor axis status in real time.",
+      "section2ImageAlt": "Smartdriver — configuration app",
+      "section2Caption": "Smartdriver configuration and tuning interface"
+    }
+  },
+  "samurai-ball": {
+    "name": "Samurai Ball",
+    "description": "An action game built with a friend — play as a samurai and master the ball to defeat your enemies.",
+    "hintDesktop": "Press Enter to view the Samurai Ball project",
+    "hintMobile": "Tap the 💬 icon to view the Samurai Ball project",
+    "page": {
+      "kicker": "Project — Video game",
+      "hero": "An arena fighting game inspired by the Smash Bros genre, where reflexes and technique clash every round. Gravity is at the heart of the gameplay — the fireball launches fighters into the air, opening the way to aerial exchanges as unpredictable as they are spectacular.",
+      "collab": "Built in collaboration with a friend, Animator / Motion designer",
+      "modelingTitle": "3D modeling",
+      "modelingText": "Characters and environments were modeled and animated entirely from scratch. Here are a few previews of the animations in action.",
+      "gifs": {
+        "fire": "Fireball",
+        "doubleJump": "Double jump",
+        "frontHit": "Front hit"
+      },
+      "makingOffTitle": "Making-of",
+      "steamCta": "The game is coming soon to Steam.",
+      "steamBadge": "Coming soon on Steam"
+    }
+  },
+  "pepper-atelier-snowboard": {
+    "name": "Pepper Atelier Snowboard",
+    "description": "Professional work — Pepper Atelier Snowboard.",
+    "hintDesktop": "Press Enter to view the Pepper Atelier Snowboard project",
+    "hintMobile": "Tap the 💬 icon to view the Pepper Atelier Snowboard project",
+    "page": {
+      "kicker": "Project — E-commerce showcase site",
+      "title": "Pepper Atelier",
+      "hero": "Showcase site for a craftsman who hand-shapes wooden snowboards. Pepper Atelier presents his handmade collection, details the board-by-board manufacturing process, and highlights the craftsmanship behind every model.",
+      "subCaption": "Built for a friend, craftsman shaper",
+      "archTitle": "Architecture",
+      "archText": "The project includes a back office that lets the craftsman manage his collection independently — adding, editing and removing boards without touching any code. Access is secured with authentication.",
+      "adminAlt": "Pepper Atelier admin interface",
+      "schemaTitle": "Architecture diagram",
+      "schemaAlt": "Pepper Atelier architecture diagram",
+      "ctaText": "Want to see the boards?",
+      "ctaLink": "Visit Pepper Atelier →"
+    }
+  },
+  "old-portfolio": {
+    "name": "Old portfolio",
+    "description": "My first portfolio — a previous version of my online presentation.",
+    "hintDesktop": "Press Enter to view the old portfolio",
+    "hintMobile": "Tap the 💬 icon to view the old portfolio",
+    "page": {
+      "kicker": "Project — Interactive portfolio",
+      "hero": "Built right after graduating from Epitech, this project was already an interactive resume concept — a world to explore to discover my background. Entirely coded in vanilla JavaScript, with no framework or game engine. The big difference with what you're exploring today: it wasn't multiplayer. Each visitor moved alone through their own world.",
+      "subCaption": "Built right after graduating from Epitech",
+      "ctaText": "Curious what it looked like?",
+      "ctaLink": "Visit the old portfolio →"
+    }
+  },
+  "oneair-world": {
+    "name": "OneairWorld",
+    "description": "The making-of this interactive multiplayer world.",
+    "hintDesktop": "Press Enter to view the OneairWorld project",
+    "hintMobile": "Tap the 💬 icon to view the OneairWorld project",
+    "page": {
+      "kicker": "Project — Making-of",
+      "hero": "You're exploring the result right now. OneairWorld is an interactive multiplayer resume — a persistent world where every visitor moves in real time alongside others. Players' positions, actions and states are synchronized over WebSocket every frame.",
+      "subCaption": "Project started 4 years ago — several cycles of testing and technology research.",
+      "videoCaption": "Each player's data — position, direction, state — is sent to the server on every input and broadcast to all clients connected to the same Colyseus room. Physics (Matter.js) runs exclusively server-side: the client sends inputs, the server responds with the authoritative state.",
+      "stackTitle": "Tech stack",
+      "stack": {
+        "colyseus": "Backend multiplayer framework — room management and real-time state synchronization",
+        "matter": "Server-side physics engine — collisions, velocities, rigid bodies",
+        "phaser": "Frontend game engine — scene rendering, animations, inputs",
+        "react": "User interface — overlays, dialogues, out-of-game screens",
+        "tailwind": "Styling for the React components",
+        "docker": "Containerization and deployment of the Colyseus server"
+      },
+      "architectureTitle": "Architecture diagram",
+      "architectureAlt": "OneairWorld architecture diagram",
+      "ctaText": "Want to explore the world?",
+      "ctaLink": "Back to home →"
+    }
+  },
+  "dessinons": {
+    "name": "Dessinons",
+    "description": "Collaborative online drawing application.",
+    "hintDesktop": "Press Enter to view the Dessinons project",
+    "hintMobile": "Tap the 💬 icon to view the Dessinons project",
+    "page": {
+      "kicker": "Project — Collaborative application",
+      "title": "Dessinons.io",
+      "inProgress": "In development",
+      "description": "A proof of concept built to test real-time collaboration on a shared canvas, with synchronized strokes and drawing tools."
+    }
+  }
+}

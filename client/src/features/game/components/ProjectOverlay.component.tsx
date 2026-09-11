@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { phaserEvents, PhaserEvent } from "../../../events/eventManager";
 import SamuraiBallContent from "../../projects/components/SamuraiBallContent.component";
 import OldPortfolioContent from "../../projects/components/OldPortfolioContent.component";
@@ -8,6 +9,7 @@ import OneAirWorldContent from "../../projects/components/OneAirWorldContent.com
 
 // TODO: make an enum
 function ProjectContent({ projectId }: { projectId: string }) {
+  const { t } = useTranslation();
   switch (projectId) {
     case "samurai-ball":
       return <SamuraiBallContent />;
@@ -22,13 +24,14 @@ function ProjectContent({ projectId }: { projectId: string }) {
     default:
       return (
         <div className="flex items-center justify-center h-full text-slate-400 text-sm">
-          Projet bientôt disponible
+          {t("projectOverlay.comingSoon")}
         </div>
       );
   }
 }
 
 export function ProjectOverlay() {
+  const { t } = useTranslation();
   const [projectId, setProjectId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -63,7 +66,7 @@ export function ProjectOverlay() {
           onClick={close}
           className="text-slate-400 text-sm hover:text-white transition-colors"
         >
-          ← Retour au jeu
+          {t("projectOverlay.backToGame")}
         </button>
       </header>
       <main>

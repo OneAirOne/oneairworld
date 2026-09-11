@@ -2,7 +2,8 @@ import { Zone } from "../../../shared/types";
 import type { LayerConfig } from "./road.config";
 import { TiledLayer } from "./road.config";
 import type { PnjSpawnConfig, PoiZoneConfig } from "./game.helpers";
-import { PROJECTS } from "../config/projects.config";
+import { PROJECTS, getProjectName, getProjectHintDesktop, getProjectHintMobile } from "../config/projects.config";
+import i18n from "../i18n/i18n";
 
 const ARCADE_PROJECTS = PROJECTS.filter((p) => p.isOnArcade);
 
@@ -50,7 +51,7 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
     ],
     playerSpawn: { x: 128, y: 200 },
     returnSpawn: { x: 0, y: 0 },
-    label: "Repaire du fantôme",
+    label: i18n.t("interiors.oldHouse.label", { ns: "game" }),
   },
   [Zone.INTERIOR_GAME_ROOM]: {
     mapKey: "interior-robot",
@@ -60,7 +61,7 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
     ],
     playerSpawn: { x: 128, y: 200 },
     returnSpawn: { x: 0, y: 0 },
-    label: "Robot's lab",
+    label: i18n.t("interiors.gameRoom.label", { ns: "game" }),
   },
   [Zone.INTERIOR_ARCADE]: {
     mapKey: "interior-arcade",
@@ -72,14 +73,14 @@ export const INTERIORS: Partial<Record<Zone, InteriorConfig>> = {
     ],
     playerSpawn: { x: 128, y: 200 },
     returnSpawn: { x: 0, y: 0 },
-    label: "Arcade",
+    label: i18n.t("interiors.arcade.label", { ns: "game" }),
     pnjs: [
       { spawnPoint: "pnj1_arcade", texture: "wendy", animKey: "wendyIdle", dialogueId: "wendy_arcade", bubbleOffsetX: 10, bubbleOffsetY: 15 },
     ],
     poiZones: ARCADE_PROJECTS.map((p, i) => ({
       spawnPoint:  `project${i + 1}`,
-      text:        p.hintDesktop ?? `Entrée — voir «${p.name}»`,
-      textMobile:  p.hintMobile  ?? `Voir «${p.name}»`,
+      text:        getProjectHintDesktop(p.id) ?? `Enter — ${getProjectName(p.id)}`,
+      textMobile:  getProjectHintMobile(p.id)  ?? getProjectName(p.id),
       action:      `open_project:${p.id}`,
       radius:      30,
     })),

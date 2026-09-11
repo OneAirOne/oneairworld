@@ -1,0 +1,378 @@
+{
+  "ghost_intro": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Hey traveler! I've been stuck in this town for quite a while… which gave me plenty of time to learn all about Erwan! Move around with the joystick at the bottom-left of the screen.",
+        "choices": [
+          { "label": "Okay!", "next": "tip" }
+        ]
+      },
+      "tip": {
+        "text": "Go see Wendy — she runs the arcade room next to the LinkedIn offices, and she might show you some ongoing projects. Enjoy your visit!",
+        "choices": [
+          { "label": "On my way!", "next": "bye" },
+          { "label": "Thanks!", "next": "bye" }
+        ]
+      },
+      "bye": {
+        "text": "And watch out for the little monsters along the way — you can attack them with the sword icon at the bottom-right!",
+        "choices": []
+      }
+    }
+  },
+  "ghost_intro_pc": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Hey traveler! I've been stuck in this town for quite a while… which gave me plenty of time to learn all about Erwan! Move with the arrow keys and confirm with Enter.",
+        "choices": [
+          { "label": "Okay!", "next": "tip" }
+        ]
+      },
+      "tip": {
+        "text": "Go see Wendy — she runs the arcade room next to the LinkedIn offices, and she might show you some ongoing projects. Enjoy your visit!",
+        "choices": [
+          { "label": "On my way!", "next": "bye" },
+          { "label": "Thanks!", "next": "bye" }
+        ]
+      },
+      "bye": {
+        "text": "And watch out for the little monsters along the way — you can attack them with the Space key!",
+        "choices": []
+      }
+    }
+  },
+  "ghost": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "So, did you find what you were looking for about Erwan?",
+        "choices": [
+          { "label": "Yes, thanks!", "next": "bye" },
+          { "label": "No, I haven't found it.", "next": "redirect" },
+          { "label": "Tell me more about him.", "next": "career" },
+          { "label": "Where can I find his links?", "next": "links" }
+        ]
+      },
+      "redirect": {
+        "text": "Go check out the arcade room next to the LinkedIn offices — Wendy runs it. She's put all of Erwan's projects on display there, you're sure to find what you're after!",
+        "choices": [
+          { "label": "On my way!", "next": "bye" }
+        ]
+      },
+      "career": {
+        "text": "Erwan started his career in finance, then pivoted into data and software development. Quite a turn! Today he builds apps and interactive experiences… like this one!",
+        "choices": [
+          { "label": "Impressive! And his links?", "next": "links" },
+          { "label": "Thanks!", "next": "bye" }
+        ]
+      },
+      "links": {
+        "text": "His resume is right in front of his house. Want me to open his LinkedIn or his GitHub for you?",
+        "choices": [
+          { "label": "LinkedIn", "next": "linkedin" },
+          { "label": "GitHub", "next": "github" },
+          { "label": "No thanks.", "next": "bye" }
+        ]
+      },
+      "linkedin": {
+        "text": "Spot the building with the LinkedIn logo in the street — get close to it to open the link!",
+        "choices": []
+      },
+      "github": {
+        "text": "Spot the building with the GitHub logo in the street — get close to it to open the link!",
+        "choices": []
+      },
+      "bye": {
+        "text": "Enjoy your visit... and watch out for the little monsters!",
+        "choices": []
+      }
+    }
+  },
+  "ghost_pc": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "So, did you find what you were looking for about Erwan?",
+        "choices": [
+          { "label": "Yes, thanks!", "next": "bye" },
+          { "label": "No, I haven't found it.", "next": "redirect" },
+          { "label": "Tell me more about him.", "next": "career" },
+          { "label": "Where can I find his links?", "next": "links" }
+        ]
+      },
+      "redirect": {
+        "text": "Go check out the arcade room next to the LinkedIn offices — Wendy runs it. She's put all of Erwan's projects on display there, you're sure to find what you're after!",
+        "choices": [
+          { "label": "On my way!", "next": "bye" }
+        ]
+      },
+      "career": {
+        "text": "Erwan started his career in finance, then pivoted into data and software development. Quite a turn! Today he builds apps and interactive experiences… like this one!",
+        "choices": [
+          { "label": "Impressive! And his links?", "next": "links" },
+          { "label": "Thanks!", "next": "bye" }
+        ]
+      },
+      "links": {
+        "text": "His resume is right in front of his house. Want me to open his LinkedIn or his GitHub for you?",
+        "choices": [
+          { "label": "LinkedIn", "next": "linkedin" },
+          { "label": "GitHub", "next": "github" },
+          { "label": "No thanks.", "next": "bye" }
+        ]
+      },
+      "linkedin": {
+        "text": "Spot the building with the LinkedIn logo in the street — get close to it to open the link!",
+        "choices": []
+      },
+      "github": {
+        "text": "Spot the building with the GitHub logo in the street — get close to it to open the link!",
+        "choices": []
+      },
+      "bye": {
+        "text": "Enjoy your visit... and watch out for the little monsters!",
+        "choices": []
+      }
+    }
+  },
+  "wendy": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Welcome! I run this arcade room. Inside you'll find Erwan's projects — he put everything on display in there. Want to take a look?",
+        "choices": [
+          { "label": "Yes, I'm in!", "next": "enter" },
+          { "label": "Not right now.", "next": "bye" }
+        ]
+      },
+      "enter": {
+        "text": "Come on in, take your time. There are some great things to discover.",
+        "action": "enter_interior:interior_arcade",
+        "choices": []
+      },
+      "bye": {
+        "text": "No worries, the room stays open.",
+        "choices": []
+      }
+    }
+  },
+  "wendy_arcade": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "The arcade machines showcase Erwan's projects — get close to one to learn more. To leave, go through the door at the top of the room.",
+        "choices": []
+      }
+    }
+  },
+  "dino": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "RAWRRR! I'm TacoRex! I can restore your strength with a taco... or sell you the speed boost for 10 coins. What'll it be?",
+        "choices": [
+          { "label": "The speed boost (5 🪙)", "next": "boost_confirm" },
+          { "label": "A taco!", "next": "eat" },
+          { "label": "No thanks.", "next": "bye" }
+        ]
+      },
+      "boost_confirm": {
+        "text": "Deal! Enjoy the boost — and watch out for slimes!",
+        "action": "buy_boost",
+        "choices": []
+      },
+      "eat": {
+        "text": "There you go! Full of energy. By the way, want to know more about Erwan? Go check out the arcade room!",
+        "action": "restore_life",
+        "choices": []
+      },
+      "bye": {
+        "text": "No worries! TacoRex is always here.",
+        "choices": []
+      }
+    }
+  },
+  "dino_broke": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "RAWRRR! I sell the speed boost for 5 coins... but you don't have enough right now! Come back once you've got 5 coins. In the meantime, a taco?",
+        "choices": [
+          { "label": "A taco!", "next": "eat" },
+          { "label": "I'll be back!", "next": "bye" }
+        ]
+      },
+      "eat": {
+        "text": "There you go! Full of energy. Collect some coins and come see me again!",
+        "action": "restore_life",
+        "choices": []
+      },
+      "bye": {
+        "text": "See you soon! The coins are waiting for you out in the street.",
+        "choices": []
+      }
+    }
+  },
+  "project1": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Machine: «Samurai Ball» — Want to check out this game built with a friend?",
+        "choices": [
+          { "label": "Yes!", "next": "open" },
+          { "label": "No thanks.", "next": "bye" }
+        ]
+      },
+      "open": {
+        "text": "Enjoy!",
+        "action": "open_project:samurai-ball",
+        "choices": []
+      },
+      "bye": {
+        "text": "",
+        "choices": []
+      }
+    }
+  },
+  "project2": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Machine: «Pepper Atelier Snowboard» — Want to check out this e-commerce project?",
+        "choices": [
+          { "label": "Yes!", "next": "open" },
+          { "label": "No thanks.", "next": "bye" }
+        ]
+      },
+      "open": {
+        "text": "Enjoy!",
+        "action": "open_project:pepper-atelier-snowboard",
+        "choices": []
+      },
+      "bye": {
+        "text": "",
+        "choices": []
+      }
+    }
+  },
+  "project3": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Machine: «Old portfolio» — Want to see the previous version of Erwan's portfolio?",
+        "choices": [
+          { "label": "Yes!", "next": "open" },
+          { "label": "No thanks.", "next": "bye" }
+        ]
+      },
+      "open": {
+        "text": "Enjoy!",
+        "action": "open_project:old-portfolio",
+        "choices": []
+      },
+      "bye": {
+        "text": "",
+        "choices": []
+      }
+    }
+  },
+  "project4": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Machine: «Dessinons» — Want to check out this collaborative drawing app?",
+        "choices": [
+          { "label": "Yes!", "next": "open" },
+          { "label": "No thanks.", "next": "bye" }
+        ]
+      },
+      "open": {
+        "text": "Enjoy!",
+        "action": "open_project:dessinons",
+        "choices": []
+      },
+      "bye": {
+        "text": "",
+        "choices": []
+      }
+    }
+  },
+  "exit_interior": {
+    "start": "ask",
+    "nodes": {
+      "ask": {
+        "text": "Do you want to leave?",
+        "choices": [
+          { "label": "Yes, I'm leaving.", "next": "yes" },
+          { "label": "No, I'll stay.", "next": "no" }
+        ]
+      },
+      "yes": {
+        "text": "See you soon!",
+        "action": "exit_interior",
+        "choices": []
+      },
+      "no": {
+        "text": "",
+        "choices": []
+      }
+    }
+  },
+  "john": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "Hey! I'm John. Did you know Erwan started out building data tools before moving into full-stack development? He worked on ETL pipelines, business intelligence apps, and now interactive experiences like this one!",
+        "choices": [
+          { "label": "Impressive!", "next": "more" },
+          { "label": "Noted, thanks!", "next": "bye" }
+        ]
+      },
+      "more": {
+        "text": "Yeah, he likes mixing domains. Data, code, games — he doesn't stick to just one box. You should check out his projects in the arcade room!",
+        "choices": []
+      },
+      "bye": {
+        "text": "Enjoy your visit!",
+        "choices": []
+      }
+    }
+  },
+  "robot": {
+    "start": "intro",
+    "nodes": {
+      "intro": {
+        "text": "BZZZT— Identification: RoboCop. Law enforcement unit… well, sort of. It's really just a costume but people still step out of the way in the street, so I keep it on.",
+        "choices": [
+          { "label": "Haha, fair enough.", "next": "billboard" },
+          { "label": "You're not really scary.", "next": "billboard" }
+        ]
+      },
+      "billboard": {
+        "text": "Hey, did you see the billboard on your way here? That's the next game Erwan's working on — and honestly, it looks really promising!",
+        "choices": [
+          { "label": "Really? What is it?", "next": "details" },
+          { "label": "No, I missed it.", "next": "details" },
+          { "label": "Not really my thing.", "next": "bye" }
+        ]
+      },
+      "details": {
+        "text": "There's already a trailer — the concept is solid, the atmosphere is really polished. The kind of project that makes you want to play from the first minute.",
+        "choices": [
+          { "label": "I want to know more!", "next": "arcade" },
+          { "label": "Interesting...", "next": "arcade" }
+        ]
+      },
+      "arcade": {
+        "text": "You'll find all the details at the arcade room — there's a dedicated machine. Go check it out, it's worth it!",
+        "choices": []
+      },
+      "bye": {
+        "text": "No worries! If you change your mind, the arcade room is right nearby.",
+        "choices": []
+      }
+    }
+  }
+}

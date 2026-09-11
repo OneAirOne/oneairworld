@@ -1,0 +1,41 @@
+{
+  "ui": {
+    "talkHint": "Appuyer sur Entrée pour parler",
+    "enterNext": "Entrée ▶",
+    "close": "Fermer ✕"
+  },
+  "road": {
+    "cv": {
+      "text": "Appuyer sur Entrée pour voir le CV d'Erwan",
+      "textMobile": "Appuyer sur l'icône 💬 pour voir le CV d'Erwan"
+    },
+    "linkedin": {
+      "text": "Appuyer sur Entrée pour ouvrir le LinkedIn d'Erwan",
+      "textMobile": "Appuyer sur l'icône 💬 pour ouvrir le LinkedIn d'Erwan"
+    },
+    "github": {
+      "text": "Appuyer sur Entrée pour ouvrir le GitHub d'Erwan",
+      "textMobile": "Appuyer sur l'icône 💬 pour ouvrir le GitHub d'Erwan"
+    },
+    "samuraiBallPoster": {
+      "text": "Cette affiche est celle d'un jeu développé par Erwan avec un ami — rends-toi à la salle d'arcade pour en savoir plus !"
+    },
+    "isComing": {
+      "text": "Rien à voir ici pour le moment… mais ça ne devrait pas tarder à changer !"
+    },
+    "notHere": {
+      "text": "Je crois que je suis en train de m'égarer... Je devrais peut-être aller voir cette salle d'arcade."
+    },
+    "doorClose": {
+      "text": "Ça m'a l'air fermé..."
+    },
+    "tooLow": {
+      "text": "Il n'y a rien d'intéressant à voir en bas."
+    }
+  },
+  "interiors": {
+    "oldHouse": { "label": "Repaire du fantôme" },
+    "gameRoom": { "label": "Laboratoire du robot" },
+    "arcade": { "label": "Salle d'arcade" }
+  }
+}

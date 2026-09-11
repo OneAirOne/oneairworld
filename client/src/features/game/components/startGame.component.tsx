@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
+import { Trans, useTranslation } from "react-i18next";
 
 // Components
 import LaunchButton from "./lauchButton.component";
@@ -17,6 +18,7 @@ import { Characters } from "../../../../../shared/types";
 const FADE_DURATION = 500;
 
 export function StartGame() {
+  const { t } = useTranslation();
   const [visible, setVisible] = React.useState(true);
   const [fading, setFading] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -72,35 +74,50 @@ phaserEvents.emit(PhaserEvent.GAME_STARTED);
           style={{ animationDelay: "0.1s" }}
         >
           <h1 className="text-4xl font-bold text-white tracking-tight mb-4">
-            Hey,
+            {t("startGame.greeting")}
           </h1>
-       
+
           <p className="text-slate-400 text-base leading-relaxed mb-4">
-            moi c'est <span className="text-white font-semibold">Erwan</span> — Software engineer. J'aime créer des expériences digitales interactives.
+            <Trans
+              i18nKey="startGame.intro1"
+              components={{ bold: <span className="text-white font-semibold" /> }}
+            />
           </p>
 
           <p className="text-slate-400 text-base leading-relaxed mb-4">
-            Bienvenue dans mon <span className="text-white font-semibold">CV jouable</span>.
+            <Trans
+              i18nKey="startGame.intro2"
+              components={{ bold: <span className="text-white font-semibold" /> }}
+            />
           </p>
 
           <p className="text-slate-400 text-base leading-relaxed">
-            Curieux de savoir comment c'est fait ? Jetez un œil au projet{" "}
-            <Link
-              to="/projets/oneair-world"
-              className="text-white font-semibold hover:text-slate-300 transition-colors duration-200"
-            >
-              OneairWorld
-            </Link>.
+            <Trans
+              i18nKey="startGame.intro3"
+              components={{
+                link: (
+                  <Link
+                    to="/projets/oneair-world"
+                    className="text-white font-semibold hover:text-slate-300 transition-colors duration-200"
+                  />
+                ),
+              }}
+            />
           </p>
 
           <p className="text-slate-400 text-base leading-relaxed mt-4">
-            Une question, une collaboration ?{" "}
-            <a
-              href="mailto:gilberterwan@gmail.com"
-              className="text-white font-semibold hover:text-slate-300 transition-colors duration-200"
-            >
-              gilberterwan@gmail.com
-            </a>
+            <Trans
+              i18nKey="startGame.intro4"
+              values={{ email: mail }}
+              components={{
+                mail: (
+                  <a
+                    href={`mailto:${mail}`}
+                    className="text-white font-semibold hover:text-slate-300 transition-colors duration-200"
+                  />
+                ),
+              }}
+            />
           </p>
         </div>
 
@@ -115,7 +132,7 @@ phaserEvents.emit(PhaserEvent.GAME_STARTED);
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
               </svg>
-              Chargement du monde…
+              {t("startGame.loading")}
             </div>
           ) : (
             <LaunchButton onClick={handleLaunch} />

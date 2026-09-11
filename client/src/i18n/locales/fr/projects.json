@@ -1,0 +1,134 @@
+{
+  "everflow": {
+    "name": "Everflow",
+    "description": "Réalisation professionnelle — Everflow.",
+    "page": {
+      "kicker": "Réalisation professionnelle · Everblix · 2019 – 2026",
+      "hero": "Compteur d'énergie et de débit ultrasonique non-invasif. L'appareil se fixe sur une canalisation existante sans interruption du circuit, et communique ses mesures à une application web de supervision en temps réel.",
+      "heroImageAlt": "Everflow — compteur ultrasonique non-invasif",
+      "heroCaption": "Compteur sur canalisation",
+      "section2Title": "Application de supervision",
+      "section2Text": "L'application web sert de plateforme de gestion de flotte IoT. Elle permet de centraliser et superviser l'ensemble des compteurs déployés : remonter les mesures en temps réel, envoyer des commandes aux appareils (mise à jour firmware, reconfiguration), et consulter les informations du dispositif — état de connexion, version, identifiants, historique des événements.",
+      "section2ImageAlt": "Everflow — application web de supervision",
+      "section2Caption": "Dashboard de supervision Everflow"
+    }
+  },
+  "actimicro": {
+    "name": "Actimicro",
+    "description": "Réalisation professionnelle — Actimicro.",
+    "page": {
+      "kicker": "Réalisation professionnelle · Everblix · 2019 – 2026",
+      "hero": "Capteur de mesure de l'activité microbiologique des sols. Placée directement en plein champ, la cloche de mesure enregistre automatiquement toutes les quatre heures trois indicateurs clés — concentration en CO₂, température et humidité du sol — pour permettre aux agriculteurs d'adapter leurs pratiques et d'optimiser leurs rendements.",
+      "heroImageAlt": "Actimicro — capteur de mesure en plein champ",
+      "heroCaption": "Cloche de mesure déployée en champ",
+      "section2Title": "Application de supervision",
+      "section2Text": "L'application web centralise la gestion de la flotte de capteurs déployés. Elle permet de visualiser en temps réel les mesures remontées par chaque dispositif, d'accéder à l'historique des données sur plusieurs saisons, de recevoir des alertes sur les événements notables et de consulter des rapports réguliers sur les indicateurs de vitalité des sols. Les commandes peuvent être envoyées aux capteurs pour les mettre à jour ou les reconfigurer à distance.",
+      "section2ImageAlt": "Actimicro — application web de supervision",
+      "section2Caption": "Dashboard de supervision Actimicro"
+    }
+  },
+  "smartdriver": {
+    "name": "Smartdriver",
+    "description": "Réalisation professionnelle — Smartdriver.",
+    "page": {
+      "kicker": "Réalisation professionnelle · Everblix · 2019 – 2026",
+      "hero": "Solution universelle pour le pilotage des moteurs. Le Smartdriver agit comme un traducteur de protocoles — il convertit les commandes entrantes dans le langage spécifique requis par chaque moteur ou actionneur, permettant de remplacer des équipements obsolètes sans modifier l'installation existante. Jusqu'à 6 modules de pilotage par boîtier, il s'adresse à la robotique industrielle, aux machines CNC, à l'automatisation de laboratoire et à l'instrumentation scientifique.",
+      "heroImageAlt": "Smartdriver — boîtier de pilotage moteur",
+      "heroCaption": "Boîtier Smartdriver — jusqu'à 6 modules de pilotage",
+      "section2Title": "Application de configuration",
+      "section2Text": "Application desktop développée avec Electron permettant de configurer et tuner les modules Smartdriver via connexion USB. Elle offre une interface intuitive pour paramétrer les moteurs, envoyer des commandes directes via terminal série, effectuer des mises à jour firmware et monitorer l'état des axes en temps réel.",
+      "section2ImageAlt": "Smartdriver — application de configuration",
+      "section2Caption": "Interface de configuration et tuning Smartdriver"
+    }
+  },
+  "samurai-ball": {
+    "name": "Samurai Ball",
+    "description": "Un jeu d'action développé avec un ami — incarne un samouraï et maîtrise la balle pour vaincre tes ennemis.",
+    "hintDesktop": "Appuyer sur Entrée pour voir le projet Samurai Ball",
+    "hintMobile": "Appuyer sur l'icône 💬 pour voir le projet Samurai Ball",
+    "page": {
+      "kicker": "Projet — Jeu vidéo",
+      "hero": "Un jeu de combat en arène inspiré du genre Smash Bros, où réflexes et technique s'affrontent à chaque round. La gravité est au cœur du gameplay — la boule de feu projette les combattants dans les airs, ouvrant la voie à des échanges aériens aussi imprévisibles que spectaculaires.",
+      "collab": "Développé en collaboration avec un ami Animateur / Motion designer",
+      "modelingTitle": "Modélisation 3D",
+      "modelingText": "Les personnages et environnements ont été modélisés et animés entièrement from scratch. Voici quelques aperçus des animations en action.",
+      "gifs": {
+        "fire": "Boule de feu",
+        "doubleJump": "Double saut",
+        "frontHit": "Impact frontal"
+      },
+      "makingOffTitle": "Making-off",
+      "steamCta": "Le jeu arrive bientôt sur Steam.",
+      "steamBadge": "Prochainement sur Steam"
+    }
+  },
+  "pepper-atelier-snowboard": {
+    "name": "Pepper Atelier Snowboard",
+    "description": "Réalisation professionnelle — Pepper Atelier Snowboard.",
+    "hintDesktop": "Appuyer sur Entrée pour voir le projet Pepper Atelier Snowboard",
+    "hintMobile": "Appuyer sur l'icône 💬 pour voir le projet Pepper Atelier Snowboard",
+    "page": {
+      "kicker": "Projet — Site vitrine e-commerce",
+      "title": "Pepper Atelier",
+      "hero": "Site vitrine pour un artisan shaper de snowboards en bois. Pepper Atelier présente sa collection faite main, détaille le processus de fabrication planche par planche, et met en avant le savoir-faire artisanal derrière chaque modèle.",
+      "subCaption": "Développé pour un ami artisan shaper",
+      "archTitle": "Architecture",
+      "archText": "Le projet intègre un back-office permettant à l'artisan de gérer sa collection en autonomie — ajout, modification et suppression de planches sans toucher au code. L'accès est sécurisé par authentification.",
+      "adminAlt": "Interface d'administration Pepper Atelier",
+      "schemaTitle": "Schéma d'architecture",
+      "schemaAlt": "Schéma d'architecture Pepper Atelier",
+      "ctaText": "Envie de voir les planches ?",
+      "ctaLink": "Visiter Pepper Atelier →"
+    }
+  },
+  "old-portfolio": {
+    "name": "Ancien portfolio",
+    "description": "Mon premier portfolio — une version précédente de ma présentation en ligne.",
+    "hintDesktop": "Appuyer sur Entrée pour voir l'ancien portfolio",
+    "hintMobile": "Appuyer sur l'icône 💬 pour voir l'ancien portfolio",
+    "page": {
+      "kicker": "Projet — Portfolio interactif",
+      "hero": "Développé en sortie d'Epitech, ce projet était déjà un concept de CV interactif — un monde à explorer pour découvrir mon parcours. Entièrement codé en JavaScript pur, sans framework ni moteur de jeu. La grande différence avec ce que vous explorez aujourd'hui : il n'était pas multijoueur. Chaque visiteur évoluait seul dans son propre monde.",
+      "subCaption": "Développé en sortie d'Epitech",
+      "ctaText": "Curieux de voir à quoi il ressemblait ?",
+      "ctaLink": "Visiter l'ancien portfolio →"
+    }
+  },
+  "oneair-world": {
+    "name": "OneairWorld",
+    "description": "Le making-of de ce monde interactif multijoueur.",
+    "hintDesktop": "Appuyer sur Entrée pour voir le projet OneairWorld",
+    "hintMobile": "Appuyer sur l'icône 💬 pour voir le projet OneairWorld",
+    "page": {
+      "kicker": "Projet — Making-of",
+      "hero": "Vous explorez en ce moment même le résultat. OneairWorld est un CV interactif multijoueur — un monde persistant où chaque visiteur évolue en temps réel aux côtés des autres. Les positions, actions et états des joueurs sont synchronisés via WebSocket à chaque frame.",
+      "subCaption": "Projet initié il y a 4 ans — plusieurs cycles de tests et de recherches de technologies.",
+      "videoCaption": "Les données de chaque joueur — position, direction, état — sont émises vers le serveur à chaque input et broadcastées à tous les clients connectés à la même room Colyseus. La physique (Matter.js) tourne exclusivement côté serveur : le client envoie des inputs, le serveur répond avec l'état autoritaire.",
+      "stackTitle": "Stack technique",
+      "stack": {
+        "colyseus": "Framework multijoueur backend — gestion des rooms et synchronisation d'état en temps réel",
+        "matter": "Moteur physique côté serveur — collisions, vélocités, corps rigides",
+        "phaser": "Moteur de jeu frontend — rendu de la scène, animations, inputs",
+        "react": "Interface utilisateur — overlays, dialogues, écrans hors-jeu",
+        "tailwind": "Styles des composants React",
+        "docker": "Conteneurisation et déploiement du serveur Colyseus"
+      },
+      "architectureTitle": "Schéma d'architecture",
+      "architectureAlt": "Schéma d'architecture OneairWorld",
+      "ctaText": "Voulez vous explorer le monde ?",
+      "ctaLink": "Retour à l'accueil →"
+    }
+  },
+  "dessinons": {
+    "name": "Dessinons",
+    "description": "Application collaborative de dessin en ligne.",
+    "hintDesktop": "Appuyer sur Entrée pour voir le projet Dessinons",
+    "hintMobile": "Appuyer sur l'icône 💬 pour voir le projet Dessinons",
+    "page": {
+      "kicker": "Projet — Application collaborative",
+      "title": "Dessinons.io",
+      "inProgress": "En cours de développement",
+      "description": "POC réalisé pour tester les possibilités de collaboration en temps réel sur un canvas partagé, avec synchronisation des traits et des outils de dessin."
+    }
+  }
+}

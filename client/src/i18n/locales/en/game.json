@@ -1,0 +1,41 @@
+{
+  "ui": {
+    "talkHint": "Press Enter to talk",
+    "enterNext": "Enter ▶",
+    "close": "Close ✕"
+  },
+  "road": {
+    "cv": {
+      "text": "Press Enter to view Erwan's resume",
+      "textMobile": "Tap the 💬 icon to view Erwan's resume"
+    },
+    "linkedin": {
+      "text": "Press Enter to open Erwan's LinkedIn",
+      "textMobile": "Tap the 💬 icon to open Erwan's LinkedIn"
+    },
+    "github": {
+      "text": "Press Enter to open Erwan's GitHub",
+      "textMobile": "Tap the 💬 icon to open Erwan's GitHub"
+    },
+    "samuraiBallPoster": {
+      "text": "This poster is for a game Erwan built with a friend — head to the arcade room to learn more!"
+    },
+    "isComing": {
+      "text": "Nothing to see here yet… but that shouldn't stay true for long!"
+    },
+    "notHere": {
+      "text": "I think I'm getting a bit lost... Maybe I should check out that arcade room."
+    },
+    "doorClose": {
+      "text": "Looks closed..."
+    },
+    "tooLow": {
+      "text": "There's nothing interesting to see down here."
+    }
+  },
+  "interiors": {
+    "oldHouse": { "label": "Ghost's lair" },
+    "gameRoom": { "label": "Robot's lab" },
+    "arcade": { "label": "Arcade room" }
+  }
+}

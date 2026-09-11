@@ -1,0 +1,51 @@
+{
+  "language": {
+    "switchTo": "Switch to {{language}}",
+    "fr": "French",
+    "en": "English"
+  },
+  "startGame": {
+    "greeting": "Hey,",
+    "intro1": "I'm <bold>Erwan</bold> — Software engineer. I love building interactive digital experiences.",
+    "intro2": "Welcome to my <bold>playable resume</bold>.",
+    "intro3": "Curious how it's built? Check out the <link>OneairWorld</link> project.",
+    "intro4": "A question, a collaboration? <mail>{{email}}</mail>",
+    "loading": "Loading the world…",
+    "enter": "Enter"
+  },
+  "characterSelect": {
+    "title": "Choose your character",
+    "subtitle": "Who do you want to explore with?",
+    "play": "PLAY"
+  },
+  "burgerMenu": {
+    "ariaLabel": "Projects menu",
+    "home": "Home",
+    "professional": "Professional work",
+    "personal": "Personal projects",
+    "cvSection": "Resume",
+    "viewCv": "View my resume"
+  },
+  "cvPopup": {
+    "download": "⬇ Download",
+    "title": "Erwan Gilbert's resume"
+  },
+  "exitButton": {
+    "exit": "← Exit"
+  },
+  "gameOver": {
+    "title": "Game Over",
+    "restartHint": "Press Enter"
+  },
+  "projectOverlay": {
+    "backToGame": "← Back to game",
+    "comingSoon": "Project coming soon"
+  },
+  "projectPage": {
+    "back": "← Back",
+    "notFound": "Project not found."
+  },
+  "about": {
+    "placeholder": "About"
+  }
+}

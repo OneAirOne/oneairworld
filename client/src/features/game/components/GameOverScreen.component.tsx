@@ -1,7 +1,9 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { phaserEvents, PhaserEvent } from "../../../events/eventManager";
 
 export function GameOverScreen() {
+  const { t } = useTranslation();
   const [visible, setVisible] = React.useState(false);
   const [fading, setFading] = React.useState(false);
 
@@ -42,10 +44,10 @@ export function GameOverScreen() {
       <h1 className="text-white font-bold tracking-widest uppercase mb-10"
         style={{ fontSize: "clamp(3rem, 10vw, 6rem)" }}
       >
-        Game Over
+        {t("gameOver.title")}
       </h1>
       <p className="text-slate-400 text-sm animate-bounce">
-        Appuyer sur Entrée
+        {t("gameOver.restartHint")}
       </p>
     </div>
   );

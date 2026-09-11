@@ -1,5 +1,5 @@
 import { phaserEvents, PhaserEvent } from "../events/eventManager";
-import dialogues from "./dialogues.json";
+import i18n from "../i18n/i18n";
 
 export interface DialogueChoice {
   label: string;
@@ -26,6 +26,11 @@ type DialogueData = {
   nodes: Record<string, DialogueNode>;
 };
 
+function getDialogues(): Record<string, DialogueData> {
+  const lng = i18n.resolvedLanguage ?? i18n.language;
+  return i18n.getResourceBundle(lng, "dialogues") as Record<string, DialogueData>;
+}
+
 export class DialogueManager {
   private activeNpcId: string | null = null;
   private dialogueOpen: boolean = false;
@@ -47,7 +52,7 @@ export class DialogueManager {
 
   open() {
     if (!this.activeNpcId || this.dialogueOpen) return;
-    const data = (dialogues as Record<string, DialogueData>)[this.activeNpcId];
+    const data = getDialogues()[this.activeNpcId];
     if (!data) return;
     this.dialogueOpen = true;
     this._goToNode(data.nodes[data.start], PhaserEvent.DIALOGUE_OPEN);
@@ -66,7 +71,7 @@ export class DialogueManager {
 
     // Navigate to the selected choice's next node
     const chosen = choices[this.selectedChoiceIndex];
-    const data = (dialogues as Record<string, DialogueData>)[this.activeNpcId!];
+    const data = getDialogues()[this.activeNpcId!];
     const nextNode = data?.nodes[chosen.next];
     if (!nextNode) { this.close(); return; }
 

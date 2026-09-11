@@ -1,11 +1,14 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { PROJECTS } from "../../../config/projects.config";
+import { getCvUrl } from "../../../config/cv.config";
 
 const pro = PROJECTS.filter((p) => p.category === "professionnel");
 const perso = PROJECTS.filter((p) => p.category === "personnel");
 
 function MenuSection({ label, projects }: { label: string; projects: typeof PROJECTS }) {
+  const { t } = useTranslation("projects");
   return (
     <div className="mb-6">
       <p className="text-xs uppercase tracking-widest text-slate-500 mb-2 font-medium px-1">
@@ -19,7 +22,7 @@ function MenuSection({ label, projects }: { label: string; projects: typeof PROJ
             className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-brand-primary/60 group-hover:bg-brand-primary transition-colors duration-200 shrink-0" />
-            <span className="text-sm font-medium">{project.name}</span>
+            <span className="text-sm font-medium">{t(`${project.id}.name`)}</span>
           </Link>
         ))}
       </nav>
@@ -28,6 +31,7 @@ function MenuSection({ label, projects }: { label: string; projects: typeof PROJ
 }
 
 export function BurgerMenu({ centered = false, side = "left", inline = false }: { centered?: boolean; side?: "left" | "right"; inline?: boolean }) {
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
 
   const close = () => setOpen(false);
@@ -39,7 +43,7 @@ export function BurgerMenu({ centered = false, side = "left", inline = false }: 
       {/* Burger button */}
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label="Menu projets"
+        aria-label={t("burgerMenu.ariaLabel")}
         className={`${inline ? "relative" : `absolute ${centered ? "top-1/2 -translate-y-1/2" : "top-5"} ${isLeft ? "left-5" : "right-5"}`} z-20 flex flex-col gap-1.5 p-2 rounded-md transition-colors pointer-events-auto`}
       >
         <span
@@ -72,13 +76,13 @@ export function BurgerMenu({ centered = false, side = "left", inline = false }: 
             className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-brand-primary/60 group-hover:bg-brand-primary transition-colors duration-200 shrink-0" />
-            <span className="text-sm font-medium">Accueil</span>
+            <span className="text-sm font-medium">{t("burgerMenu.home")}</span>
           </Link>
         </div>
 
         <div onClick={close}>
           {pro.length > 0 && (
-            <MenuSection label="Réalisations professionnelles" projects={pro} />
+            <MenuSection label={t("burgerMenu.professional")} projects={pro} />
           )}
 
           {pro.length > 0 && perso.length > 0 && (
@@ -86,23 +90,23 @@ export function BurgerMenu({ centered = false, side = "left", inline = false }: 
           )}
 
           {perso.length > 0 && (
-            <MenuSection label="Projets personnels" projects={perso} />
+            <MenuSection label={t("burgerMenu.personal")} projects={perso} />
           )}
         </div>
 
         <div className="border-t border-slate-800 mt-2 pt-6">
           <p className="text-xs uppercase tracking-widest text-slate-500 mb-2 font-medium px-1">
-            CV
+            {t("burgerMenu.cvSection")}
           </p>
           <a
-            href="/assets/cv-erwan-gilbert.pdf"
+            href={getCvUrl()}
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200"
             onClick={close}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-brand-primary/60 group-hover:bg-brand-primary transition-colors duration-200 shrink-0" />
-            <span className="text-sm font-medium">Voir mon CV</span>
+            <span className="text-sm font-medium">{t("burgerMenu.viewCv")}</span>
           </a>
         </div>
       </div>

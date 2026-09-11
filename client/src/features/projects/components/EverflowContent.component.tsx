@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 const TECH = ["React", "Zustand", "Go", "Kubernetes", "PostgreSQL"];
 
 function TechChip({ label }: { label: string }) {
@@ -9,20 +11,19 @@ function TechChip({ label }: { label: string }) {
 }
 
 export default function EverflowContent() {
+  const { t } = useTranslation("projects");
   return (
     <>
       {/* ── Hero ── */}
       <section className="max-w-4xl mx-auto px-6 pt-20">
         <p className="text-brand-primary text-xs font-semibold tracking-widest uppercase mb-4">
-          Réalisation professionnelle · Everblix · 2019 – 2026
+          {t("everflow.page.kicker")}
         </p>
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-          Everflow
+          {t("everflow.name")}
         </h1>
         <p className="text-slate-400 text-lg leading-relaxed max-w-2xl mb-6">
-          Compteur d'énergie et de débit ultrasonique non-invasif. L'appareil se
-          fixe sur une canalisation existante sans interruption du circuit, et
-          communique ses mesures à une application web de supervision en temps réel.
+          {t("everflow.page.hero")}
         </p>
 
         {/* Objet connecté */}
@@ -30,11 +31,11 @@ export default function EverflowContent() {
           <div className="w-80 rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
             <img
               src="/assets/everflow/everflow-objet.jpg"
-              alt="Everflow — compteur ultrasonique non-invasif"
+              alt={t("everflow.page.heroImageAlt")}
               className="w-full object-cover"
             />
           </div>
-          <p className="text-xs text-slate-500">Compteur sur canalisation</p>
+          <p className="text-xs text-slate-500">{t("everflow.page.heroCaption")}</p>
         </div>
 
       </section>
@@ -42,29 +43,24 @@ export default function EverflowContent() {
       {/* ── Application web ── */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
         <div className="border-t border-brand-surface pt-16">
-          <h2 className="text-2xl font-semibold mb-2">Application de supervision</h2>
+          <h2 className="text-2xl font-semibold mb-2">{t("everflow.page.section2Title")}</h2>
           <p className="text-slate-400 text-sm leading-relaxed mb-4 max-w-xl">
-            L'application web sert de plateforme de gestion de flotte IoT. Elle
-            permet de centraliser et superviser l'ensemble des compteurs déployés :
-            remonter les mesures en temps réel, envoyer des commandes aux appareils
-            (mise à jour firmware, reconfiguration), et consulter les informations
-            du dispositif — état de connexion, version, identifiants, historique des
-            événements.
+            {t("everflow.page.section2Text")}
           </p>
           <div className="flex flex-wrap gap-2 mb-8">
-            {TECH.map((t) => (
-              <TechChip key={t} label={t} />
+            {TECH.map((tech) => (
+              <TechChip key={tech} label={tech} />
             ))}
           </div>
           <div className="rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
             <img
               src="/assets/everflow/everflow-webapp.webp"
-              alt="Everflow — application web de supervision"
+              alt={t("everflow.page.section2ImageAlt")}
               className="w-full object-cover"
             />
           </div>
           <p className="text-xs text-slate-500 mt-3 text-center">
-            Dashboard de supervision Everflow
+            {t("everflow.page.section2Caption")}
           </p>
         </div>
       </section>

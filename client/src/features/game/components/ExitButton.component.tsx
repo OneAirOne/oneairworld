@@ -1,7 +1,9 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { phaserEvents, PhaserEvent } from "../../../events/eventManager";
 
 export function ExitButton() {
+  const { t } = useTranslation();
   const [visible, setVisible] = React.useState(false);
 
   React.useEffect(() => {
@@ -35,7 +37,7 @@ export function ExitButton() {
         className="group rounded-xl border-0 p-0 cursor-pointer outline-offset-4 bg-brand-shadow"
       >
         <span className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand-primary -translate-y-1 will-change-transform transition-transform duration-[250ms] group-hover:-translate-y-[6px] group-active:-translate-y-0.5">
-          ← Sortir
+          {t("exitButton.exit")}
         </span>
       </button>
     </div>

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { Characters } from "../../../../../shared/types";
 import { PLAYABLE_CHARACTERS, CharacterChoice } from "../config/characters.config";
 import PushButton from "./PushButton.component";
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function CharacterSelectModal({ onSelect, onClose }: Props) {
+  const { t } = useTranslation();
   const [selected, setSelected] = React.useState<Characters | null>(null);
 
   return (
@@ -22,10 +24,10 @@ export function CharacterSelectModal({ onSelect, onClose }: Props) {
       >
 
         <h2 className="text-white text-2xl font-bold text-center mb-2">
-          Choisissez votre personnage
+          {t("characterSelect.title")}
         </h2>
         <p className="text-slate-400 text-sm text-center mb-8">
-          Avec qui voulez-vous explorer ?
+          {t("characterSelect.subtitle")}
         </p>
 
         <div className="flex gap-4 justify-center mb-8">
@@ -48,7 +50,7 @@ export function CharacterSelectModal({ onSelect, onClose }: Props) {
 
         <div className="flex justify-center">
           <PushButton disabled={!selected} onClick={() => selected && onSelect(selected)}>
-            PLAY
+            {t("characterSelect.play")}
           </PushButton>
         </div>
       </div>

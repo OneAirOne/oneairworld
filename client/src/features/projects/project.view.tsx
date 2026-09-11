@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { getProject } from "config/projects.config";
 import PageLayout from "components/PageLayout";
 import SamuraiBallContent from "./components/SamuraiBallContent.component";
@@ -11,14 +12,25 @@ import ActimicroContent from "./components/ActimicroContent.component";
 import SmartdriverContent from "./components/SmartdriverContent.component";
 
 function BackButton() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <button
       onClick={() => navigate(-1)}
       className="inline-block mt-4 text-sm text-slate-400 hover:text-white transition-colors"
     >
-      ← Retour
+      {t("projectPage.back")}
     </button>
+  );
+}
+
+function NotFound() {
+  const { t } = useTranslation();
+  return (
+    <div className="max-w-4xl mx-auto px-6 pt-20">
+      <p className="text-slate-400">{t("projectPage.notFound")}</p>
+      <BackButton />
+    </div>
   );
 }
 
@@ -41,12 +53,7 @@ function ProjectContent({ projectId }: { projectId: string }) {
     case "dessinons":
       return <DessinonsContent />;
     default:
-      return (
-        <div className="max-w-4xl mx-auto px-6 pt-20">
-          <p className="text-slate-400">Projet introuvable.</p>
-          <BackButton />
-        </div>
-      );
+      return <NotFound />;
   }
 }
 
@@ -56,10 +63,7 @@ export default function ProjectView() {
   if (!id || !getProject(id)) {
     return (
       <PageLayout>
-        <div className="max-w-4xl mx-auto px-6 pt-20">
-          <p className="text-slate-400">Projet introuvable.</p>
-          <BackButton />
-        </div>
+        <NotFound />
       </PageLayout>
     );
   }

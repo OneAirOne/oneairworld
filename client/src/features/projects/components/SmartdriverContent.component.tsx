@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 const TECH = ["React", "Electron", "Communication série"];
 
 function TechChip({ label }: { label: string }) {
@@ -9,24 +11,19 @@ function TechChip({ label }: { label: string }) {
 }
 
 export default function SmartdriverContent() {
+  const { t } = useTranslation("projects");
   return (
     <>
       {/* ── Hero ── */}
       <section className="max-w-4xl mx-auto px-6 pt-20">
         <p className="text-brand-primary text-xs font-semibold tracking-widest uppercase mb-4">
-          Réalisation professionnelle · Everblix · 2019 – 2026
+          {t("smartdriver.page.kicker")}
         </p>
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-          Smartdriver
+          {t("smartdriver.name")}
         </h1>
         <p className="text-slate-400 text-lg leading-relaxed max-w-2xl mb-6">
-          Solution universelle pour le pilotage des moteurs. Le Smartdriver agit
-          comme un traducteur de protocoles — il convertit les commandes entrantes
-          dans le langage spécifique requis par chaque moteur ou actionneur,
-          permettant de remplacer des équipements obsolètes sans modifier
-          l'installation existante. Jusqu'à 6 modules de pilotage par boîtier,
-          il s'adresse à la robotique industrielle, aux machines CNC, à
-          l'automatisation de laboratoire et à l'instrumentation scientifique.
+          {t("smartdriver.page.hero")}
         </p>
 
         {/* Objet connecté */}
@@ -34,39 +31,35 @@ export default function SmartdriverContent() {
           <div className="w-80 rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
             <img
               src="/assets/smartdriver/smartdriver-objet.jpeg"
-              alt="Smartdriver — boîtier de pilotage moteur"
+              alt={t("smartdriver.page.heroImageAlt")}
               className="w-full object-cover"
             />
           </div>
-          <p className="text-xs text-slate-500">Boîtier Smartdriver — jusqu'à 6 modules de pilotage</p>
+          <p className="text-xs text-slate-500">{t("smartdriver.page.heroCaption")}</p>
         </div>
       </section>
 
       {/* ── Application desktop ── */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
         <div className="border-t border-brand-surface pt-16">
-          <h2 className="text-2xl font-semibold mb-2">Application de configuration</h2>
+          <h2 className="text-2xl font-semibold mb-2">{t("smartdriver.page.section2Title")}</h2>
           <p className="text-slate-400 text-sm leading-relaxed mb-4 max-w-xl">
-            Application desktop développée avec Electron permettant de configurer
-            et tuner les modules Smartdriver via connexion USB. Elle offre une
-            interface intuitive pour paramétrer les moteurs, envoyer des commandes
-            directes via terminal série, effectuer des mises à jour firmware et
-            monitorer l'état des axes en temps réel.
+            {t("smartdriver.page.section2Text")}
           </p>
           <div className="flex flex-wrap gap-2 mb-8">
-            {TECH.map((t) => (
-              <TechChip key={t} label={t} />
+            {TECH.map((tech) => (
+              <TechChip key={tech} label={tech} />
             ))}
           </div>
           <div className="rounded-xl overflow-hidden border border-slate-700 bg-brand-surface">
             <img
               src="/assets/smartdriver/smartdriver-web.webp"
-              alt="Smartdriver — application de configuration"
+              alt={t("smartdriver.page.section2ImageAlt")}
               className="w-full object-cover"
             />
           </div>
           <p className="text-xs text-slate-500 mt-3 text-center">
-            Interface de configuration et tuning Smartdriver
+            {t("smartdriver.page.section2Caption")}
           </p>
         </div>
       </section>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import PushButton from "./PushButton.component";
 
 interface Props {
@@ -5,5 +6,6 @@ interface Props {
 }
 
 export default function LaunchButton({ onClick }: Props) {
-  return <PushButton onClick={onClick}>Entrer</PushButton>;
+  const { t } = useTranslation();
+  return <PushButton onClick={onClick}>{t("startGame.enter")}</PushButton>;
 }

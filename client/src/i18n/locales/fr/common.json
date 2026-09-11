@@ -1,0 +1,51 @@
+{
+  "language": {
+    "switchTo": "Passer en {{language}}",
+    "fr": "Français",
+    "en": "Anglais"
+  },
+  "startGame": {
+    "greeting": "Hey,",
+    "intro1": "moi c'est <bold>Erwan</bold> — Software engineer. J'aime créer des expériences digitales interactives.",
+    "intro2": "Bienvenue dans mon <bold>CV jouable</bold>.",
+    "intro3": "Curieux de savoir comment c'est fait ? Jetez un œil au projet <link>OneairWorld</link>.",
+    "intro4": "Une question, une collaboration ? <mail>{{email}}</mail>",
+    "loading": "Chargement du monde…",
+    "enter": "Entrer"
+  },
+  "characterSelect": {
+    "title": "Choisissez votre personnage",
+    "subtitle": "Avec qui voulez-vous explorer ?",
+    "play": "JOUER"
+  },
+  "burgerMenu": {
+    "ariaLabel": "Menu projets",
+    "home": "Accueil",
+    "professional": "Réalisations professionnelles",
+    "personal": "Projets personnels",
+    "cvSection": "CV",
+    "viewCv": "Voir mon CV"
+  },
+  "cvPopup": {
+    "download": "⬇ Télécharger",
+    "title": "CV d'Erwan Gilbert"
+  },
+  "exitButton": {
+    "exit": "← Sortir"
+  },
+  "gameOver": {
+    "title": "Game Over",
+    "restartHint": "Appuyer sur Entrée"
+  },
+  "projectOverlay": {
+    "backToGame": "← Retour au jeu",
+    "comingSoon": "Projet bientôt disponible"
+  },
+  "projectPage": {
+    "back": "← Retour",
+    "notFound": "Projet introuvable."
+  },
+  "about": {
+    "placeholder": "À propos"
+  }
+}

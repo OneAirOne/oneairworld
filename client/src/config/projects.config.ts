@@ -1,94 +1,45 @@
+import i18n from "../i18n/i18n";
+
 export type ProjectCategory = "personnel" | "professionnel";
 
 export interface ProjectConfig {
   id: string;
-  name: string;
   category: ProjectCategory;
   /** URL opened in new tab when the player interacts with the arcade machine */
   url: string;
-  description?: string;
   /** Whether this project has a dedicated arcade machine in the game room */
   isOnArcade?: boolean;
-  /** Hint shown on desktop (keyboard) */
-  hintDesktop?: string;
-  /** Hint shown on mobile (touch) */
-  hintMobile?: string;
 }
 
+// Display strings (name, description, hints) live in the "projects" i18n
+// namespace — see src/i18n/locales/{fr,en}/projects.json — keyed by id.
 export const PROJECTS: ProjectConfig[] = [
-  {
-    id: "everflow",
-    name: "Everflow",
-    category: "professionnel",
-    url: "/projets/everflow",
-    description: "Réalisation professionnelle — Everflow.",
-  },
-  {
-    id: "actimicro",
-    name: "Actimicro",
-    category: "professionnel",
-    url: "/projets/actimicro",
-    description: "Réalisation professionnelle — Actimicro.",
-  },
-  {
-    id: "smartdriver",
-    name: "Smartdriver",
-    category: "professionnel",
-    url: "/projets/smartdriver",
-    description: "Réalisation professionnelle — Smartdriver.",
-  },
-  {
-    id: "samurai-ball",
-    name: "Samurai Ball",
-    category: "personnel",
-    isOnArcade: true,
-    url: "/projets/samurai-ball",
-    description: "Un jeu d'action développé avec un ami — incarne un samouraï et maîtrise la balle pour vaincre tes ennemis.",
-    hintDesktop: "Appuyer sur Entrée pour voir le projet Samurai Ball",
-    hintMobile:  "Appuyer sur l'icône 💬 pour voir le projet Samurai Ball",
-  },
-  {
-    id: "pepper-atelier-snowboard",
-    name: "Pepper Atelier Snowboard",
-    category: "professionnel",
-    isOnArcade: true,
-    url: "/projets/pepper-atelier-snowboard",
-    description: "Réalisation professionnelle — Pepper Atelier Snowboard.",
-    hintDesktop: "Appuyer sur Entrée pour voir le projet Pepper Atelier Snowboard",
-    hintMobile:  "Appuyer sur l'icône 💬 pour voir le projet Pepper Atelier Snowboard",
-  },
-  {
-    id: "old-portfolio",
-    name: "Ancien portfolio",
-    category: "personnel",
-    isOnArcade: true,
-    url: "/projets/old-portfolio",
-    description: "Mon premier portfolio — une version précédente de ma présentation en ligne.",
-    hintDesktop: "Appuyer sur Entrée pour voir l'ancien portfolio",
-    hintMobile:  "Appuyer sur l'icône 💬 pour voir l'ancien portfolio",
-  },
-  {
-    id: "oneair-world",
-    name: "OneairWorld",
-    category: "personnel",
-    isOnArcade: true,
-    url: "/projets/oneair-world",
-    description: "Le making-of de ce monde interactif multijoueur.",
-    hintDesktop: "Appuyer sur Entrée pour voir le projet OneairWorld",
-    hintMobile:  "Appuyer sur l'icône 💬 pour voir le projet OneairWorld",
-  },
-  {
-    id: "dessinons",
-    name: "Dessinons",
-    category: "personnel",
-    isOnArcade: true,
-    url: "/projets/dessinons",
-    description: "Application collaborative de dessin en ligne.",
-    hintDesktop: "Appuyer sur Entrée pour voir le projet Dessinons",
-    hintMobile:  "Appuyer sur l'icône 💬 pour voir le projet Dessinons",
-  },
+  { id: "everflow", category: "professionnel", url: "/projets/everflow" },
+  { id: "actimicro", category: "professionnel", url: "/projets/actimicro" },
+  { id: "smartdriver", category: "professionnel", url: "/projets/smartdriver" },
+  { id: "samurai-ball", category: "personnel", isOnArcade: true, url: "/projets/samurai-ball" },
+  { id: "pepper-atelier-snowboard", category: "professionnel", isOnArcade: true, url: "/projets/pepper-atelier-snowboard" },
+  { id: "old-portfolio", category: "personnel", isOnArcade: true, url: "/projets/old-portfolio" },
+  { id: "oneair-world", category: "personnel", isOnArcade: true, url: "/projets/oneair-world" },
+  { id: "dessinons", category: "personnel", isOnArcade: true, url: "/projets/dessinons" },
 ];
 
 export function getProject(id: string): ProjectConfig | undefined {
   return PROJECTS.find((p) => p.id === id);
+}
+
+export function getProjectName(id: string): string {
+  return i18n.t(`${id}.name`, { ns: "projects" });
+}
+
+export function getProjectDescription(id: string): string {
+  return i18n.t(`${id}.description`, { ns: "projects" });
+}
+
+export function getProjectHintDesktop(id: string): string | undefined {
+  return i18n.t(`${id}.hintDesktop`, { ns: "projects", defaultValue: "" }) || undefined;
+}
+
+export function getProjectHintMobile(id: string): string | undefined {
+  return i18n.t(`${id}.hintMobile`, { ns: "projects", defaultValue: "" }) || undefined;
 }
