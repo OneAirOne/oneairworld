@@ -1,3 +1,5 @@
+// Load server/.env into process.env (no-op when absent, e.g. in Docker)
+import "dotenv/config";
 import { Server, LobbyRoom } from "colyseus";
 import { monitor } from "@colyseus/monitor";
 import { createServer } from "http";
@@ -44,3 +46,6 @@ app.use("/colyseus", monitor());
 
 gameServer.listen(port);
 console.log(`Listening on ws://localhost:${port}`);
+console.log(
+  `[DISCORD] Notifications ${process.env.DISCORD_WEBHOOK_URL ? "enabled" : "disabled (DISCORD_WEBHOOK_URL not set)"}`
+);

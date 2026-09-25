@@ -10,6 +10,7 @@ import { PlayerUpdateCommand } from "./commands";
 
 import { GameEngine } from "../engine/Game.engine";
 import { SERVER_CONFIG } from "../server.config";
+import { notifyDiscord } from "../services/discord.service";
 
 // Shared
 import {
@@ -140,9 +141,14 @@ export class Game extends Room<GameState> {
   onJoin(client: Client, lauchOptions: LauchOptions) {
     console.log(client.sessionId, "joined!", lauchOptions);
 
-    console.log({ lauchOptions });
-
     this.engine.addPlayer(client.sessionId, lauchOptions);
+
+    notifyDiscord(
+      `🎮 **Nouveau joueur connecté !**\n` +
+        `🆔 ID: ${client.sessionId}\n` +
+        `🕒 Heure: ${new Date().toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}\n` +
+        `🌐 Room: ${this.roomId}`
+    );
 
     client.send(Message.SEND_ROOM_DATA, {
       id: this.roomId,
